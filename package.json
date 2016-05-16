@@ -1,0 +1,42 @@
+{
+  "name": "ohm-js-editor",
+  "productName": "Ohm Editor",
+  "version": "0.1.0",
+  "description": "An IDE for the Ohm language (JavaScript edition)",
+  "repository": "https://github.com/cdglabs/ohm-editor",
+  "keywords": [
+    "editor",
+    "ide",
+    "javascript",
+    "ohm",
+    "ohm-js",
+    "semantics",
+    "visualizer",
+    "prototyping"
+  ],
+  "homepage": "http://cdglabs.org/ohm/visualizer/",
+  "bugs": "https://github.com/cdglabs/ohm-editor/issues",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd dist && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
+    "start": "electron index.js"
+  },
+  "license": "MIT",
+  "author": "Alex Warth <alexwarth@gmail.com> (http://tinlizzie.org/~awarth)",
+  "contributors": [
+    "Marko Röder <m.roeder@photon-software.de>",
+    "Meixian Li <lmeixian@gmail.com>",
+    "Patrick Dubroy <pdubroy@gmail.com>",
+    "Saketh Kasibatla <sake.kasi@gmail.com>"
+  ],
+  "dependencies": {
+    "electron-prebuilt": "^1.1.0",
+    "ohm-js": "^0.11"
+  },
+  "devDependencies": {
+    "electron-packager": "^7.0.1"
+  },
+  "engines": {
+    "node": ">=4.0"
+  }
+}
