@@ -17,6 +17,9 @@
   "homepage": "http://cdglabs.org/ohm/visualizer/",
   "bugs": "https://github.com/cdglabs/ohm-editor/issues",
   "main": "index.js",
+  "bin": {
+    "ohm-editor": "cli.js"
+  },
   "scripts": {
     "build": "cd dist && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
     "start": "electron index.js"
