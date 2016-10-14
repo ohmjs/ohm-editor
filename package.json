@@ -42,7 +42,8 @@
     "eslint": "^3.7.1",
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-camelcase-ohm": "^0.2.0",
-    "eslint-plugin-no-extension-in-require": "^0.2.0"
+    "eslint-plugin-no-extension-in-require": "^0.2.0",
+    "eslint-plugin-tape": "^1.1.0"
   },
   "engines": {
     "node": ">=4.0"

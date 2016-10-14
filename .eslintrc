@@ -1,5 +1,5 @@
 {
-  parserOptions: {
+  "parserOptions": {
     ecmaVersion: 5,
     sourceType: "script"
   },
@@ -18,17 +18,18 @@
     "require": true,
   },
   "plugins": [
-    "eslint-plugin-no-extension-in-require",
-    "eslint-plugin-camelcase-ohm"
+    "camelcase-ohm",  
+    "no-extension-in-require",
+    "tape"
   ],
-  rules: {
+  "rules": {
     // Enforce "one true brace style", allowing start and end braces to be on the same line.
     brace-style: ["error", "1tbs", {allowSingleLine: true}],
 
     // Turn off the regular camelcase rule, and use a custom rule which
     // allows semantic actions to be named like `RuleName_caseName`.
     camelcase: 0,
-    "camelcase-ohm/camelcase-ohm": 2,
+    camelcase-ohm/camelcase-ohm: 2,
 
     consistent-this: 0,
     default-case: 0,
@@ -55,8 +56,8 @@
     no-implicit-coercion: 0,
     no-negated-condition: 0,
     no-nested-ternary: 0,
-    // Don't allow `test.only` (defined in ./eslint_rules/no-test-only.js).
-//    no-test-only: 2,
+
+    tape/no-only-test: 2,
 
     // Allow unused parameters, but not unused variables.
     no-unused-vars: ["error", {vars: "all", args: "none"}],
@@ -69,7 +70,7 @@
     radix: 0,
     require-jsdoc: 0,
 
-    "strict": ["error", "global"],
+    strict: ["error", "global"],
 
     // We would use `["error", "never", {exceptRange: true}]` here, but it doesn't seem to work.
     yoda: 0,
