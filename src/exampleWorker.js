@@ -9,7 +9,7 @@
   if (typeof exports === 'object') {
     module.exports = initModule;
   } else { // inside web worker
-    root.importScripts('../dist/ohm.js', 'utils.js');
+    root.importScripts('../node_modules/ohm-js/dist/ohm.min.js', 'utils.js');
     initModule(root.ohm, root.utils, root, root.overrides);
   }
 })(this, function(ohm, utils, workerGlobalScope, optOverrides) {

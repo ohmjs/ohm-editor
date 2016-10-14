@@ -2,6 +2,7 @@
 'use strict';
 
 var electron = require('electron');
+var path = require('path');
 
 var app = electron.app; // Module to control application life.
 var BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
@@ -17,7 +18,7 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({width: 1400, height: 900});
 
   // and load the index.html of the app.
-  mainWindow.loadURL('file://' + require.resolve('ohm-js/visualizer/index.html'));
+  mainWindow.loadURL('file://' + path.join(__dirname, 'src', 'index.html'));
 
   // Open the DevTools.
   // mainWindow.openDevTools();
