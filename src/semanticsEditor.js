@@ -201,8 +201,7 @@
     }
   }
   ohmEditor.parseTree.addListener('create:traceElement', function(wrapper, traceNode) {
-    var shouldHaveSemanticsEditor = ohmEditor.options.semantics &&
-        ohmEditor.semantics.appendEditor &&
+    var shouldHaveSemanticsEditor = ohmEditor.semantics.appendEditor &&
         !wrapper.classList.contains('hidden') &&
         !wrapper.classList.contains('failed');
     if (shouldHaveSemanticsEditor) {
