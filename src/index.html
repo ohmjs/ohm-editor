@@ -103,7 +103,11 @@
       display: flex;
       flex: 1;
 
+    }
+
+    #bottomSection #visualizerContainer {
       position: relative;  /* For absolute positioning of .overlay */
+      flex-direction: row;
     }
 
     #bottomSection .overlay {
@@ -117,21 +121,25 @@
     }
 
     #exampleContainer {
-        display: flex;
-        flex-direction: row;
-        flex: 1;
+      display: flex;
+      flex-direction: row;
+      flex: 1;
     }
 
     #exampleRequestContainer,
     #userExampleContainer,
-    #grammarContainer {
+    #grammarContainer,
+    #semanticsContainer,
+    #visualizerContainer {
       display: flex;
       flex-direction: column;
       flex: 1;
       overflow: hidden;
     }
 
-    #grammarContainer {
+    #grammarContainer,
+    #semanticsContainer,
+    #visualizerContainer {
       position: relative;
     }
 
@@ -144,7 +152,7 @@
       min-height: 60px;
     }
 
-    #topSection h2 {
+    h2 {
       color: #e0a;
       font-size: 1em;
       margin: 12px 12px 10px;
@@ -421,22 +429,28 @@
   <div id="mainSplitter" class="splitter"></div>
 
   <div id="bottomSection">
-    <button id="zoomOutButton" type="button" hidden></button>
-    <div id="visualizerBody">
-      <div id="expandedInputWrapper">
-        <div id="sizer">&nbsp;</div>
-        <canvas id="expandedInput" width="1" height="1"></canvas>
+    <div id="semanticsContainer">
+      <h2>Semantics</h2>
+      <div id="semantics">
+        <div class="column">
+          <a href="#" id="addAttribute">+ attribute</a>
+          <div id="attributes" class="entries"></div>
+        </div>
+        <div class="column">
+          <a href="#" id="addOperation">+ operation</a>
+          <div id="operations" class="entries"></div>
+        </div>
       </div>
-      <div id="parseResults"></div>
     </div>
-    <div id="semantics">
-      <div class="column">
-        <a href="#" id="addAttribute">+ attribute</a>
-        <div id="attributes" class="entries"></div>
-      </div>
-      <div class="column">
-        <a href="#" id="addOperation">+ operation</a>
-        <div id="operations" class="entries"></div>
+    <div id="bottomSplitter" class="splitter vertical"></div>
+    <div id="visualizerContainer">
+      <button id="zoomOutButton" type="button" hidden></button>
+      <div id="visualizerBody">
+        <div id="expandedInputWrapper">
+          <div id="sizer">&nbsp;</div>
+          <canvas id="expandedInput" width="1" height="1"></canvas>
+        </div>
+        <div id="parseResults"></div>
       </div>
     </div>
     <div class="overlay"></div>

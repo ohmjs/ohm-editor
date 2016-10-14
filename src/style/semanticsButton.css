@@ -13,8 +13,7 @@
 
 #semantics {
   display: flex;
-  position: fixed;
-  right: 2px;
+  position: absolute;
   margin-top: 40px;
   font-size: 14px;
 }

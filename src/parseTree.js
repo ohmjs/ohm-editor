@@ -107,7 +107,8 @@
 
     inputCtx.fillStyle = 'rgba(51, 51, 51, ' + (optAlpha == null ? 1 : optAlpha) + ')';
 
-    var x = rect.left;
+    var baseRect = $('#expandedInputWrapper').getBoundingClientRect();
+    var x = rect.left - baseRect.left;
     for (var i = 0; i < text.length; i++) {
       x += letterPadding;
       inputCtx.fillText(text[i], x * getPixelRatio(), 0);
@@ -118,9 +119,10 @@
 
   function renderHighlight(el) {
     var elBounds = el.getBoundingClientRect();
+    var baseRect = $('#expandedInputWrapper').getBoundingClientRect();
     var pixelRatio = getPixelRatio();
     var rect = {
-      x: elBounds.left * pixelRatio,
+      x: (elBounds.left - baseRect.left) * pixelRatio,
       y: 0,
       width: (elBounds.right - elBounds.left) * pixelRatio,
       height: $('#expandedInput').height
@@ -677,10 +679,11 @@
 
   function renderFailedInputText(el, rect) {
     var text = el._traceNode.inputStream.sourceSlice(el._traceNode.pos);
+    var baseRect = $('#expandedInputWrapper').getBoundingClientRect();
     var renderRect = {
       bottom: rect.bottom,
-      left: rect.left,
-      right: rect.left + measureInputText(text),
+      left: rect.left - baseRect.left,
+      right: rect.left - baseRect.left + measureInputText(text),
       top: rect.top
     };
     renderInputText(text, renderRect, 0.5);
