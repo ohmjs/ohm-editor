@@ -22,6 +22,7 @@
   },
   "scripts": {
     "build": "cd dist && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
+    "lint": "eslint .",
     "start": "electron index.js"
   },
   "license": "MIT",
@@ -37,7 +38,11 @@
     "ohm-js": "^0.11"
   },
   "devDependencies": {
-    "electron-packager": "^7.0.1"
+    "electron-packager": "^7.0.1",
+    "eslint": "^3.7.1",
+    "eslint-config-google": "^0.6.0",
+    "eslint-plugin-camelcase-ohm": "^0.2.0",
+    "eslint-plugin-no-extension-in-require": "^0.2.0"
   },
   "engines": {
     "node": ">=4.0"
