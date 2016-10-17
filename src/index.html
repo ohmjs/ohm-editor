@@ -430,17 +430,12 @@
 
   <div id="bottomSection">
     <div id="semanticsContainer">
-      <h2>Semantics</h2>
+      <h2>Semantics
+        <input id="addSemanticButton" type="button" value="+"></input>
+      </h2>
       <div id="semantics">
-        <div class="column">
-          <a href="#" id="addAttribute">+ attribute</a>
-          <div id="attributes" class="entries"></div>
-        </div>
-        <div class="column">
-          <a href="#" id="addOperation">+ operation</a>
-          <div id="operations" class="entries"></div>
-        </div>
       </div>
+      <div class="flex-fix"><div class="editorWrapper"></div></div>
     </div>
     <div id="bottomSplitter" class="splitter vertical"></div>
     <div id="visualizerContainer">
@@ -539,12 +534,11 @@ number  (a number)
   <script src="domUtil.js"></script>
   <script src="utils.js"></script>
   <script src="parseTree.js"></script>
-  <script src="semanticsEditor.js"></script>
   <script src="semanticsHelper.js"></script>
   <script src="externalRules.js"></script>
   <script src="ruleHyperlinks.js"></script>
   <script src="searchBar.js"></script>
-  <script src="actionButton.js"></script>
+  <script src="semanticsButton.js"></script>
   <script src="editorErrors.js"></script>
   <script src="examples.js"></script>
   <script src="exampleWorkerManager.js"></script>

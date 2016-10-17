@@ -28,21 +28,6 @@
     }
   });
 
-  // Handle the `change:semanticOperation` event. The event is emitted when user click on an
-  // operation button, or try to change the operation argument
-  ohmEditor.semantics.addListener('change:semanticOperation', function(targetName, optArgs) {
-    if (opName === targetName) {
-      // If user click on the same button that already selected, we stop evaluating the semantic
-      // operation, i.e. no semantics is called afterward.
-      opName = null;
-      opArguments = null;
-    } else {
-      // If the user is just change the arguments, i.e. `targetName` is `null`, keep the `opName`
-      opName = targetName || opName;
-      opArguments = ohmEditor.semantics.opArguments = optArgs;
-    }
-  });
-
   // Semantics result that represents an error
   // caused by missing semantics action
   function Failure() { }
@@ -253,17 +238,8 @@
     mergeActionDict(name, semantics._getActionDict(name), optOrigActionDict);
   }
 
-  // Check if an operation name is a restrict JS identifier
-  // TODO: it less restrictive in the future
-  function isOperationNameValid(name) {
-    return /^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(name);
-  }
   ohmEditor.semantics.addListener('add:semanticOperation', function(type, name, optArgs,
       origActionDict) {
-    // Throw a more clear and readable error message if the name is not a valid operation name.
-    if (!isOperationNameValid(name)) {
-      throw new Error('Cannot add ' + type + " '" + name + "': that's an invalid name");
-    }
     addSemanticOperation(type, name, optArgs, origActionDict);
     opName = name;
     opArguments = ohmEditor.semantics.opArguments = optArgs;
@@ -420,25 +396,6 @@
       actionBody) {
     saveAction(traceNode, opName, actionArguments, actionBody);
   });
-
-  function editSemanticsOperation(wrapper, operationName, opDescription) {
-    wrapper._origActionDict = semantics._getActionDict(operationName);
-    semantics._remove(operationName);
-
-    if (opDescription) {
-      var type = opDescription.type;
-      var optArgs = opDescription.args;
-      addSemanticOperation(type, operationName, optArgs, wrapper._origActionDict);
-      delete wrapper._origActionDict;
-      if (operationName === opName) {
-        opArguments = ohmEditor.semantics.opArguments = optArgs;
-      }
-    } else if (operationName === opName) {
-      opName = null;
-      opArguments = null;
-    }
-  }
-  ohmEditor.semantics.addListener('edit:semanticOperation', editSemanticsOperation);
 
   // Exports
   // -------
