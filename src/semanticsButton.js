@@ -101,6 +101,12 @@
 
   // When click on the add button, create an input box for adding new operation.
   addButton.onclick = function(event) {
+    // Return directly if there is an input box already.
+    if (semanticsContainer.querySelector('textarea.opName')) {
+      semanticsContainer.querySelector('textarea.opName').focus();
+      return;
+    }
+
     var semanticsInputBox = domUtil.createElement('textarea.opName');
     semanticsInputBox.cols = 15;
     semanticsInputBox.addEventListener('keydown', function(e) {

@@ -460,4 +460,8 @@
     };
     return semanticOperations;
   };
+
+  ohmEditor.semantics.getActionDict = function(opName) {
+    return semantics._getActionDict(opName);
+  };
 });
