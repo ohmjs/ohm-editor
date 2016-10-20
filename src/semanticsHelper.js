@@ -326,33 +326,33 @@
     return new Function(formals, actionBody);    // eslint-disable-line no-new-func
   }
 
-  function wrapAction(currentOpName, actionArguments, actionBody) {
-    if (!actionBody.trim()) {
+  function wrapAction(operation, args, body) {
+    if (!body.trim()) {
       return undefined;
     }
 
-    var origActionBody = actionBody;
-    var enclosedActionArgStr = '(' + actionArguments.join(',') + ')';
-    var realAction = 'function' + enclosedActionArgStr + '{\n' + actionBody + '\n}';
-    var isExpression = es6.match(actionBody, 'AssignmentExpression<withIn>').succeeded();
+    var origActionBody = body;
+    var enclosedActionArgStr = '(' + args.join(',') + ')';
+    var realAction = 'function' + enclosedActionArgStr + '{\n' + body + '\n}';
+    var isExpression = es6.match(body, 'AssignmentExpression<withIn>').succeeded();
     if (isExpression) {
-      actionBody = 'return ' + actionBody + ';';
+      body = 'return ' + body + ';';
     }
     var wrapper = function() {
       var key = nodeKey(this);
-      var nOpKey = nodeOpKey(key, currentOpName);
+      var nOpKey = nodeOpKey(key, operation);
       var result;
       var action;
 
       // Build the semantic action, if there is a syntactic error, then
       // record it and return.
       try {
-        action = buildAction(this.args, actionArguments, actionBody);
+        action = buildAction(this.args, args, body);
       } catch (error) {
         result = new ErrorWrapper(nOpKey, error);
         errorList = errorList || [];
         errorList.push(result);
-        addResult(result, key, currentOpName, this.args);
+        addResult(result, key, operation, this.args);
         return result;
       }
 
@@ -376,25 +376,20 @@
       result = todoList ? failure : (errorList ? errorList[0] : result);
       todoList = todoList ? todoList.concat(origTodoList) : origTodoList;
       errorList = errorList ? errorList.concat(origErrorList) : origErrorList;
-      addResult(result, key, currentOpName, this.args);
+      addResult(result, key, operation, this.args);
       return result;
     };
     wrapper.toString = function() {
       return realAction;
     };
-    wrapper._actionArguments = actionArguments;
+    wrapper._actionArguments = args;
     wrapper._actionBody = origActionBody;
     return wrapper;
   }
 
-  function saveAction(traceNode, currentOpName, actionArguments, actionBody) {
-    var actionKey = traceNode.bindings[0].ctorName;
-    var actionWrapper = wrapAction(currentOpName, actionArguments, actionBody);
-    semantics._getActionDict(currentOpName)[actionKey] = actionWrapper;
-  }
-  ohmEditor.semantics.addListener('save:semanticAction', function(traceNode, actionArguments,
-      actionBody) {
-    saveAction(traceNode, opName, actionArguments, actionBody);
+  ohmEditor.semantics.addListener('save:action', function(operationName, key, args, body) {
+    var actionWrapper = wrapAction(operationName, args, body);
+    semantics._getActionDict(operationName)[key] = actionWrapper;
   });
 
   // Exports
@@ -440,17 +435,13 @@
     return argPairList;
   };
 
-  ohmEditor.semantics.getActionBody = function(traceNode) {
-    var actionKey = traceNode.bindings[0].ctorName;
-    var action = semantics._getActionDict(opName)[actionKey];
-    if (!action || action._isDefault) {
-      return '';
+  ohmEditor.semantics.getAction = function(operation, ruleKey) {
+    var action = semantics._getActionDict(operation)[ruleKey];
+    if (!action || action._isDefault || ruleKey === '_default') {
+      return undefined;
     }
 
-    var actionStr = action.toString();
-    var actionBodyStartIdx = actionStr.indexOf('\n') + 1;
-    var actionBodyEndIdx = actionStr.lastIndexOf('\n');
-    return actionStr.substring(actionBodyStartIdx, actionBodyEndIdx);
+    return action;
   };
 
   ohmEditor.semantics.getSemantics = function() {
@@ -461,7 +452,7 @@
     return semanticOperations;
   };
 
-  ohmEditor.semantics.getActionDict = function(opName) {
-    return semantics._getActionDict(opName);
+  ohmEditor.semantics.getActionDict = function(operationName) {
+    return semantics._getActionDict(operationName);
   };
 });

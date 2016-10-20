@@ -51,8 +51,8 @@ ohmEditor.semantics.registerEvents({
   // Emitted after selecting an operation button.
   'select:operation': ['operationName'],
 
-  // Emitted after pressing cmd/ctrl-S in semantics editor.
-  'save:semanticAction': ['traceNode', 'actionArguments', 'actionBody'],
+  // Emitted after pressing cmd/ctrl-S in semantics editor
+  'save:action': ['operation', 'key', 'args', 'body'],
 
   // Emitted when user want to add a new semantic editor
   'add:semanticEditor': ['type', 'name']

@@ -36,8 +36,8 @@
     if (editor && editor.classList.contains(type)) {
       var cm = editor.querySelector('.body').firstChild.CodeMirror;
       cm.setCursor({line: cm.lineCount()});
-      cm.focus();
       cm.refresh();
+      cm.focus();
     } else {
       ohmEditor.semantics.emit('add:semanticEditor', type, name);
     }
