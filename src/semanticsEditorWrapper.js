@@ -16,6 +16,25 @@
 
   var editorWrapper = $('#semanticsContainer .editorWrapper');
 
+  function showSemanticsEditor(type, name) {
+    var editor = editorWrapper.querySelector('#' + name);
+    if (editor && editor.classList.contains(type)) {
+      var cm = editor.querySelector('.body').firstChild.CodeMirror;
+      cm.setCursor({line: cm.lineCount()});
+      cm.refresh();
+      cm.focus();
+    } else {
+      ohmEditor.semantics.emit('add:semanticEditor', type, name);
+    }
+  }
+  ohmEditor.parseTree.addListener('cmdOrCtrlClick:traceElement', function(wrapper) {
+    var selfWrapper = wrapper.querySelector('.self');
+    if (selfWrapper.parentElement !== wrapper) {
+      return false;
+    }
+    showSemanticsEditor('rule', wrapper._traceNode.bindings[0].ctorName);
+  });
+
   // Suggestion List
   // ---------------
 
@@ -32,15 +51,7 @@
     var entry = $('#suggestions .selected');
     var name = entry._name;
     var type = entry.classList.contains('helper') ? 'helper' : 'rule';
-    var editor = editorWrapper.querySelector('#' + name);
-    if (editor && editor.classList.contains(type)) {
-      var cm = editor.querySelector('.body').firstChild.CodeMirror;
-      cm.setCursor({line: cm.lineCount()});
-      cm.refresh();
-      cm.focus();
-    } else {
-      ohmEditor.semantics.emit('add:semanticEditor', type, name);
-    }
+    showSemanticsEditor(type, name);
   }
 
   // Display a list of suggested editor name base on the given prefix. The position of the list
@@ -164,7 +175,7 @@
 
     Object.keys(actionDict).forEach(function(key) {
       var action = actionDict[key];
-      if (action._isDefault || key === '_default') {
+      if (!action || action._isDefault || key === '_default') {
         return;
       }
       ohmEditor.semantics.emit('add:semanticEditor', 'rule', key);

@@ -169,11 +169,11 @@
   function saveAction() {
     var operation = $('#semantics div.opName.selected')._operation;
     $$('editor.rule').forEach(function(editor) {
-      var cm = editor.querySelector('.body').firstChild.CodeMirror;
+      var body = editor.querySelector('.body').firstChild.CodeMirror.getValue();
       var args = retrieveArguments(editor.querySelector('rule'));
-      ohmEditor.semantics.emit('save:action', operation, editor._key, args, cm.getValue());
+      ohmEditor.semantics.emit('save:action', operation, editor.id, args, body);
     });
-    // ohmEditor.parseTree.refresh();
+    ohmEditor.parseTree.refresh();
   }
 
   // Main body of the editor contains the CodeMirror for editing action/function body.
@@ -196,7 +196,7 @@
   // Create an editor for `name` with given type (either a helper, or a rule).
   function createEditor(type, name) {
     var editor = domUtil.createElement('editor.' + type);
-    editor._key = name;
+    editor.id = name;
     editor.appendChild(createTopLayer(type, name));
     editor.appendChild(createMainBody(type, name));
     return editor;
@@ -204,6 +204,7 @@
 
   ohmEditor.semantics.addListener('add:semanticEditor', function(type, name) {
     var editor = editorWrapper.appendChild(createEditor(type, name));
+    editor.classList.add('selected');
     var cm = editor.querySelector('.body').firstChild.CodeMirror;
     cm.setCursor({line: cm.lineCount()});
     cm.refresh();

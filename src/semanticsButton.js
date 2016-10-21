@@ -95,8 +95,9 @@
     ohmEditor.semantics.emit('add:operation', type, name, args);
 
     var sContainer = createSemanticContainer(value, name);
-    selectSemantic(sContainer);
     semanticsContainer.replaceChild(sContainer, semanticsInputBox);
+    selectSemantic(sContainer);
+    ohmEditor.parseTree.refresh();
   }
 
   // When click on the add button, create an input box for adding new operation.
