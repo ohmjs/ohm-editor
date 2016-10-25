@@ -42,6 +42,22 @@ ohmEditor.registerEvents({
 ohmEditor.grammar = null;
 ohmEditor.startRule = null;
 ohmEditor.options = {};
+
+ohmEditor.semantics = new CheckedEmitter();
+ohmEditor.semantics.registerEvents({
+  // Emitted after adding an new operation/attribute.
+  'add:operation': ['type', 'name', 'optArguments'],
+
+  // Emitted after selecting an operation button.
+  'select:operation': ['operationName'],
+
+  // Emitted after pressing cmd/ctrl-S in semantics editor
+  'save:action': ['operation', 'key', 'args', 'body'],
+
+  // Emitted when user want to add a new semantic editor
+  'add:semanticEditor': ['type', 'name']
+});
+
 ohmEditor.ui = {
   inputEditor: CodeMirror(document.querySelector('#exampleContainer .editorWrapper')),
   grammarEditor: CodeMirror(document.querySelector('#grammarContainer .editorWrapper'))

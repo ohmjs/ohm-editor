@@ -6,40 +6,19 @@
   if (typeof exports === 'object') {
     module.exports = initModule;
   } else {
-    initModule(root.ohm, root.ohmEditor, root.CheckedEmitter, root.es6);
+    initModule(root.ohm, root.domUtil, root.ohmEditor, root.CheckedEmitter, root.es6);
   }
-})(this, function(ohm, ohmEditor, CheckedEmitter, es6) {
+})(this, function(ohm, domUtil, ohmEditor, CheckedEmitter, es6) {
+
+  // Privates
+  // --------
+  var $ = domUtil.$;
 
   var semantics = null;
-
-  // `opName` is the semantic operation that current executing, it's null whenever
-  // an empty semantics is created.
-  var opName = null;
-
-  // `opArguments` is the operation arguments for the operation with `opName`, could
-  // be empty.
-  var opArguments = null;
 
   ohmEditor.addListener('parse:grammar', function(matchResult, grammar, error) {
     if (grammar && grammar.defaultStartRule) {
       semantics = grammar.createSemantics();
-      opName = null;
-      opArguments = null;
-    }
-  });
-
-  // Handle the `change:semanticOperation` event. The event is emitted when user click on an
-  // operation button, or try to change the operation argument
-  ohmEditor.semantics.addListener('change:semanticOperation', function(targetName, optArgs) {
-    if (opName === targetName) {
-      // If user click on the same button that already selected, we stop evaluating the semantic
-      // operation, i.e. no semantics is called afterward.
-      opName = null;
-      opArguments = null;
-    } else {
-      // If the user is just change the arguments, i.e. `targetName` is `null`, keep the `opName`
-      opName = targetName || opName;
-      opArguments = ohmEditor.semantics.opArguments = optArgs;
     }
   });
 
@@ -145,10 +124,10 @@
 
     var nOpKey = nodeOpKey(key, name);
     resultWrapper.forced = forcing;
-    resultWrapper.forCallingSemantic = opName === name;
+    resultWrapper.forCallingSemantic = $('#semantics div.opName.selected')._operation === name;
     resultWrapper.missingSemanticsAction = result === failure;
     resultWrapper.isError = result && result.isErrorWrapper || result === failure;
-    resultWrapper.isNextStep = name === opName && result &&
+    resultWrapper.isNextStep = $('#semantics div.opName.selected')._operation === name && result &&
       ((result.isErrorWrapper && result.causedBy(nOpKey)) ||
       (todoList && todoList.includes(nOpKey)));
     resultWrapper.isPassThrough = !!passThroughList && passThroughList.includes(nOpKey);
@@ -224,23 +203,7 @@
     return defaults;
   }
 
-  // Merge the actions in the `optActionDict` into `actionDict`
-  function mergeActionDict(name, actionDict, optActionDict) {
-    if (!optActionDict) {
-      return;
-    }
-    Object.keys(optActionDict).forEach(function(key) {
-      if (actionDict[key]) {
-        return;
-      }
-      var actionArguments = optActionDict[key]._actionArguments;
-      var actionBody = optActionDict[key]._actionBody;
-      actionDict[key] = wrapAction(name, actionArguments, actionBody);
-    });
-  }
-
-  // Add new operation/attribute to the semantics
-  function addSemanticOperation(type, name, optArgs, optOrigActionDict) {
+  ohmEditor.semantics.addListener('add:operation', function(type, name, optArgs) {
     var signature = name;
     if (type === 'Operation' && optArgs) {
       var argumentNames = Object.keys(optArgs);
@@ -250,36 +213,13 @@
     }
 
     semantics['add' + type](signature, initActionDict(type, name));
-    mergeActionDict(name, semantics._getActionDict(name), optOrigActionDict);
-  }
-
-  // Check if an operation name is a restrict JS identifier
-  // TODO: it less restrictive in the future
-  function isOperationNameValid(name) {
-    return /^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(name);
-  }
-  ohmEditor.semantics.addListener('add:semanticOperation', function(type, name, optArgs,
-      origActionDict) {
-    // Throw a more clear and readable error message if the name is not a valid operation name.
-    if (!isOperationNameValid(name)) {
-      throw new Error('Cannot add ' + type + " '" + name + "': that's an invalid name");
-    }
-    addSemanticOperation(type, name, optArgs, origActionDict);
-    opName = name;
-    opArguments = ohmEditor.semantics.opArguments = optArgs;
   });
 
-  function populateSemanticsResult(traceNode, optOpName, optArgs) {
-    var operationName = optOpName || opName;
+  function populateSemanticsResult(traceNode, operationName, optArgs) {
     try {
       var nodeWrapper = semantics._getSemantics().wrap(traceNode.bindings[0]);
       if (operationName in semantics._getSemantics().operations) {
-        var argValues;
-        if (operationName === opName) {
-          argValues = toValueList(optArgs || opArguments || Object.create(null));
-        } else {
-          argValues = toValueList(optArgs || Object.create(null));
-        }
+        var argValues = toValueList(Object.create(null));
         nodeWrapper[operationName].apply(nodeWrapper, argValues);
       } else {
         nodeWrapper._forgetMemoizedResultFor(operationName);
@@ -290,13 +230,11 @@
     }
   }
   ohmEditor.parseTree.addListener('render:parseTree', function(traceNode) {
-    if (!opName) {
-      ohmEditor.semantics.appendEditor = false;
+    if (!$('#semantics div.opName.selected')) {
       return;
     }
-    ohmEditor.semantics.appendEditor = true;
     initializeSemanticsLog();
-    populateSemanticsResult(traceNode);
+    populateSemanticsResult(traceNode, $('#semantics div.opName.selected')._operation);
   });
 
   function forceResults(traceNode) {
@@ -350,95 +288,65 @@
     return new Function(formals, actionBody);    // eslint-disable-line no-new-func
   }
 
-  function wrapAction(currentOpName, actionArguments, actionBody) {
-    if (!actionBody.trim()) {
+  function wrapAction(operation, args, body) {
+    if (!body.trim()) {
       return undefined;
     }
 
-    var origActionBody = actionBody;
-    var enclosedActionArgStr = '(' + actionArguments.join(',') + ')';
-    var realAction = 'function' + enclosedActionArgStr + '{\n' + actionBody + '\n}';
-    var isExpression = es6.match(actionBody, 'AssignmentExpression<withIn>').succeeded();
+    var origActionBody = body;
+    var enclosedActionArgStr = '(' + args.join(',') + ')';
+    var realAction = 'function' + enclosedActionArgStr + '{\n' + body + '\n}';
+    var isExpression = es6.match(body, 'AssignmentExpression<withIn>').succeeded();
     if (isExpression) {
-      actionBody = 'return ' + actionBody + ';';
+      body = 'return ' + body + ';';
     }
-    var wrapper = function() {
-      var key = nodeKey(this);
-      var nOpKey = nodeOpKey(key, currentOpName);
-      var result;
-      var action;
 
-      // Build the semantic action, if there is a syntactic error, then
-      // record it and return.
-      try {
-        action = buildAction(this.args, actionArguments, actionBody);
-      } catch (error) {
-        result = new ErrorWrapper(nOpKey, error);
-        errorList = errorList || [];
-        errorList.push(result);
-        addResult(result, key, currentOpName, this.args);
-        return result;
-      }
+    /* eslint-disable no-eval */
+    var wrapper = eval('(function(' + args + ') {\n' +
+    '  var key = nodeKey(this);\n' +
+    '  var nOpKey = nodeOpKey(key, operation);\n' +
+    '  var result;\n' +
+    '  var action;\n' +
+    '  try {\n' +
+    '    action = buildAction(this.args, args, body);\n' +
+    '  } catch (error) {\n' +
+    '    result = new ErrorWrapper(nOpKey, error);\n' +
+    '    errorList = errorList || [];\n' +
+    '    errorList.push(result);\n' +
+    '    addResult(result, key, operation, this.args);\n' +
+    '    return result;\n' +
+    '  }\n' +
+    '  var origTodoList = todoList;\n' +
+    '  var origErrorList = errorList;\n' +
+    '  todoList = errorList = undefined;\n' +
+    '  try {\n' +
+    '    result = action.apply(this, arguments);\n' +
+    '  } catch (error) {\n' +
+    '    result = new ErrorWrapper(nOpKey, error);\n' +
+    '    if (!errorList) {\n' +
+    '      errorList = [result];\n' +
+    '    }\n' +
+    '  }\n' +
+    '  result = todoList ? failure : (errorList ? errorList[0] : result);\n' +
+    '  todoList = todoList ? todoList.concat(origTodoList) : origTodoList;\n' +
+    '  errorList = errorList ? errorList.concat(origErrorList) : origErrorList;\n' +
+    '  addResult(result, key, operation, this.args);\n' +
+    '  return result;\n' +
+    '})');
+    /* eslint-enable no-eval */
 
-      var origTodoList = todoList;
-      var origErrorList = errorList;
-      todoList = errorList = undefined;
-      try {
-        result = action.apply(this, arguments);
-      } catch (error) {
-        result = new ErrorWrapper(nOpKey, error);
-
-        // The error will be recorded only if there is no error caught by its children.
-        if (!errorList) {
-          errorList = [result];
-        }
-      }
-
-      // If there is a child missing semantic action, then its result should be
-      // `failure`. If there is an error occured during the action evaluation, then
-      // its result should be an `ErrorWrapper`. Otherwise, keep the result.
-      result = todoList ? failure : (errorList ? errorList[0] : result);
-      todoList = todoList ? todoList.concat(origTodoList) : origTodoList;
-      errorList = errorList ? errorList.concat(origErrorList) : origErrorList;
-      addResult(result, key, currentOpName, this.args);
-      return result;
-    };
     wrapper.toString = function() {
       return realAction;
     };
-    wrapper._actionArguments = actionArguments;
+    wrapper._actionArguments = args;
     wrapper._actionBody = origActionBody;
     return wrapper;
   }
 
-  function saveAction(traceNode, currentOpName, actionArguments, actionBody) {
-    var actionKey = traceNode.bindings[0].ctorName;
-    var actionWrapper = wrapAction(currentOpName, actionArguments, actionBody);
-    semantics._getActionDict(currentOpName)[actionKey] = actionWrapper;
-  }
-  ohmEditor.semantics.addListener('save:semanticAction', function(traceNode, actionArguments,
-      actionBody) {
-    saveAction(traceNode, opName, actionArguments, actionBody);
+  ohmEditor.semantics.addListener('save:action', function(operationName, key, args, body) {
+    var actionWrapper = wrapAction(operationName, args, body);
+    semantics._getActionDict(operationName)[key] = actionWrapper;
   });
-
-  function editSemanticsOperation(wrapper, operationName, opDescription) {
-    wrapper._origActionDict = semantics._getActionDict(operationName);
-    semantics._remove(operationName);
-
-    if (opDescription) {
-      var type = opDescription.type;
-      var optArgs = opDescription.args;
-      addSemanticOperation(type, operationName, optArgs, wrapper._origActionDict);
-      delete wrapper._origActionDict;
-      if (operationName === opName) {
-        opArguments = ohmEditor.semantics.opArguments = optArgs;
-      }
-    } else if (operationName === opName) {
-      opName = null;
-      opArguments = null;
-    }
-  }
-  ohmEditor.semantics.addListener('edit:semanticOperation', editSemanticsOperation);
 
   // Exports
   // -------
@@ -465,7 +373,7 @@
 
   // If there is no user added action for the rule, return default argument list,
   // Otherwise, return the argument list that user renamed before
-  ohmEditor.semantics.getActionArgPairedList = function(traceNode) {
+  ohmEditor.semantics.getActionArgPairedList = function(traceNode, opName) {
     var actionKey = traceNode.bindings[0].ctorName;
     var defaultArgExpression = getDefaultArgExpression(traceNode);
 
@@ -483,17 +391,13 @@
     return argPairList;
   };
 
-  ohmEditor.semantics.getActionBody = function(traceNode) {
-    var actionKey = traceNode.bindings[0].ctorName;
-    var action = semantics._getActionDict(opName)[actionKey];
-    if (!action || action._isDefault) {
-      return '';
+  ohmEditor.semantics.getAction = function(operation, ruleKey) {
+    var action = semantics._getActionDict(operation)[ruleKey];
+    if (!action || action._isDefault || ruleKey === '_default') {
+      return undefined;
     }
 
-    var actionStr = action.toString();
-    var actionBodyStartIdx = actionStr.indexOf('\n') + 1;
-    var actionBodyEndIdx = actionStr.lastIndexOf('\n');
-    return actionStr.substring(actionBodyStartIdx, actionBodyEndIdx);
+    return action;
   };
 
   ohmEditor.semantics.getSemantics = function() {
@@ -502,5 +406,9 @@
       attributes: semantics._getSemantics().attributes
     };
     return semanticOperations;
+  };
+
+  ohmEditor.semantics.getActionDict = function(operationName) {
+    return semantics._getActionDict(operationName);
   };
 });
