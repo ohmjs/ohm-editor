@@ -1,4 +1,4 @@
-#semanticsContainer editor {
+#semanticsContainer .editor {
   border: 2px solid #ccc;
   padding: 4px 8px;
   background: white;
@@ -10,22 +10,22 @@
   overflow: scroll;
 }
 
-editor rule {
+.editor .rule {
   font-family: Menlo, Monaco, sans-serif;
   font-size: 16px;
   display: flex;
   flex-direction: column;
   margin: 2px 8px;
 }
-editor rule cstNodeName:not(.default)::after {
+.editor .rule .cstNodeName:not(.default)::after {
   content: '\003D';
   clear: both;
   margin: 0 3px;
 }
-editor rule blocks {
+.editor .rule .blocks {
   margin-left: 20px;
 }
-editor rule blocks::after {
+.editor .rule .blocks::after {
   float: left;
   margin-left: 2px;
   margin-top: -2px;
@@ -34,36 +34,36 @@ editor rule blocks::after {
   color: slateblue;
   font-size: 16pt;
 }
-editor rule block {
-  padding-top: 5px;
+.editor .rule .block {
+  p.editoradding-top: 5px;
   padding-bottom: 5px;
   float: left;
   margin-left: 5px;
 }
-editor rule block div,
-editor rule cstNodeName {
+.editor .rule .block .display,
+.editor .rule .cstNodeName {
   color: rgb(123, 123, 123);
   float: left;
 }
-editor rule block div {
+.editor .rule .block .display {
   display: flex;
   flex-direction: column;
   cursor: default;
 }
-editor rule block div > * {
+.editor .rule .block .display > * {
   flex: 1;
 }
-editor rule block div span {
+.editor .rule .block .display span {
   color: orange;
   border-top: 1px solid;
   font-size: 6px;
   float: right;
 }
-editor rule block div:hover span {
+.editor .rule .block .display:hover span {
   font-weight: bolder;
   font-size: 9px;
 }
-editor rule block real {
+.editor .rule .block .real {
   display: inline-block;
   height: 12px;
   outline: none;
@@ -75,11 +75,11 @@ editor rule block real {
   width: auto;
 }
 
-editor .body {
+.editor .body {
   padding-left: 10pt;
   overflow: visible;
 }
-editor .body .CodeMirror {
+.editor .body .CodeMirror {
   cursor: default;
   display: block;
   height: auto;
@@ -89,9 +89,9 @@ editor .body .CodeMirror {
   position: relative;
   font-family: Menlo, Monaco, sans-serif;
 }
-editor .body .CodeMirror-lines {
+.editor .body .CodeMirror-lines {
   padding: 8px;
 }
-editor .body .CodeMirror-lines pre{
+.editor .body .CodeMirror-lines pre{
   padding-left: 0px;
 }

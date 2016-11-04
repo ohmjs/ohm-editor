@@ -44,18 +44,29 @@ ohmEditor.startRule = null;
 ohmEditor.options = {};
 
 ohmEditor.semantics = new CheckedEmitter();
+ohmEditor.semantics.value = null;
 ohmEditor.semantics.registerEvents({
   // Emitted after adding an new operation/attribute.
-  'add:operation': ['type', 'name', 'optArguments'],
+  'add:operation': ['type', 'signature'],
 
   // Emitted after selecting an operation button.
-  'select:operation': ['operationName'],
+  'select:operation': ['operationName', 'optArgs'],
 
   // Emitted after pressing cmd/ctrl-S in semantics editor
   'save:action': ['operation', 'key', 'args', 'body'],
+  'save:helper': ['operation', 'key', 'args', 'body'],
 
   // Emitted when user want to add a new semantic editor
-  'add:semanticEditor': ['type', 'name']
+  'add:semanticEditor': ['type', 'name'],
+
+  // Emitted when an operation is unselected.
+  'clear:semanticsEditorWrapper': [],
+
+  // Emitted when an operation is selected, or semantics is updated.
+  'render:semanticResult': ['traceNode', 'operation', 'optArgs'],
+
+  // Emitted after a semantics action is saved.
+  'update:results': ['operation', 'optArgs']
 });
 
 ohmEditor.ui = {

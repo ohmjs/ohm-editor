@@ -12,7 +12,6 @@
 
   // Privates
   // --------
-  var $ = domUtil.$;
   var $$ = domUtil.$$;
 
   // Generate a class name for the result block which used to identify the
@@ -149,7 +148,7 @@
   }
 
   ohmEditor.parseTree.addListener('create:traceElement', function(wrapper, traceNode) {
-    var shouldHaveSemanticsEditor = $('#semantics div.opName.selected') &&
+    var shouldHaveSemanticsEditor = ohmEditor.semantics.operation &&
         !wrapper.classList.contains('hidden') &&
         !wrapper.classList.contains('failed');
     if (shouldHaveSemanticsEditor) {

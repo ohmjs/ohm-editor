@@ -1,5 +1,6 @@
 #suggestions {
-  position: fixed;
+  margin-top: -10px;
+  margin-left: 10px;
   cursor: default;
   width: auto;
   max-height: 300px;
@@ -9,24 +10,24 @@
   box-shadow: 2px 3px 5px rgba(0,0,0,.2);
   overflow: scroll;
 }
-#suggestions entry {
+#suggestions .entry {
   display: block;
   padding: 2px 8px;
   font-family: Menlo, Monaco, sans-serif;
   font-size: 16px;
   margin: 0;
 }
-#suggestions entry span {
+#suggestions .entry span {
   font-style: italic;
   color: grey;
 }
-#suggestions entry span::before {
+#suggestions .entry span::before {
   content: '\2212';
   margin: 0 4px;
 }
-#suggestions entry.selected {
+#suggestions .entry.selected {
   background: #4f9dfb;
 }
-#suggestions entry.selected span {
+#suggestions .entry.selected span {
   color: white;
 }

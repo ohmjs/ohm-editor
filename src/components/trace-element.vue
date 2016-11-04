@@ -1,9 +1,11 @@
 <template>
   <div class="pexpr" :class="classObj" id="id">
-    <div v-if="labeled" class="self">
+    <div v-if="labeled" class="self" :class="selfClassObj">
       <trace-label :traceNode="traceNode" :minWidth="minWidth"
                    @hover="onHover" @unhover="onUnhover" @click="onClick"
                    @showContextMenu="onShowContextMenu" />
+      <semantics-result v-if="hasResult" :traceNode="traceNode"
+                        @styleUpdate="updateSelfStyle"/>
     </div>
     <div v-if="!isLeaf" ref="children"
          class="children" :class="{vbox: vbox}"
@@ -11,7 +13,8 @@
       <trace-element v-for="child in childrenToRender"
                      :id="child.id" :traceNode="child.traceNode" :context="child.context"
                      :currentLR="child.currentLR" :measureInputText="measureInputText"
-                     :isInVBox="child.isInVBox" :eventHandlers="eventHandlers">
+                     :isInVBox="child.isInVBox" :eventHandlers="eventHandlers"
+                     :showResult="hasResult">
       </trace-element>
     </div>
   </div>
@@ -27,6 +30,7 @@
   var ohmEditor = require('../ohmEditor');
 
   var traceLabel = require('./trace-label.vue');
+  var semanticsResult = require('./semantics-result.vue');
 
   var nextNodeId = 0;
 
@@ -131,7 +135,8 @@
   module.exports = {
     name: 'trace-element',
     components: {
-      'trace-label': traceLabel
+      'trace-label': traceLabel,
+      'semantics-result': semanticsResult
     },
     props: {
       traceNode: {type: Object, required: true},
@@ -142,7 +147,9 @@
       context: {type: Object},
 
       eventHandlers: {type: Object},
-      currentLR: {type: Object}
+      currentLR: {type: Object},
+
+      showResult: {type: Boolean}
     },
     computed: {
       id: function() {
@@ -228,7 +235,8 @@
               vbox: self.vbox
             },
             isInVBox: self.vbox,
-            currentLR: lrObj
+            currentLR: lrObj,
+            showResult: self.hasResult
           };
           children.push(traceElement);
         });
@@ -243,7 +251,8 @@
             traceNode: this.traceNode.terminatingLREntry,
             context: this.context,
             isInVBox: true,
-            currentLR: lrObj
+            currentLR: lrObj,
+            showResult: this.hasResult
           });
         }
         return children;
@@ -255,7 +264,9 @@
     data: function() {
       return {
         collapsed: false,
-        hasUserToggledCollapsedState: false
+        hasUserToggledCollapsedState: false,
+        hasResult: this.showResult,
+        selfClassObj: {}
       };
     },
     beforeMount: function() {
@@ -276,6 +287,16 @@
           ohmEditor.parseTree.emit('exit:traceElement', el, el._traceNode);
         });
       }
+
+      var self = this;
+      ohmEditor.semantics.addListener('select:operation', function(operation, optArgs) {
+        self.hasResult = true;
+      });
+
+      ohmEditor.semantics.addListener('clear:semanticsEditorWrapper', function() {
+        self.hasResult = false;
+        self.selfClassObj = {};
+      });
     },
     beforeUpdate: function() {
       if (this.traceNode !== this.$el._traceNode) {
@@ -322,7 +343,15 @@
           console.log(this.traceNode);  // eslint-disable-line no-console
         } else if (modifier === 'cmd') {
           // cmd/ctrl + click to open or close semantic editor
-          ohmEditor.parseTree.emit('cmdOrCtrlClick:traceElement', this.$el);
+          var id;
+          if (this.traceNode.expr instanceof ohm.pexprs.Iter) {
+            id = '_iter';
+          } else if (this.traceNode.expr instanceof ohm.pexprs.Terminal) {
+            id = '_terminal';
+          } else {
+            id = this.traceNode.expr.ruleName;
+          }
+          ohmEditor.semanticsContainer.emit('create:editor', 'rule', id);
         } else if (!isLeaf(this.traceNode)) {
           this.toggleCollapsed();
         }
@@ -338,6 +367,7 @@
       setCollapsed: function(collapse, optDurationInMs) {
         this.collapsed = collapse;
         this.hasUserToggledCollapsedState = true;
+        this.selfClassObj.tmpNextStep = this.collapsed && this.selfClassObj.optNextStep;
 
         var duration = optDurationInMs != null ? optDurationInMs : 500;
         var el = this.$el;
@@ -422,6 +452,12 @@
         };
         measuringDiv.removeChild(clone);
         return result;
+      },
+      updateSelfStyle: function(classObj, optNextStep) {
+        this.selfClassObj = classObj;
+        if (this.collapsed) {
+          this.selfClassObj.tmpNextStep = !!this.selfClassObj.optNextStep;
+        }
       }
     }
   };

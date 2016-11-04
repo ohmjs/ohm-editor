@@ -29,6 +29,16 @@
         };
       }
     },
+    mounted: function() {
+      var self = this;
+      ohmEditor.semantics.addListener('select:operation', function(operation, optArgs) {
+        ohmEditor.semantics.emit('render:semanticResult', self.trace, operation, optArgs);
+      });
+
+      ohmEditor.semantics.addListener('update:results', function(operation, optArgs) {
+        ohmEditor.semantics.emit('render:semanticResult', self.trace, operation, optArgs);
+      });
+    },
     methods: {
       // To make it easier to navigate around the parse tree, handle mousewheel events
       // and translate vertical overscroll into horizontal movement. I.e., when scrolled all

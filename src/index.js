@@ -10,6 +10,8 @@ require('./editorErrors');
 require('./examples');
 require('./exampleGenerationRequests');  // Required for examples.
 require('./externalRules');
+require('./semanticsHelper');
+require('./semantics');
 require('./parseTree');
 require('./ruleHyperlinks');
 require('./searchBar');
