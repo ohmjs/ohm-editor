@@ -12,7 +12,6 @@
 
   // Privates
   // --------
-  var $ = domUtil.$;
 
   var semantics = null;
 
@@ -124,10 +123,10 @@
 
     var nOpKey = nodeOpKey(key, name);
     resultWrapper.forced = forcing;
-    resultWrapper.forCallingSemantic = $('#semantics div.opName.selected')._operation === name;
+    resultWrapper.forCallingSemantic = ohmEditor.semantics.operation === name;
     resultWrapper.missingSemanticsAction = result === failure;
     resultWrapper.isError = result && result.isErrorWrapper || result === failure;
-    resultWrapper.isNextStep = $('#semantics div.opName.selected')._operation === name && result &&
+    resultWrapper.isNextStep = ohmEditor.semantics.operation === name && result &&
       ((result.isErrorWrapper && result.causedBy(nOpKey)) ||
       (todoList && todoList.includes(nOpKey)));
     resultWrapper.isPassThrough = !!passThroughList && passThroughList.includes(nOpKey);
@@ -203,15 +202,9 @@
     return defaults;
   }
 
-  ohmEditor.semantics.addListener('add:operation', function(type, name, optArgs) {
-    var signature = name;
-    if (type === 'Operation' && optArgs) {
-      var argumentNames = Object.keys(optArgs);
-      if (argumentNames.length > 0) {
-        signature += '(' + argumentNames.join(',') + ')';
-      }
-    }
-
+  ohmEditor.semantics.addListener('add:operation', function(type, operationInfo) {
+    var signature = operationInfo.signature;
+    var name = operationInfo.name;
     semantics['add' + type](signature, initActionDict(type, name));
   });
 
@@ -229,12 +222,9 @@
       /* All the error will be an ErrorWrapper which already recorded in the resultMap */
     }
   }
-  ohmEditor.parseTree.addListener('render:parseTree', function(traceNode) {
-    if (!$('#semantics div.opName.selected')) {
-      return;
-    }
+  ohmEditor.parseTree.addListener('refresh:parseTree', function(traceNode, operation) {
     initializeSemanticsLog();
-    populateSemanticsResult(traceNode, $('#semantics div.opName.selected')._operation);
+    populateSemanticsResult(traceNode, operation);
   });
 
   function forceResults(traceNode) {
