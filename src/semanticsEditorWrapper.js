@@ -83,6 +83,16 @@
 
   var bus = new Vue();
 
+  // Hack to let both mouseover and up&down arrow both work for suggestion list
+  bus.$data.mousePos = {x: 0, y: 0};
+  bus.$data.isScrolled = false;
+  window.onmousemove = function(event) {
+    var preMousePos = bus.$data.mousePos;
+    var currMousePos = {x: event.screenX, y: event.screenY};
+    bus.$data.isScrolled = currMousePos.x === preMousePos.x && currMousePos.y === preMousePos.y;
+    bus.$data.mousePos = currMousePos;
+  };
+
   Vue.component('action-addtion', {
     template: [
       '<div class=addition>',
@@ -137,7 +147,12 @@
     },
     methods: {
       highlight: function(event) {
-        bus.$emit('highlightEntry', this.index);
+        var self = this;
+        this.$nextTick(function() {
+          if (!bus.$data.isScrolled) {
+            bus.$emit('highlightEntry', self.index);
+          }
+        });
       },
       select: function() {
         bus.$emit('addEditor', this.type, this.id);
