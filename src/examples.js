@@ -57,8 +57,8 @@ function checkExample(id) {
   } catch (e) {
     succeeded = false;
   }
-  el.classList.toggle('pass', succeeded);
-  el.classList.toggle('fail', !succeeded);
+  el.classList.toggle('pass', succeeded === example.positive);
+  el.classList.toggle('fail', !succeeded === example.positive);
 }
 
 function getListEl(exampleId) {
@@ -78,6 +78,22 @@ function addExample() {
   exampleTextEl.onmousedown = handleMouseDown;
   startRuleEl.onmousedown = handleMouseDown;
 
+  exampleValues[id] = {
+    text: '',
+    startRule: null
+  };
+
+  var sign = li.appendChild(domUtil.createElement('div.sign'));
+  sign.onmousedown = function(e) {
+    e.stopPropagation();  // Prevent selection.
+  };
+  sign.onclick = function() { // flip orientation
+    exampleValues[id].positive = !exampleValues[id].positive;
+    setExample(id, exampleValues[id].text, exampleValues[id].startRule, exampleValues[id].positive);
+    saveExamples();
+  };
+  exampleValues[id].positive = true;
+
   var del = li.appendChild(domUtil.createElement('div.delete'));
   del.innerHTML = '&#x2716;';
   del.onmousedown = function(e) {
@@ -95,10 +111,6 @@ function addExample() {
     ohmEditor.examples.emit('remove:example', id);
   };
 
-  exampleValues[id] = {
-    text: '',
-    startRule: null
-  };
   domUtil.$('#exampleContainer ul').appendChild(li);
   ohmEditor.ui.inputEditor.focus();
 
@@ -123,7 +135,7 @@ function getExamples() {
 }
 
 // Set the contents of an example the given id to `value`.
-function setExample(id, text, optStartRule) {
+function setExample(id, text, optStartRule, isPositive) {
   if (!(id in exampleValues)) {
     throw new Error(id + ' is not a valid example id');
   }
@@ -132,12 +144,14 @@ function setExample(id, text, optStartRule) {
   var oldValue = exampleValues[id];
   var value = exampleValues[id] = {
     text: text,
-    startRule: startRule
+    startRule: startRule,
+    positive: isPositive
   };
 
   var listItem = getListEl(id);
   var code = listItem.querySelector('code > span.code');
   var startRuleEl = listItem.querySelector('code > span.startRule');
+  var sign = listItem.querySelector('div.sign');
 
   code.startRule = startRule;
   code.parentElement.classList.remove('pass', 'fail');
@@ -152,6 +166,14 @@ function setExample(id, text, optStartRule) {
     startRuleEl.textContent = startRule;
   } else {
     startRuleEl.textContent = '';
+  }
+
+  if (value.positive) {
+    sign.innerHTML = '&#x1F44D;';
+    sign.setAttribute('title', 'Example should pass');
+  } else {
+    sign.innerHTML = '&#x1F44E;';
+    sign.setAttribute('title', 'Example should fail');
   }
 
   ohmEditor.examples.emit('set:example', id, oldValue, value);
@@ -214,7 +236,10 @@ function restoreExamples(editor, key) {
   }
 
   examples.forEach(function(ex) {
-    setExample(addExample(), ex.text, ex.startRule);
+    if (!ex.hasOwnProperty('positive')) {
+      ex.positive = true;
+    }
+    setExample(addExample(), ex.text, ex.startRule, ex.positive);
   });
 
   // Select the first example.
@@ -244,7 +269,8 @@ var uiSave = function(cm) {
     var selectEl = domUtil.$('#startRuleDropdown');
     var value = cm.getValue();
     var startRule = selectEl.options[selectEl.selectedIndex].value;
-    setExample(selectedId, value, startRule);
+    var isPositive = exampleValues[selectedId].positive;
+    setExample(selectedId, value, startRule, isPositive);
     saveExamples();
   }
 };
