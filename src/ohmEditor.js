@@ -64,3 +64,8 @@ ohmEditor.ui = {
 };
 ohmEditor.emit('init:inputEditor', ohmEditor.ui.inputEditor);
 ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
+
+// Exports
+// -------
+
+module.exports = ohmEditor;

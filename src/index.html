@@ -427,7 +427,7 @@
   <div id="mainSplitter" class="splitter"></div>
 
   <div id="bottomSection">
-    <div id="semanticsContainer">
+    <div id="semanticsContainer" hidden>
       <h2>Semantics
         <input id="addSemanticButton" type="button" value="+"></input>
       </h2>
@@ -499,7 +499,6 @@ number  (a number)
   = digit* "." digit+  -- fract
   | digit+             -- whole
 }</pre>
-    <!-- <pre id="sampleInput">2 * (42 - 1) / 9</pre> -->
     <pre id="sampleExamples">
       <pre>2 * (42 - 1) / 9</pre>
       <pre>1+2*3</pre>
@@ -511,7 +510,7 @@ number  (a number)
 
   <script src="splitters.js"></script>
 
-  <script src="../node_modules/ohm-js/dist/ohm.min.js"></script>
+  <script src="third_party/ohm.min.js"></script>
   <script src="third_party/es6.js"></script>
   <script src="third_party/d3.min.js"></script>
   <script src="third_party/FileSaver.js"></script>
@@ -521,26 +520,20 @@ number  (a number)
   <script src="third_party/checked-emitter-1.0.1.js"></script>
   <script src="third_party/autosize.min.js"></script>
   <script src="third_party/vue-2.0.5.js"></script>
-  <script src="ohmEditor.js"></script>
-  <script src="cmUtil.js"></script>
-  <script src="domUtil.js"></script>
-  <script src="utils.js"></script>
-  <script src="parseTree.js"></script>
+
+  <script src="assets/visualizer-bundle.js"></script>
+
+  <!-- Scripts that not yet been moved to CommonJS
   <script src="semanticsHelper.js"></script>
   <script src="semanticsEditorWrapper.js"></script>
   <script src="semanticsEditor.js"></script>
   <script src="semanticsResult.js"></script>
-  <script src="externalRules.js"></script>
-  <script src="ruleHyperlinks.js"></script>
   <script src="searchBar.js"></script>
   <script src="semanticsButton.js"></script>
   <script src="editorErrors.js"></script>
-  <script src="examples.js"></script>
-  <script src="exampleWorkerManager.js"></script>
-  <script src="exampleGenerationRequests.js"></script>
   <script src="exampleGenerationLinks.js"></script>
   <script src="timeline.js"></script>
   <script src="persistence.js"></script>
-  <script src="index.js"></script>
+  -->
 </body>
 </html>

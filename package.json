@@ -22,8 +22,9 @@
   },
   "scripts": {
     "build": "cd dist && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
+    "electron": "electron index.js",
     "lint": "eslint .",
-    "start": "electron index.js"
+    "start": "webpack-dev-server"
   },
   "license": "MIT",
   "author": "Alex Warth <alexwarth@gmail.com> (http://tinlizzie.org/~awarth)",
@@ -43,7 +44,9 @@
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-camelcase-ohm": "^0.2.0",
     "eslint-plugin-no-extension-in-require": "^0.2.0",
-    "eslint-plugin-tape": "^1.1.0"
+    "eslint-plugin-tape": "^1.1.0",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
   },
   "engines": {
     "node": ">=4.0"

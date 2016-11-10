@@ -276,7 +276,7 @@
 
   // Build the action that called from the wrapper, which includes renaming the
   // operation arguments, and actual action body that user typed.
-  function buildAction(opArgs, actionArguments, actionBody) {
+  function buildAction(opArgs, actionArguments, actionBody) {  // eslint-disable-line no-unused-vars
     // Constructs the code that renames the operation arguments, so we could refer
     // them by name directly. i.e. `var <argument name> = this.args.<argument name>`
     var renameOpArgStr = opArgs && Object.keys(opArgs).map(function(argName) {
