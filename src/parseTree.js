@@ -70,7 +70,7 @@ function addChildToVNode(vnode, child) {
 // Trace element helpers
 // ---------------------
 
-function shouldNodeBeLabeled(traceNode, parent) {
+function shouldNodeBeLabeled(traceNode) {
   var expr = traceNode.expr;
 
   // Don't label Seq and Alt nodes.
@@ -275,37 +275,118 @@ Vue.component('trace-element', {
   props: {
     traceNode: {type: Object, required: true},
     measureInputText: {type: Function},
-    classes: {type: Object, default: Object},
     isInVBox: {type: Boolean},
-    vbox: {type: Boolean}
+
+    // from parent element
+    context: {type: Object},
+
+    // from currentLR
+    currentLR: {type: Object, default: Object},
+    eventHandlers: {type: Object}
   },
   computed: {
+    labeled: function() {
+      return shouldNodeBeLabeled(this.traceNode);
+    },
+    vbox: function() {
+      return hasVisibleChoice(this.traceNode) ||
+             hasVisibleLeftRecursion(this.traceNode) ||
+             (isAlt(this.traceNode.expr) && this.context && this.context.vbox);
+    },
+    isWhitespace: function() {
+      return this.traceNode.ruleName === 'spaces';
+    },
+    isLeaf: function() {
+      var leaf = isLeaf(this.traceNode);
+      if (this.traceNode.isMemoized) {
+        var memoKey = this.traceNode.expr.toMemoKey();
+        var stack = this.currentLR[memoKey];
+        if (stack && stack[stack.length - 1] === this.traceNode.pos) {
+          leaf = true;
+        }
+      }
+      return leaf;
+    },
     classObj: function() {
       var obj = {
-        disclosure: this.classes.labeled && this.isInVBox
+        disclosure: this.labeled && this.isInVBox
       };
       var ctorName = this.traceNode.ctorName;
       if (ctorName) {
         obj[ctorName.toLowerCase()] = true;
       }
-      Object.assign(obj, this.classes);
+
+      obj.collapsed = this.labeled &&
+        this.context &&
+        shouldTraceElementBeCollapsed(this.traceNode, this.context);
+      obj.failed = !this.traceNode.succeeded;
+      obj.labeled = this.labeled;
+      obj.leaf = this.isLeaf;
       return obj;
+    },
+    children: function() {
+      if (this.collapsed) {
+        return undefined;
+      }
+
+      var children = [];
+      var self = this;
+      function visitTraceNode(node) {
+        // Don't show or recurse into nodes that failed, unless "Show failures" is enabled.
+        if ((!node.succeeded && !ohmEditor.options.showFailures) ||
+            (node.isImplicitSpaces && !ohmEditor.options.showSpaces)) {
+          return;
+        }
+        // Don't bother showing whitespace nodes that didn't consume anything.
+        var isWhitespace = node.expr.ruleName === 'spaces';
+        if (isWhitespace && node.source.contents.length === 0) {
+          return;
+        }
+
+        var traceElement = {
+          traceNode: node,
+          context: {
+            parent: self,
+            collapsed: self.collapsed,
+            syntactic: self.labeled ? isSyntactic(node.expr) :
+                                      self.context && self.context.syntactic,
+            vbox: self.vbox
+          },
+          isInVBox: self.context ? self.context.vbox : false,
+          currentLR: self.currentLR
+        };
+        children.push(traceElement);
+        return;
+      }
+      if (children) {
+        this.traceNode.children.forEach(visitTraceNode);
+      }
+      return children;
     },
     minWidth: function() {
       return this.measureInputText(this.traceNode.source.contents) + 'px';
     }
   },
+  data: function() {
+    return {
+      collapsed: false
+    };
+  },
   template: [
-    '<div class="pexpr" :class="classObj">',
-    '  <div v-if="classes.labeled" class="self">',
+    '<div class="pexpr" :class="classObj" id="getFreshNodeId()">',
+    '  <div v-if="labeled" class="self">',
     '    <trace-label :traceNode="traceNode" :minWidth="minWidth"',
     '                 @hover="onHover" @unhover="onUnhover" @click="onClick"',
     '                 @showContextMenu="onShowContextMenu" />',
     '  </div>',
-    '  <div v-if="!classes.leaf" ref="children"',
+    '  <div v-if="!isLeaf" ref="children"',
     '       class="children" :class="{vbox: vbox}"',
-    '       :hidden="classes.collapsed">',
-    '    <slot />',
+    '       :hidden="classObj.collapsed">',
+    '    <trace-element v-for="child in children"',
+    '                   :id="child.id" :traceNode="child.traceNode" :context="child.context"',
+    '                   :currentLR="child.currentLR" :measureInputText="measureInputText"',
+    '                   :isInVBox="child.isInVBox" :eventHandlers="eventHandlers">',
+    '    </trace-element>',
     '  </div>',
     '</div>'
   ].join(''),
@@ -314,11 +395,11 @@ Vue.component('trace-element', {
     el._traceNode = this.traceNode;
 
     ohmEditor.parseTree.emit('create:traceElement', el, el._traceNode);
-    if (this.classes.collapsed) {
+    if (this.classObj.collapsed) {
       ohmEditor.parseTree.emit('collapse:traceElement', el);
     }
 
-    if (!this.classes.leaf) {
+    if (!this.isLeaf) {
       // On the next tick, children will be mounted.
       this.$nextTick(function() {
         ohmEditor.parseTree.emit('exit:traceElement', el, el._traceNode);
@@ -326,9 +407,17 @@ Vue.component('trace-element', {
     }
   },
   updated: function() {
-    this.$el._traceNode = this.traceNode;
+    if (this.traceNode !== this.$el._traceNode) {
+      this.$el._traceNode = this.traceNode;
+      this.initiallyCollapsed();
+    }
   },
   methods: {
+    initiallyCollapsed: function() {
+      this.collapsed = this.labeled &&
+        this.context &&
+        shouldTraceElementBeCollapsed(this.traceNode, this.context);
+    },
     onHover: function() {
       var grammarEditor = ohmEditor.ui.grammarEditor;
       var inputEditor = ohmEditor.ui.inputEditor;
@@ -350,11 +439,11 @@ Vue.component('trace-element', {
       if (ruleName) {
         ohmEditor.emit('peek:ruleDefinition', ruleName);
       }
-      this.$emit('hover');
+      this.eventHandlers.hover();
     },
     onUnhover: function() {
       ohmEditor.emit('unpeek:ruleDefinition');
-      this.$emit('unhover');
+      this.eventHandlers.unhover();
     },
     onClick: function(modifier) {
       if (modifier === 'alt') {
@@ -368,7 +457,7 @@ Vue.component('trace-element', {
     },
     onShowContextMenu: function(data) {
       data.el = this.$el;
-      this.$emit('showContextMenu', data);
+      this.eventHandlers.showContextMenu(data);
     },
     toggleCollapsed: function() {
       // Caution: direct DOM manipulation here!
@@ -378,6 +467,10 @@ Vue.component('trace-element', {
     },
     // Hides or shows the children of `el`, which is a div.pexpr.
     setCollapsed: function(collapse, optDurationInMs) {
+      if (!collapse && !this.children) {
+        this.collapsed = collapse;
+      }
+
       var duration = optDurationInMs != null ? optDurationInMs : 500;
       var el = this.$el;
 
@@ -393,14 +486,14 @@ Vue.component('trace-element', {
         return;
       }
 
-      var childrenSize = this.measureChildren();
-      var newWidth = collapse ? this.measureLabel().width : childrenSize.width;
       var self = this;
-
-      d3.select(el)
+      this.$nextTick(function() {
+        var childrenSize = self.measureChildren();
+        var newWidth = collapse ? self.measureLabel().width : childrenSize.width;
+        d3.select(el)
           .transition().duration(duration)
           .styleTween('width', tweenWithCallback(newWidth + 'px', function(t) {
-            self.$emit('updateExpandedInput', el, collapse, t);
+            self.eventHandlers.updateExpandedInput(el, collapse, t);
           }))
           .each('start', function() {
             this.style.width = this.offsetWidth + 'px';
@@ -412,25 +505,26 @@ Vue.component('trace-element', {
             this.style.width = '';
           });
 
-      var height = collapse ? 0 : childrenSize.height;
-      d3.select(el.lastChild)
-          .style('height', currentHeightPx)
-          .transition().duration(duration)
-          .style('height', height + 'px')
-          .each('start', function() {
-            if (!collapse) {
-              emitEvent();
-              this.hidden = false;
-            }
-          })
-          .each('end', function() {
-            this.style.height = '';
-            if (collapse) {
-              this.hidden = true;
-              emitEvent();
-            }
-            self.$emit('updateExpandedInput');
-          });
+        var height = collapse ? 0 : childrenSize.height;
+        d3.select(el.lastChild)
+            .style('height', currentHeightPx)
+            .transition().duration(duration)
+            .style('height', height + 'px')
+            .each('start', function() {
+              if (!collapse) {
+                emitEvent();
+                this.hidden = false;
+              }
+            })
+            .each('end', function() {
+              this.style.height = '';
+              if (collapse) {
+                this.hidden = true;
+                emitEvent();
+              }
+              self.eventHandlers.updateExpandedInput();
+            });
+      });
     },
     measureLabel: function() {
       var tempWrapper = $('#measuringDiv .pexpr');
@@ -443,7 +537,6 @@ Vue.component('trace-element', {
       tempWrapper.innerHTML = '';
       return result;
     },
-
     measureChildren: function() {
       var measuringDiv = $('#measuringDiv');
       var clone = measuringDiv.appendChild(this.$el.cloneNode(true));
@@ -457,6 +550,9 @@ Vue.component('trace-element', {
       measuringDiv.removeChild(clone);
       return result;
     }
+  },
+  created: function() {
+    this.initiallyCollapsed();
   }
 });
 
@@ -523,7 +619,13 @@ Vue.component('parse-results', {
       return createElement('div');
     }
     var rootTraceElement = createElement('trace-element', {
-      props: {traceNode: this.trace}
+      props: {
+        traceNode: this.trace,
+        isInVBox: false,
+        currentLR: {},
+        measureInputText: this.measureInputText,
+        eventHandlers: this.pexprEventHandlers
+      }
     });
     var rootContainer = createElement('div', {
       domProps: {id: 'parseResults'},
@@ -533,95 +635,7 @@ Vue.component('parse-results', {
       }
     }, [rootTraceElement]);
 
-    var contextStack = [{
-      parent: rootTraceElement,
-      collapsed: false,
-      syntactic: false,
-      vbox: false
-    }];
-
-    var self = this;
-    var currentLR = {};
-
     ohmEditor.parseTree.emit('render:parseTree', this.trace);
-    var renderActions = {
-      enter: function handleEnter(node, parent, depth) {
-        // Don't show or recurse into nodes that failed, unless "Show failures" is enabled.
-        if ((!node.succeeded && !ohmEditor.options.showFailures) ||
-            (node.isImplicitSpaces && !ohmEditor.options.showSpaces)) {
-          return node.SKIP;
-        }
-        // Don't bother showing whitespace nodes that didn't consume anything.
-        var isWhitespace = node.expr.ruleName === 'spaces';
-        if (isWhitespace && node.source.contents.length === 0) {
-          return node.SKIP;
-        }
-
-        var context = contextStack[contextStack.length - 1];
-        var isLabeled = shouldNodeBeLabeled(node, parent);
-        var collapsed = isLabeled && shouldTraceElementBeCollapsed(node, context);
-
-        var vbox = hasVisibleChoice(node) ||
-            hasVisibleLeftRecursion(node) ||
-            (isAlt(node.expr) && context.vbox);
-
-        var isLeafNode = isLeaf(node);
-        if (node.isMemoized) {
-          var memoKey = node.expr.toMemoKey();
-          var stack = currentLR[memoKey];
-          if (stack && stack[stack.length - 1] === node.pos) {
-            isLeafNode = true;
-          }
-        }
-
-        var classes = {
-          collapsed: collapsed,
-          failed: !node.succeeded,
-          labeled: isLabeled,
-          leaf: isLeafNode
-        };
-        if (self.highlightNode && self.highlightNode.node === node) {
-          classes[self.highlightNode.class] = true;
-        }
-        var traceElement = createElement('trace-element', {
-          domProps: {id: getFreshNodeId()},
-          props: {
-            traceNode: node,
-            measureInputText: self.measureInputText,
-            classes: classes,
-            isInVBox: context.vbox,
-            vbox: vbox
-          },
-          on: self.pexprEventHandlers
-        });
-        addChildToVNode(context.parent, traceElement);
-
-        if (isLeafNode) {
-          return node.SKIP;
-        }
-        contextStack.push({
-          parent: traceElement,
-          collapsed: collapsed,
-          syntactic: isLabeled ? isSyntactic(node.expr) : context.syntactic,
-          vbox: vbox
-        });
-      },
-      exit: function(node, parent, depth) {
-        // If necessary, render the "Grow LR" trace as a pseudo-child, after the real child.
-        // To avoid exponential growth of the tree, when we encounter a memoized entry that
-        // is a copy of the head of left recursion, treat it as a leaf.
-        if (hasVisibleLeftRecursion(node)) {
-          var memoKey = node.expr.toMemoKey();
-          var stack = currentLR[memoKey] || [];
-          currentLR[memoKey] = stack;
-          stack.push(node.pos);
-          node.terminatingLREntry.walk(renderActions);
-          stack.pop();
-        }
-        contextStack.pop();
-      }
-    };
-    this.trace.walk(renderActions);
     this.$nextTick(function() {
       this.$emit('updateExpandedInput');
     });
