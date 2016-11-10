@@ -87,15 +87,13 @@ function addExample() {
     var elToSelect = li.previousSibling || li.nextSibling;
     li.remove();
     delete exampleValues[id];
-    saveExamples(ohmEditor.ui.inputEditor, 'examples');
+    saveExamples();
     if (selectedId === id) {
       setSelected(elToSelect ? elToSelect.id : -1);
     }
 
     ohmEditor.examples.emit('remove:example', id);
   };
-
-  li.appendChild(del);
 
   exampleValues[id] = {
     text: '',
