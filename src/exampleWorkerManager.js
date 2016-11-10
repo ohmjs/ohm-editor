@@ -8,6 +8,7 @@
 
 var ohmEditor = require('./ohmEditor');
 
+var DEBUG = false;
 var exampleWorkerManager = new CheckedEmitter();
 
 exampleWorkerManager.registerEvents({
@@ -73,10 +74,8 @@ function onWorkerMessage(event) {
   if (eventsToEmit.includes(event.data.name)) {
     exampleWorkerManager.emit.apply(exampleWorkerManager,
                                     [event.data.name].concat(event.data.args));
-  } else {
-    /* eslint-disable no-console */
-    console.debug('WORKER:', event.data);
-    /* eslint-enable no-console */
+  } else if (DEBUG) {
+    console.debug('WORKER:', event.data);  // eslint-disable-line no-console
   }
 }
 
