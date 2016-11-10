@@ -6,11 +6,14 @@
 var domUtil = require('./domUtil');
 var ohmEditor = require('./ohmEditor');
 
+require('./editorErrors');
 require('./examples');
 require('./exampleGenerationRequests');  // Required for examples.
 require('./externalRules');
 require('./parseTree');
 require('./ruleHyperlinks');
+require('./searchBar');
+require('./timeline');
 
 var checkboxes;
 var grammarChanged = true;
