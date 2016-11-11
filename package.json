@@ -23,7 +23,7 @@
   "scripts": {
     "build": "NODE_ENV=production webpack -p",
     "electron-build": "cd dist && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
-    "electron": "electron index.js",
+    "electron": "electron electron-main.js",
     "lint": "eslint .",
     "start": "webpack-dev-server"
   },
