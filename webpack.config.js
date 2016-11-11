@@ -4,15 +4,17 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    visualizer: './src/index.js'
+    visualizer: ['./src/index.js']
   },
   output: {
-    path: 'dist',
+    path: path.join(__dirname, 'dist'),
     publicPath: 'assets',
     filename: '[name]-bundle.js'
   },
   devServer: {
     contentBase: path.join(__dirname, 'src'),
-    inline: true
+    inline: true,
+    port: 8080,
+    publicPath: '/assets'
   }
 };
