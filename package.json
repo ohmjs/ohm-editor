@@ -46,9 +46,11 @@
     "eslint-plugin-no-extension-in-require": "^0.2.0",
     "eslint-plugin-tape": "^1.1.0",
     "open": "0.0.5",
+    "tape": "^4.6.2",
     "uglify": "^0.1.5",
     "webpack": "^1.13.3",
-    "webpack-dev-server": "^1.16.2"
+    "webpack-dev-server": "^1.16.2",
+    "worker-loader": "^0.7.1"
   },
   "engines": {
     "node": ">=4.0"

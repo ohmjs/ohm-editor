@@ -2,18 +2,17 @@
 
 'use strict';
 
+var utils = require('./utils');
+
 // Web Worker that generates examples.
 // communicates with 'exampleGenerationUI.js'
 
-(function(root, initModule) {
-  if (typeof exports === 'object') {
-    module.exports = initModule;
-  } else { // inside web worker
-    root.importScripts('assets/ohm.min.js', 'utils.js');
-    initModule(root.ohm, root.utils, root, root.overrides);
-  }
-})(this, function(ohm, utils, workerGlobalScope, optOverrides) {
+module.exports = function(workerGlobalScope) {
   var self = workerGlobalScope;
+  if (!self.ohm) {
+    self.importScripts('../assets/ohm.min.js');
+  }
+  var ohm = self.ohm;
 
   // -------------------------------------------------------
   // HELPERS
@@ -41,7 +40,7 @@
 
   var generator;
 
-  var overrides = optOverrides || {
+  var overrides = {
     ident: function(g, ex, syn, args) {
       return {needHelp: true};
     },
@@ -285,5 +284,4 @@
   }
 
   return {ExampleGenerator: ExampleGenerator};
-
-});
+};

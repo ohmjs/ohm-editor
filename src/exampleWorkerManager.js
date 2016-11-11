@@ -6,6 +6,7 @@
 // TODO: handle invalid grammar in textbox
 // TODO: fix needed eamples bug (need force update to get rid of ident)
 
+var ExampleWorker = require('worker!./exampleWorker-shim');
 var ohmEditor = require('./ohmEditor');
 
 var DEBUG = false;
@@ -18,7 +19,7 @@ exampleWorkerManager.registerEvents({
 
 var eventsToEmit = ['received:examples', 'received:neededExamples'];
 
-var exampleWorker = new Worker('exampleWorker.js');
+var exampleWorker = new ExampleWorker();
 
 // TODO: may want to reset current worker instead
 
@@ -26,7 +27,7 @@ function resetWorker(grammar) {
   if (exampleWorker) {
     exampleWorker.terminate();
   }
-  exampleWorker = new Worker('exampleWorker.js');
+  exampleWorker = new ExampleWorker();
   exampleWorker.onmessage = onWorkerMessage;
   exampleWorker.postMessage({
     name: 'initialize', recipe: grammar.toRecipe()
