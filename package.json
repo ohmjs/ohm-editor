@@ -24,7 +24,8 @@
     "build": "NODE_ENV=production webpack -p",
     "electron-build": "cd dist && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
     "electron": "electron electron-main.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "tape test/*.js test/**/*.js | tap-spec"
   },
   "license": "MIT",
   "author": "Alex Warth <alexwarth@gmail.com> (http://tinlizzie.org/~awarth)",
@@ -46,6 +47,7 @@
     "eslint-plugin-no-extension-in-require": "^0.2.0",
     "eslint-plugin-tape": "^1.1.0",
     "open": "0.0.5",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.2",
     "uglify": "^0.1.5",
     "webpack": "^1.13.3",
