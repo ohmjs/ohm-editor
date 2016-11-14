@@ -15,6 +15,7 @@ require('./ruleHyperlinks');
 require('./searchBar');
 require('./splitters');
 require('./timeline');
+require('./persistence');
 
 var checkboxes;
 var grammarChanged = true;

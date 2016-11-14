@@ -1,40 +1,37 @@
 /* eslint-env browser */
+/* global CheckedEmitter, saveAs */
 
 'use strict';
 
-(function(root, initLocal, initServer) {
-  if (typeof exports === 'object') {
-    module.exports = {
-      local: initLocal,
-      server: initServer
-    };
-  } else {
-    try {
-      checkForServerGrammars(initServer, initLocal);
-    } catch (e) {
-      initLocal(root.ohmEditor, root.CheckedEmitter, root.domUtil, root.saveAs);
-    }
-  }
+var ohmEditor = require('./ohmEditor');
+var domUtil = require('./domUtil');
 
-  function checkForServerGrammars(success, fail) {
-    var httpObj = new XMLHttpRequest();
-    httpObj.onreadystatechange = function() {
-      if (httpObj.readyState === 4) {
-        if (httpObj.status === 200) {
-          var grammars = [];
-          try {
-            grammars = JSON.parse(httpObj.responseText);
-          } catch (e) { }
-          success(root.ohmEditor, root.CheckedEmitter, root.domUtil, root.CodeMirror, grammars);
-        } else {
-          fail(root.ohmEditor, root.CheckedEmitter, root.domUtil, root.saveAs);
-        }
+try {
+  checkForServerGrammars(initServer, initLocal);
+} catch (e) {
+  initLocal(ohmEditor, CheckedEmitter, domUtil, saveAs);
+}
+
+function checkForServerGrammars(success, fail) {
+  var httpObj = new XMLHttpRequest();
+  httpObj.onreadystatechange = function() {
+    if (httpObj.readyState === 4) {
+      if (httpObj.status === 200) {
+        var grammars = [];
+        try {
+          grammars = JSON.parse(httpObj.responseText);
+        } catch (e) { }
+        success(ohmEditor, CheckedEmitter, domUtil, CodeMirror, grammars);
+      } else {
+        fail(ohmEditor, CheckedEmitter, domUtil, saveAs);
       }
-    };
-    httpObj.open('GET', '../grammars/', true);
-    httpObj.send();
-  }
-})(this, function initLocal(ohmEditor, CheckedEmitter, domUtil, saveAs) {
+    }
+  };
+  httpObj.open('GET', '../grammars/', true);
+  httpObj.send();
+}
+
+function initLocal(ohmEditor, CheckedEmitter, domUtil, saveAs) {
   var $ = domUtil.$;
 
   $('#grammars').hidden = false;
@@ -80,7 +77,9 @@
   ohmEditor.addListener('change:grammar', function(source) {
     ohmEditor.saveState(ohmEditor.ui.grammarEditor, 'grammar');
   });
-}, function initServer(ohmEditor, CheckedEmitter, domUtil, CodeMirror, grammars) {
+}
+
+function initServer(ohmEditor, CheckedEmitter, domUtil, CodeMirror, grammars) {
   var $ = domUtil.$;
 
   function getFromURL(url, cb) {
@@ -158,4 +157,12 @@
       $('#saveIndicator').classList.add('edited');
     }
   });
-});
+}
+
+// Exports
+// -------
+
+module.exports = {
+  local: initLocal,
+  server: initServer
+};
