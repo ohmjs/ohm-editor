@@ -56,17 +56,6 @@ function tweenWithCallback(endValue, cb) {
   };
 }
 
-// Vue helpers
-// -----------
-
-function addChildToVNode(vnode, child) {
-  var children = vnode.componentOptions.children;
-  if (!children) {
-    children = vnode.componentOptions.children = [];
-  }
-  children.push(child);
-}
-
 // Trace element helpers
 // ---------------------
 
@@ -285,6 +274,9 @@ Vue.component('trace-element', {
     eventHandlers: {type: Object}
   },
   computed: {
+    id: function() {
+      return getFreshNodeId();
+    },
     labeled: function() {
       return shouldNodeBeLabeled(this.traceNode);
     },
@@ -326,12 +318,12 @@ Vue.component('trace-element', {
     },
     children: function() {
       if (this.collapsed) {
-        return undefined;
+        return null;
       }
 
       var children = [];
       var self = this;
-      function visitTraceNode(node) {
+      this.traceNode.children.forEach(function(node) {
         // Don't show or recurse into nodes that failed, unless "Show failures" is enabled.
         if ((!node.succeeded && !ohmEditor.options.showFailures) ||
             (node.isImplicitSpaces && !ohmEditor.options.showSpaces)) {
@@ -356,11 +348,7 @@ Vue.component('trace-element', {
           currentLR: self.currentLR
         };
         children.push(traceElement);
-        return;
-      }
-      if (children) {
-        this.traceNode.children.forEach(visitTraceNode);
-      }
+      });
       return children;
     },
     minWidth: function() {
@@ -368,12 +356,10 @@ Vue.component('trace-element', {
     }
   },
   data: function() {
-    return {
-      collapsed: false
-    };
+    return {collapsed: false};
   },
   template: [
-    '<div class="pexpr" :class="classObj" id="getFreshNodeId()">',
+    '<div class="pexpr" :class="classObj" id="id">',
     '  <div v-if="labeled" class="self">',
     '    <trace-label :traceNode="traceNode" :minWidth="minWidth"',
     '                 @hover="onHover" @unhover="onUnhover" @click="onClick"',
@@ -406,14 +392,17 @@ Vue.component('trace-element', {
       });
     }
   },
+  created: function() {
+    this.initializeCollapsedState();
+  },
   updated: function() {
     if (this.traceNode !== this.$el._traceNode) {
       this.$el._traceNode = this.traceNode;
-      this.initiallyCollapsed();
+      this.initializeCollapsedState();
     }
   },
   methods: {
-    initiallyCollapsed: function() {
+    initializeCollapsedState: function() {
       this.collapsed = this.labeled &&
         this.context &&
         shouldTraceElementBeCollapsed(this.traceNode, this.context);
@@ -550,9 +539,6 @@ Vue.component('trace-element', {
       measuringDiv.removeChild(clone);
       return result;
     }
-  },
-  created: function() {
-    this.initiallyCollapsed();
   }
 });
 
