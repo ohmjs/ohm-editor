@@ -8,10 +8,10 @@ Usage
 
 Clone this repository and run `npm install` in the project root.
 
-To run the editor:
+To run the editor in the browser:
 
     npm start
 
-To package the editor into a standalone Mac OS X app:
+To run the editor as a standalone app (using Electron):
 
-    npm run build
+    npm run electron
