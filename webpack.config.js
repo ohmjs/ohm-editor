@@ -7,7 +7,7 @@ module.exports = {
     visualizer: './src/index.js'
   },
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.join(__dirname, 'build'),
     publicPath: 'assets',
     filename: '[name]-bundle.js'
   },
