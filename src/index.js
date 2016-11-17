@@ -13,6 +13,7 @@ require('./externalRules');
 require('./parseTree');
 require('./ruleHyperlinks');
 require('./searchBar');
+require('./splitters');
 require('./timeline');
 
 var checkboxes;
