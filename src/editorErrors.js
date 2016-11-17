@@ -47,7 +47,7 @@ function showError(category, editor, interval, messageOrNode) {
 function createErrorEl(result, pos) {
   var el = domUtil.createElement('span', 'Expected ');
 
-  var failures = result._failures;
+  var failures = result.getRightmostFailures();
   var sep = ', ';
   var lastSep = failures.length >= 3 ? ', or ' : ' or ';  // Oxford comma.
 
