@@ -8,6 +8,7 @@
 
 var cmUtil = require('./cmUtil');
 var exampleWorkerManager = require('./exampleWorkerManager');
+var domUtil = require('./domUtil');
 var ohmEditor = require('./ohmEditor');
 var utils = require('./utils');
 
