@@ -7,7 +7,7 @@ var ohmEditor = require('./ohmEditor');
 
 var grammar;
 var grammarEditor;
-var grammarPosInfos;  // Holds the memo table from the last successful parse.
+var grammarMemoTable;
 var mouseCoords;
 var mark;
 var markWordInfo;
@@ -27,7 +27,7 @@ function updateLinks(cm, e) {
   cmUtil.clearMark(mark);
   markWordInfo = null;
 
-  if (mouseCoords && grammarPosInfos && areLinksEnabled(e)) {
+  if (mouseCoords && grammarMemoTable && areLinksEnabled(e)) {
     var wordInfo = getWordUnderPoint(cm, mouseCoords.x, mouseCoords.y);
     if (isRuleApplication(wordInfo)) {
       mark = cm.markText(wordInfo.startPos, wordInfo.endPos, {
@@ -57,8 +57,8 @@ function getWordUnderPoint(cm, x, y) {
 }
 
 function isRuleApplication(wordInfo) {
-  if (wordInfo.value.length > 0 && grammarPosInfos && grammarPosInfos[wordInfo.startIdx]) {
-    var memo = grammarPosInfos[wordInfo.startIdx].memo;
+  if (wordInfo.value.length > 0 && grammarMemoTable && grammarMemoTable[wordInfo.startIdx]) {
+    var memo = grammarMemoTable[wordInfo.startIdx].memo;
     if (memo && memo.Base_application && memo.Base_application.value) {
       return true;
     }
@@ -113,5 +113,5 @@ ohmEditor.addListener('parse:grammar', function(matchResult, g, err) {
     registerListeners(grammarEditor);
   }
   grammar = g;
-  grammarPosInfos = matchResult.succeeded() ? matchResult.state.posInfos : null;
+  grammarMemoTable = matchResult.succeeded() ? matchResult.matcher.memoTable : null;
 });

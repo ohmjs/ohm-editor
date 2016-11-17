@@ -42,7 +42,7 @@
   ],
   "dependencies": {
     "electron-prebuilt": "^1.1.0",
-    "ohm-js": "git://github.com/cdglabs/ohm.git"
+    "ohm-js": "git://github.com/cdglabs/ohm.git#c888659"
   },
   "devDependencies": {
     "electron-packager": "^7.0.1",
