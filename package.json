@@ -25,7 +25,10 @@
     "electron-build": "cd dist && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
     "electron": "electron electron-main.js",
     "lint": "eslint .",
-    "test": "tape test/*.js test/**/*.js | tap-spec"
+    "test": "tape test/*.js test/**/*.js | tap-spec",
+    "postinstall": "true",
+    "prestart": "bash bin/update-env.sh",
+    "pretest": "bash bin/update-env.sh"
   },
   "precommit": ["lint", "test"],
   "license": "MIT",
