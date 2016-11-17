@@ -22,7 +22,8 @@
   },
   "scripts": {
     "build": "rm build/*.worker.js; NODE_ENV=production webpack -p",
-    "electron-build": "cd build && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
+    "build-visualizer": "bash bin/build-visualizer.sh",
+    "build-electron": "cd build && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
     "electron": "electron electron-main.js",
     "lint": "eslint .",
     "test": "tape test/*.js test/**/*.js | tap-spec",

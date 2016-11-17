@@ -8,13 +8,13 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'build'),
-    publicPath: 'assets',
+    publicPath: 'assets/',
     filename: '[name]-bundle.js'
   },
   devServer: {
     contentBase: path.join(__dirname, 'src'),
     inline: true,
     port: 8080,
-    publicPath: '/assets'
+    publicPath: '/assets/'
   }
 };
