@@ -1,7 +1,8 @@
 #!/bin/bash
 
-BUILD_DIR=$(dirname $0)/../build
-EXEC_NAME=$(basename $0)
+DIR_NAME=$(dirname "$0")
+EXEC_NAME=$(basename "$0")
+BUILD_DIR=$(dirname "$DIR_NAME")/build
 
 set -e  # Exit if any step returns an error code.
 
@@ -14,19 +15,22 @@ fi
 npm run build
 
 pushd "$BUILD_DIR"
+
+# Ensure there is a clean 'visualizer' directory under $BUILD_DIR.
+mkdir -p visualizer
+rm -rf visualizer/*
 mkdir -p visualizer/assets
+echo "Ohm editor version: $(git rev-parse HEAD)" > visualizer/build-info.txt
+
+# Copy the appropriate files into the $BUILD_DIR/visualizer.
 cp visualizer-bundle.js visualizer/assets
 cp *.worker.js visualizer/assets
-cp ../src/index.html visualizer
-cp -r ../src/style visualizer
-cp -r ../src/third_party visualizer
+cp -r ../src/index.html ../src/style ../src/third_party visualizer
 
+# Sync $BUILD_DIR/visualizer with the user-specified destination dir.
 read -p "Copy visualizer to $1 (y/n)? " -n 1 -r
-echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
   popd
-  cp -rv "${BUILD_DIR}/visualizer/" "$1"
+  rsync -av --delete "${BUILD_DIR}/visualizer" $(dirname "$1")
 fi
-
-# Missing step: symlink ohm.min.js.
