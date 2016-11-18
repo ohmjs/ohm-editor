@@ -25,13 +25,16 @@
     "build-visualizer": "bash bin/build-visualizer.sh",
     "build-electron": "cd build && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
     "electron": "electron electron-main.js",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .js,.vue",
     "test": "tape test/*.js test/**/*.js | tap-spec",
     "postinstall": "true",
     "prestart": "bash bin/update-env.sh",
     "pretest": "bash bin/update-env.sh"
   },
-  "precommit": ["lint", "test"],
+  "precommit": [
+    "lint",
+    "test"
+  ],
   "license": "MIT",
   "author": "Alex Warth <alexwarth@gmail.com> (http://tinlizzie.org/~awarth)",
   "contributors": [
@@ -45,10 +48,12 @@
     "ohm-js": "git://github.com/cdglabs/ohm.git#c888659"
   },
   "devDependencies": {
+    "css-loader": "^0.26.0",
     "electron-packager": "^7.0.1",
     "eslint": "^3.7.1",
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-camelcase-ohm": "^0.2.0",
+    "eslint-plugin-html": "^1.6.0",
     "eslint-plugin-no-extension-in-require": "^0.2.0",
     "eslint-plugin-tape": "^1.1.0",
     "open": "0.0.5",
@@ -56,6 +61,7 @@
     "tap-spec": "^4.1.1",
     "tape": "^4.6.2",
     "uglify": "^0.1.5",
+    "vue-loader": "^9.9.5",
     "webpack": "^1.13.3",
     "webpack-dev-server": "^1.16.2",
     "worker-loader": "^0.7.1"

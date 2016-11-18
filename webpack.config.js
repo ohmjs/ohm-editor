@@ -3,6 +3,11 @@
 var path = require('path');
 
 module.exports = {
+  module: {
+    loaders: [
+      {test: /\.vue$/, loader: 'vue'}
+    ]
+  },
   entry: {
     visualizer: './src/index.js'
   },

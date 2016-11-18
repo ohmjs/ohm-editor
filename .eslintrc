@@ -18,10 +18,15 @@
     "require": true,
   },
   "plugins": [
-    "camelcase-ohm",  
+    "camelcase-ohm",
+    "html",
     "no-extension-in-require",
     "tape"
   ],
+  "settings": {
+    "html/indent": "+2",  // indentation is the <script> indentation plus two spaces.
+    "html/report-bad-indent": 2
+  },
   "rules": {
     // Enforce "one true brace style", allowing start and end braces to be on the same line.
     brace-style: ["error", "1tbs", {allowSingleLine: true}],
@@ -73,6 +78,6 @@
     strict: ["error", "global"],
 
     // We would use `["error", "never", {exceptRange: true}]` here, but it doesn't seem to work.
-    yoda: 0,
+    yoda: 0
   }
 }
