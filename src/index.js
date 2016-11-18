@@ -25,11 +25,14 @@ var showFailuresImplicitly = true;
 var $ = domUtil.$;
 var $$ = domUtil.$$;
 
+var grammarMatcher = ohm.ohmGrammar.matcher();
+
 // Helpers
 // -------
 
-function parseGrammar(source) {
-  var matchResult = ohm.ohmGrammar.match(source);
+function parseGrammar() {
+  var matchResult = grammarMatcher.match();
+
   var grammar;
   var err;
 
@@ -86,7 +89,7 @@ function refresh() {
     grammarChanged = false;
     ohmEditor.emit('change:grammar', grammarSource);
 
-    var result = parseGrammar(grammarSource);
+    var result = parseGrammar();
     ohmEditor.grammar = result.grammar;
     ohmEditor.emit('parse:grammar', result.matchResult, result.grammar, result.error);
   }
@@ -130,6 +133,11 @@ function triggerRefresh(delay) {
   refreshTimeout = setTimeout(refresh.bind(ohmEditor), delay || 0);
 }
 
+function resetGrammarMatcher() {
+  grammarMatcher = ohm.ohmGrammar.matcher();
+  grammarMatcher.setInput(ohmEditor.ui.grammarEditor.getValue());
+}
+
 checkboxes = $$('#options input[type=checkbox]');
 checkboxes.forEach(function(cb) {
   cb.addEventListener('click', function(e) {
@@ -152,7 +160,17 @@ ohmEditor.ui.inputEditor.on('change', function(cm) {
   ohmEditor.emit('change:inputEditor', cm);
   triggerRefresh(250);
 });
-ohmEditor.ui.grammarEditor.on('change', function(cm) {
+
+ohmEditor.ui.grammarEditor.on('beforeChange', function(cm, change) {
+  grammarMatcher.replaceInputRange(
+      cm.indexFromPos(change.from),
+      cm.indexFromPos(change.to),
+      change.text.join('\n'));
+});
+
+ohmEditor.ui.grammarEditor.on('swapDoc', resetGrammarMatcher);
+
+ohmEditor.ui.grammarEditor.on('change', function(cm, change) {
   grammarChanged = true;
   ohmEditor.emit('change:grammarEditor', cm);
   triggerRefresh(250);
@@ -168,4 +186,5 @@ console.log([
 ].join('\n'));
 /* eslint-enable no-console */
 
+resetGrammarMatcher();
 refresh();
