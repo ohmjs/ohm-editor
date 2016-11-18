@@ -1,3 +1,10 @@
+<template>
+  <div id="expandedInputWrapper">
+    <div id="sizer">&nbsp;</div>
+    <canvas id="expandedInput" width="1" height="1"></canvas>
+  </div>
+</template>
+
 <script>
   /* global window */
   'use strict';
@@ -27,12 +34,6 @@
         return this.canvasEl.getContext('2d');
       }
     },
-    template: [
-      '<div id="expandedInputWrapper">',
-      '  <div id="sizer">&nbsp;</div>',
-      '  <canvas id="expandedInput" width="1" height="1"></canvas>',
-      '</div>'
-    ].join(''),
     mounted: function() {
       this.update();
     },

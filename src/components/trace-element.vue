@@ -1,3 +1,22 @@
+<template>
+  <div class="pexpr" :class="classObj" id="id">
+    <div v-if="labeled" class="self">
+      <trace-label :traceNode="traceNode" :minWidth="minWidth"
+                   @hover="onHover" @unhover="onUnhover" @click="onClick"
+                   @showContextMenu="onShowContextMenu" />
+    </div>
+    <div v-if="!isLeaf" ref="children"
+         class="children" :class="{vbox: vbox}"
+         :hidden="classObj.collapsed">
+      <trace-element v-for="child in children"
+                     :id="child.id" :traceNode="child.traceNode" :context="child.context"
+                     :currentLR="child.currentLR" :measureInputText="measureInputText"
+                     :isInVBox="child.isInVBox" :eventHandlers="eventHandlers">
+      </trace-element>
+    </div>
+  </div>
+</template>
+
 <script>
   /* global d3, ohm */
   'use strict';
@@ -216,24 +235,6 @@
     data: function() {
       return {collapsed: false};
     },
-    template: [
-      '<div class="pexpr" :class="classObj" id="id">',
-      '  <div v-if="labeled" class="self">',
-      '    <trace-label :traceNode="traceNode" :minWidth="minWidth"',
-      '                 @hover="onHover" @unhover="onUnhover" @click="onClick"',
-      '                 @showContextMenu="onShowContextMenu" />',
-      '  </div>',
-      '  <div v-if="!isLeaf" ref="children"',
-      '       class="children" :class="{vbox: vbox}"',
-      '       :hidden="classObj.collapsed">',
-      '    <trace-element v-for="child in children"',
-      '                   :id="child.id" :traceNode="child.traceNode" :context="child.context"',
-      '                   :currentLR="child.currentLR" :measureInputText="measureInputText"',
-      '                   :isInVBox="child.isInVBox" :eventHandlers="eventHandlers">',
-      '    </trace-element>',
-      '  </div>',
-      '</div>'
-    ].join(''),
     mounted: function() {
       var el = this.$el;
       el._traceNode = this.traceNode;

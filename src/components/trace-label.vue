@@ -1,3 +1,13 @@
+<template>
+  <div class="label" :title="labelData.tooltip" :style="{minWidth: minWidth}"
+       @mouseover="emitHover" @mouseout="emitUnhover" @click="onClick($event)"
+       @contextmenu="onContextMenu($event)">{{
+    labelData.text
+  }}<span v-if="labelData.caseName" class="caseName">{{ labelData.caseName }}</span>
+    <span v-if="extraInfo" class="info">{{ extraInfo }}</span>
+  </div>
+</template>
+
 <script>
   /* global window */
   'use strict';
@@ -78,15 +88,6 @@
         e.stopPropagation();
         e.preventDefault();
       }
-    },
-    template: [
-      '<div class="label" :title="labelData.tooltip" :style="{minWidth: minWidth}"',
-      '     @mouseover="emitHover" @mouseout="emitUnhover" @click="onClick($event)"',
-      '     @contextmenu="onContextMenu($event)">{{',
-      '  labelData.text',
-      '}}<span v-if="labelData.caseName" class="caseName">{{ labelData.caseName }}</span>',
-      '<span v-if="extraInfo" class="info">{{ extraInfo }}</span>',
-      '</div>'
-    ].join('')
+    }
   };
 </script>
