@@ -78,7 +78,7 @@
           // Skip anything that falls outside the viewport, and any failed nodes apart
           // from the first top-level failure.
           if (!isRectInViewport(rect) ||
-              (el.classList.contains('failed') && el !== firstFailedEl)) {
+              (el.classList.contains('failed') && el !== root && el !== firstFailedEl)) {
             return;
           }
 
@@ -136,7 +136,7 @@
       },
 
       renderFailedInputText: function(el, rect) {
-        var text = el._traceNode.inputStream.sourceSlice(el._traceNode.pos);
+        var text = el._traceNode.input.substring(el._traceNode.pos);
         var baseRect = $('#expandedInputWrapper').getBoundingClientRect();
         var renderRect = {
           bottom: rect.bottom,
