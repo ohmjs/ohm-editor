@@ -86,7 +86,7 @@
 }
 
 /* A successful expression in a failed branch */
-.pexpr.failed .pexpr:not(.failed):not(.unevaluated) > .self .label {
+#parseResults > .pexpr > .children .pexpr.failed .pexpr:not(.failed):not(.unevaluated) > .self .label {
   background-color: #FFD7DE;
 }
 

@@ -130,6 +130,17 @@
     return ohmEditor.options.showFailures && traceNode.terminatingLREntry != null;
   }
 
+  function cloneObject(obj) {
+    var newObj = Object.create(null);
+    if (!obj) {
+      return newObj;
+    }
+    Object.keys(obj).forEach(function(key) {
+      newObj[key] = Array.prototype.slice.call(obj[key]);
+    });
+    return newObj;
+  }
+
   // Exports
   // -------
 
@@ -146,9 +157,8 @@
       // from parent element
       context: {type: Object},
 
-      // from currentLR
-      currentLR: {type: Object, default: Object},
-      eventHandlers: {type: Object}
+      eventHandlers: {type: Object},
+      currentLR: {type: Object}
     },
     computed: {
       id: function() {
@@ -187,6 +197,7 @@
 
         obj.collapsed = this.labeled &&
           this.context &&
+          !this.isLeaf &&
           shouldTraceElementBeCollapsed(this.traceNode, this.context);
         obj.failed = !this.traceNode.succeeded;
         obj.labeled = this.labeled;
@@ -201,7 +212,7 @@
         var children = [];
         var self = this;
         this.traceNode.children.forEach(function(node) {
-          // Don't show or recurse into nodes that failed, unless "Show failures" is enabled.
+          // Don't show or recurse into nodes that failed, unless "Explain parse" is enabled.
           if ((!node.succeeded && !ohmEditor.options.showFailures) ||
               (node.isImplicitSpaces && !ohmEditor.options.showSpaces)) {
             return;
@@ -212,6 +223,7 @@
             return;
           }
 
+          var lrObj = cloneObject(self.currentLR);
           var traceElement = {
             traceNode: node,
             context: {
@@ -221,11 +233,25 @@
                                         self.context && self.context.syntactic,
               vbox: self.vbox
             },
-            isInVBox: self.context ? self.context.vbox : false,
-            currentLR: self.currentLR
+            isInVBox: self.vbox,
+            currentLR: lrObj
           };
           children.push(traceElement);
         });
+
+        if (hasVisibleLeftRecursion(this.traceNode)) {
+          var lrObj = cloneObject(self.currentLR);
+          var memoKey = this.traceNode.expr.toMemoKey();
+          var stack = lrObj[memoKey] || [];
+          lrObj[memoKey] = stack;
+          stack.push(this.traceNode.pos);
+          children.push({
+            traceNode: this.traceNode.terminatingLREntry,
+            context: this.context,
+            isInVBox: true,
+            currentLR: lrObj
+          });
+        }
         return children;
       },
       minWidth: function() {
@@ -310,6 +336,9 @@
       toggleCollapsed: function() {
         // Caution: direct DOM manipulation here!
         // TODO: Consider using Vue.js <transition> wrapper element.
+        if (this.isLeaf) {
+          return;
+        }
         var children = this.$refs.children;
         this.setCollapsed(!children.hidden);
       },
