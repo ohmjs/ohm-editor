@@ -284,6 +284,7 @@
       if (this.traceNode !== this.$el._traceNode) {
         this.$el._traceNode = this.traceNode;
         this.initializeCollapsedState();
+        this.$el.classList.toggle('collapsed', !!this.collapsed);
       }
     },
     methods: {
