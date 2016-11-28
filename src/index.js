@@ -176,6 +176,11 @@ ohmEditor.ui.grammarEditor.on('change', function(cm, change) {
   ohmEditor.emit('change:grammarEditor', cm);
   triggerRefresh(250);
 });
+ohmEditor.ui.grammarEditor.on('swapDoc', function(cm) {
+  grammarChanged = true;
+  ohmEditor.emit('change:grammarEditor', cm);
+  triggerRefresh(250);
+});
 
 /* eslint-disable no-console */
 console.log('%cOhm visualizer', 'color: #e0a; font-family: Avenir; font-size: 18px;');
