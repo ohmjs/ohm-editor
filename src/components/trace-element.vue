@@ -7,8 +7,8 @@
     </div>
     <div v-if="!isLeaf" ref="children"
          class="children" :class="{vbox: vbox}"
-         :hidden="classObj.collapsed">
-      <trace-element v-for="child in children"
+         :hidden="collapsed">
+      <trace-element v-for="child in childrenToRender"
                      :id="child.id" :traceNode="child.traceNode" :context="child.context"
                      :currentLR="child.currentLR" :measureInputText="measureInputText"
                      :isInVBox="child.isInVBox" :eventHandlers="eventHandlers">
@@ -85,22 +85,6 @@
       return expr.factors.some(isSyntactic);
     }
     return expr instanceof ohm.pexprs.Param;
-  }
-
-  // Return true if the trace element `el` should be collapsed by default.
-  function shouldTraceElementBeCollapsed(traceNode, context) {
-    // Don't collapse unlabeled nodes (they can't be expanded), nodes with a collapsed ancestor,
-    // or leaf nodes.
-    if (context.collapsed || isLeaf(traceNode)) {
-      return false;
-    }
-
-    // Collapse uppermost failure nodes.
-    if (!traceNode.succeeded) {
-      return true;
-    }
-
-    return context.syntactic && !isSyntactic(traceNode);
   }
 
   /*
@@ -186,6 +170,17 @@
         }
         return leaf;
       },
+      initiallyCollapsed: function() {
+        if (!this.labeled || this.isLeaf) {
+          return false;
+        }
+        // Collapse uppermost failure nodes.
+        if (!this.traceNode.succeeded) {
+          return true;
+        }
+        // Collapse the non-syntactic nodes that are in syntactic contexts.
+        return this.context.syntactic && !isSyntactic(this.traceNode);
+      },
       classObj: function() {
         var obj = {
           disclosure: this.labeled && this.isInVBox
@@ -194,23 +189,24 @@
         if (ctorName) {
           obj[ctorName.toLowerCase()] = true;
         }
-
-        obj.collapsed = this.labeled &&
-          this.context &&
-          !this.isLeaf &&
-          shouldTraceElementBeCollapsed(this.traceNode, this.context);
+        obj.collapsed = this.collapsed;
         obj.failed = !this.traceNode.succeeded;
         obj.labeled = this.labeled;
         obj.leaf = this.isLeaf;
         return obj;
       },
-      children: function() {
-        if (this.collapsed) {
+      // The children to actually be rendered in the DOM. By using a separate property, we can
+      // defer calculation of the children until the first time the node is expanded.
+      childrenToRender: function() {
+        if (this.initiallyCollapsed && !this.hasUserToggledCollapsedState) {
           return null;
         }
-
+        return this.children;
+      },
+      children: function() {
         var children = [];
         var self = this;
+
         this.traceNode.children.forEach(function(node) {
           // Don't show or recurse into nodes that failed, unless "Explain parse" is enabled.
           if ((!node.succeeded && !ohmEditor.options.showFailures) ||
@@ -227,8 +223,6 @@
           var traceElement = {
             traceNode: node,
             context: {
-              parent: self,
-              collapsed: self.collapsed,
               syntactic: self.labeled ? isSyntactic(node.expr) :
                                         self.context && self.context.syntactic,
               vbox: self.vbox
@@ -259,14 +253,20 @@
       }
     },
     data: function() {
-      return {collapsed: false};
+      return {
+        collapsed: false,
+        hasUserToggledCollapsedState: false
+      };
+    },
+    beforeMount: function() {
+      this.initializeCollapsedState();
     },
     mounted: function() {
       var el = this.$el;
       el._traceNode = this.traceNode;
 
       ohmEditor.parseTree.emit('create:traceElement', el, el._traceNode);
-      if (this.classObj.collapsed) {
+      if (this.collapsed) {
         ohmEditor.parseTree.emit('collapse:traceElement', el);
       }
 
@@ -277,21 +277,18 @@
         });
       }
     },
-    created: function() {
-      this.initializeCollapsedState();
+    beforeUpdate: function() {
+      if (this.traceNode !== this.$el._traceNode) {
+        this.initializeCollapsedState();
+      }
     },
     updated: function() {
-      if (this.traceNode !== this.$el._traceNode) {
-        this.$el._traceNode = this.traceNode;
-        this.initializeCollapsedState();
-        this.$el.classList.toggle('collapsed', !!this.collapsed);
-      }
+      this.$el._traceNode = this.traceNode;
     },
     methods: {
       initializeCollapsedState: function() {
-        this.collapsed = this.labeled &&
-          this.context &&
-          shouldTraceElementBeCollapsed(this.traceNode, this.context);
+        this.collapsed = this.initiallyCollapsed;
+        this.hasUserToggledCollapsedState = false;
       },
       onHover: function() {
         var grammarEditor = ohmEditor.ui.grammarEditor;
@@ -335,19 +332,12 @@
         this.eventHandlers.showContextMenu(data);
       },
       toggleCollapsed: function() {
-        // Caution: direct DOM manipulation here!
-        // TODO: Consider using Vue.js <transition> wrapper element.
-        if (this.isLeaf) {
-          return;
-        }
-        var children = this.$refs.children;
-        this.setCollapsed(!children.hidden);
+        this.setCollapsed(!this.collapsed);
       },
       // Hides or shows the children of `el`, which is a div.pexpr.
       setCollapsed: function(collapse, optDurationInMs) {
-        if (!collapse && !this.children) {
-          this.collapsed = collapse;
-        }
+        this.collapsed = collapse;
+        this.hasUserToggledCollapsedState = true;
 
         var duration = optDurationInMs != null ? optDurationInMs : 500;
         var el = this.$el;
@@ -364,8 +354,13 @@
           return;
         }
 
+        // Caution: direct DOM manipulation here!
+        // TODO: Consider using Vue.js <transition> wrapper element.
         var self = this;
         this.$nextTick(function() {
+          // Temporarily toggle the visibility of the children, which is the pre-transition state.
+          el.lastChild.hidden = !el.lastChild.hidden;
+
           var childrenSize = self.measureChildren();
           var newWidth = collapse ? self.measureLabel().width : childrenSize.width;
           d3.select(el)
