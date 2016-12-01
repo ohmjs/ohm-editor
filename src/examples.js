@@ -33,6 +33,11 @@ ohmEditor.examples.registerEvents({
   'remove:example': ['id']
 });
 
+module.exports = {
+  restoreExamples: restoreExamples,
+  getExamples: getExamples
+};
+
 // Helpers
 // -------
 
@@ -220,20 +225,30 @@ function setSelected(id) {
   ohmEditor.examples.emit('set:selected', id);
 }
 
-// Restore the examples from localStorage.
-function restoreExamples(editor, key) {
-  var value = localStorage.getItem(key);
+// Restore the examples from localStorage or the given object.
+function restoreExamples(key /* orExamples */) {
   var examples = [];
-  if (value) {
-    examples = JSON.parse(value);
+  if (typeof key === 'string') {
+    var value = localStorage.getItem(key);
+    if (value) {
+      examples = JSON.parse(value);
+    } else {
+      examples = domUtil.$$('#sampleExamples pre').map(function(elem) {
+        return {
+          text: elem.textContent,
+          startRule: null
+        };
+      });
+    }
   } else {
-    examples = domUtil.$$('#sampleExamples pre').map(function(elem) {
-      return {
-        text: elem.textContent,
-        startRule: null
-      };
-    });
+    examples = key;
   }
+
+  // remove previous examples
+  domUtil.$$('#exampleContainer ul li.example').forEach(function(li) {
+    delete exampleValues[li.id];
+    li.remove();
+  })
 
   examples.forEach(function(ex) {
     if (!ex.hasOwnProperty('positive')) {
@@ -294,4 +309,4 @@ ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
 // Hide the inputEditor by default, only showing it when there is a selected example.
 ohmEditor.ui.inputEditor.getWrapperElement().hidden = true;
 
-restoreExamples(ohmEditor.ui.inputEditor, 'examples');
+restoreExamples('examples');
