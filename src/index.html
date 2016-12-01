@@ -357,6 +357,58 @@
       flex: 1;
     }
 
+    #promptScreen {
+      display: none;
+      position: fixed;
+      z-index: 5; /* z-index = 2 are the externalRules */
+      padding-top: 200px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    #promptScreen > * {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 15px;
+      border: 1px solid #888;
+      width: 300px;
+    }
+
+    #promptScreen h2 {
+      margin: 0;
+    }
+
+    #promptScreen label {
+      display: inline-block;
+      font-size: 14px;
+      width: 85px;
+    }
+
+    #promptScreen label,
+    #promptScreen input[type="submit"],
+    #promptScreen input[type="reset"] {
+      margin-top: 10px;
+    }
+
+    .close {
+      color: #aaaaaa;
+      float: right;
+      margin: -10px -5px 0 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .close:hover, .close:focus {
+      color: #e0a;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
     /*
       Use media query hack to enable custom styling on WebKit/Blink only.
       Other browsers will ignore these rules.
@@ -452,6 +504,30 @@
       <li><input type="checkbox" name="showFailures"><label>Explain parse</label></li>
       <li><input type="checkbox" name="showSpaces"><label>Show spaces</label></li>
     </ul>
+  </div>
+
+  <div id="promptScreen">
+    <div id="loginBox" hidden>
+      <span class="close">×</span>
+      <h2>Log into GitHub</h1>
+      <form id="gitHubForm">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username"><br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password"><br>
+        <input type="submit" value="Login">
+      </form>
+    </div>
+    <div id="newGrammarBox" hidden>
+      <span class="close">×</span>
+      <h2>New Grammar</h1>
+      <form id="newGrammarForm">
+        <label for="newGrammarName" style="width: 110px">Grammar name:</label>
+        <input type="text" name="newGrammarName" id="newGrammarName" style="width: 290px"><br>
+        <input type="submit" value="Create">
+        <input type="reset" value="Cancel">
+      </form>
+    </div>
   </div>
 
   <div id="measuringDiv">
