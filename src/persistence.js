@@ -6,32 +6,7 @@
 var ohmEditor = require('./ohmEditor');
 var domUtil = require('./domUtil');
 
-try {
-  checkForServerGrammars(initServer, initLocal);
-} catch (e) {
-  initLocal(ohmEditor, CheckedEmitter, domUtil, saveAs);
-}
-
-function checkForServerGrammars(success, fail) {
-  var httpObj = new XMLHttpRequest();
-  httpObj.onreadystatechange = function() {
-    if (httpObj.readyState === 4) {
-      if (httpObj.status === 200) {
-        var grammars = [];
-        try {
-          grammars = JSON.parse(httpObj.responseText);
-        } catch (e) { }
-        success(ohmEditor, CheckedEmitter, domUtil, CodeMirror, grammars);
-      } else {
-        fail(ohmEditor, CheckedEmitter, domUtil, saveAs);
-      }
-    }
-  };
-  httpObj.open('GET', '../grammars/', true);
-  httpObj.send();
-}
-
-function initLocal(ohmEditor, CheckedEmitter, domUtil, saveAs) {
+function initLocal() {
   var $ = domUtil.$;
 
   $('#grammars').hidden = false;
@@ -79,7 +54,7 @@ function initLocal(ohmEditor, CheckedEmitter, domUtil, saveAs) {
   });
 }
 
-function initServer(ohmEditor, CheckedEmitter, domUtil, CodeMirror, grammars) {
+function initServer(grammars) {
   var $ = domUtil.$;
 
   function getFromURL(url, cb) {
@@ -157,6 +132,20 @@ function initServer(ohmEditor, CheckedEmitter, domUtil, CodeMirror, grammars) {
       $('#saveIndicator').classList.add('edited');
     }
   });
+}
+
+// Main
+// -------
+
+if (window.location.protocol !== 'file:') {
+  var grammars = {
+    official: [
+      '7f62adb8df879a5eb8288dbbddcc663f' // Arithmetic
+    ]
+  };
+  initServer(grammars);
+} else {
+  initLocal();
 }
 
 // Exports
