@@ -44,6 +44,7 @@ ohmEditor.startRule = null;
 ohmEditor.options = {};
 
 ohmEditor.semantics = new CheckedEmitter();
+ohmEditor.semantics.value = null;
 ohmEditor.semantics.registerEvents({
   // Emitted after adding an new operation/attribute.
   'add:operation': ['type', 'signature'],
