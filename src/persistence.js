@@ -12,6 +12,7 @@ function initLocal() {
   var $ = domUtil.$;
 
   $('#grammars').hidden = false;
+  $('#saveGrammarAs').hidden = true;
 
   var loadedGrammar = 'unnamed.ohm';
   var grammarName = $('#grammarName');
@@ -66,7 +67,10 @@ function initServer(grammars) {
   $('#loadGrammar').hidden = true;
 
   var saveButton = $('#saveGrammar');
-  saveButton.textContent = 'Save as...';
+  var saveAsButton = $('#saveGrammarAs');
+
+  saveButton.textContent = 'Save';
+  saveButton.disabled = true;
 
   // -------------------------------------------------------
   // PROMPT STUFF
@@ -239,6 +243,7 @@ function initServer(grammars) {
         option.text = description;
         group.insertBefore(option, group.lastChild);
         grammarList.value = gistId;
+        saveButton.disabled = false;
       }
 
       $('#saveIndicator').classList.remove('edited');
@@ -246,27 +251,31 @@ function initServer(grammars) {
   }
 
   saveButton.addEventListener('click', function(e) {
-    if (saveButton.textContent === 'Save') {
-      // FIXME: can only be checked if changes to examples are also noted
-      // var active = $('#saveIndicator').classList.contains('edited');
-      // if (!active) {
-      //   return;
-      // }
+    // TODO: check for GitHub user
 
-      var option = grammarList.options[grammarList.selectedIndex];
-      var grammarHash = option.value;
+    // FIXME: can only be checked if changes to examples are also noted
+    // var active = $('#saveIndicator').classList.contains('edited');
+    // if (!active) {
+    //   return;
+    // }
 
-      var description = option.label;
-      var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
-      var grammarText = ohmEditor.ui.grammarEditor.getValue();
-      var examples = getExamples();
+    var option = grammarList.options[grammarList.selectedIndex];
+    var grammarHash = option.value;
 
-      saveToGist(description, grammarName, grammarText, examples, grammarHash);
-    } else { // save as
-      showPrompt('newGrammarBox');
-      $('#newGrammarName').focus();
-    }
+    var description = option.label;
+    var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
+    var grammarText = ohmEditor.ui.grammarEditor.getValue();
+    var examples = getExamples();
+
+    saveToGist(description, grammarName, grammarText, examples, grammarHash);
   });
+  saveAsButton.addEventListener('click', function(e) {
+    // TODO: check for GitHub user
+
+    showPrompt('newGrammarBox');
+    $('#newGrammarName').focus();
+  });
+
   $('#newGrammarForm').addEventListener('submit', function(e) {
     hidePrompt();
 
@@ -298,7 +307,7 @@ function initServer(grammars) {
     if (grammarHash === '') { // local storage
       ohmEditor.restoreState(ohmEditor.ui.grammarEditor, 'grammar', $('#sampleGrammar'));
       restoreExamples('examples');
-      saveButton.textContent = 'Save as...';
+      saveButton.disabled = true;
       return false;
     } else if (grammarHash === '!login') {
       showPrompt('loginBox');
@@ -323,9 +332,9 @@ function initServer(grammars) {
 
     var optGroup = grammarList.options[grammarList.selectedIndex].parentElement;
     if (optGroup.label === 'My Grammars') {
-      saveButton.textContent = 'Save';
+      saveButton.disabled = false;
     } else {
-      saveButton.textContent = 'Save as...';
+      saveButton.disabled = true;
     }
     loadFromGist(grammarHash, function(src, examplesJSON) {
       ohmEditor.once('change:grammar', function(_) {
