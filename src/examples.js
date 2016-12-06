@@ -268,7 +268,7 @@ var uiSave = function(cm) {
   if (selectedId) {
     var selectEl = domUtil.$('#startRuleDropdown');
     var value = cm.getValue();
-    var startRule = selectEl.options[selectEl.selectedIndex].value;
+    var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
     var isPositive = exampleValues[selectedId].positive;
     setExample(selectedId, value, startRule, isPositive);
     saveExamples();

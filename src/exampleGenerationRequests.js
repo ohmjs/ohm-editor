@@ -55,7 +55,11 @@ exampleWorkerManager.addListener('received:neededExamples', function(updatedNeed
 });
 
 ohmEditor.examples.addListener('set:selected', function(id) {
-  var value = ohmEditor.examples.getExample(id);
+  try {
+    var value = ohmEditor.examples.getExample(id);
+  } catch (e) {
+    return;
+  }
   var inputList = domUtil.$('#neededExamples > ul');
   var startRuleDropdown = domUtil.$('#startRuleDropdown');
   var startRule = value.startRule;
@@ -91,7 +95,9 @@ function makeStartRuleDropdown(grammar, neededExamples, optStartRule) {
       dropdown.options,
       function(option) { return option.value === startRule; }
     );
-    option.selected = true;
+    if (option) {
+      option.selected = true;
+    }
   }
 
   return dropdown;
