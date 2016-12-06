@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global CodeMirror, saveAs, GitHub */
+/* global saveAs, GitHub */
 
 'use strict';
 
@@ -114,7 +114,7 @@ function initServer(grammars) {
 
       var grammarFile = res.files[grammarFilename];
       var exampleFile = res.files[exampleFilename];
-      cb(grammarFile && grammarFile.content, exampleFile && exampleFile.content);
+      cb(grammarFile && grammarFile.content, exampleFile && JSON.parse(exampleFile.content));
     });
   }
 
@@ -302,11 +302,24 @@ function initServer(grammars) {
     prevSelection = grammarList.selectedIndex;
   });
 
+  function setGrammarAndExamples(grammar, examples) {
+    ohmEditor.once('change:grammar', function(_) {
+      $('#saveIndicator').classList.remove('edited');
+    });
+    if (examples) {
+      ohmEditor.once('parse:grammar', function(matchResult, grammar, err) {
+        restoreExamples(examples);
+      });
+    }
+
+    restoreExamples([]); // clear examples
+    ohmEditor.setGrammar(grammar);
+  }
+
   grammarList.addEventListener('change', function(e) {
     var grammarHash = grammarList.options[grammarList.selectedIndex].value;
     if (grammarHash === '') { // local storage
-      ohmEditor.restoreState(ohmEditor.ui.grammarEditor, 'grammar', $('#sampleGrammar'));
-      restoreExamples('examples');
+      setGrammarAndExamples(null, 'examples' /* local storage key */);
       saveButton.disabled = true;
       return false;
     } else if (grammarHash === '!login') {
@@ -336,21 +349,7 @@ function initServer(grammars) {
     } else {
       saveButton.disabled = true;
     }
-    loadFromGist(grammarHash, function(src, examplesJSON) {
-      ohmEditor.once('change:grammar', function(_) {
-        $('#saveIndicator').classList.remove('edited');
-      });
-      if (!examplesJSON) {
-        examplesJSON = '[]';
-      }
-      ohmEditor.once('parse:grammar', function(matchResult, grammar, err) {
-        restoreExamples(JSON.parse(examplesJSON));
-      });
-
-      restoreExamples([]); // clear examples
-      var doc = CodeMirror.Doc(src, 'null');
-      ohmEditor.ui.grammarEditor.swapDoc(doc);
-    });
+    loadFromGist(grammarHash, setGrammarAndExamples);
   });
 
   ohmEditor.ui.grammarEditor.setOption('extraKeys', {

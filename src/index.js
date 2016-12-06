@@ -108,14 +108,14 @@ function refresh() {
   }
 }
 
-ohmEditor.restoreState = function(editor, key, defaultEl) {
-  var value = localStorage.getItem(key);
-  var doc;
-  if (value) {
-    doc = CodeMirror.Doc(value, 'null');
-  } else if (defaultEl) {
-    doc = CodeMirror.Doc(defaultEl.textContent, 'null');
+ohmEditor.setGrammar = function(grammar) {
+  if (grammar === null) { // load from local storage or default element
+    grammar = localStorage.getItem('grammar');
+    if (!grammar || grammar === '') {
+      grammar = $('#sampleGrammar').textContent; // default element
+    }
   }
+  var doc = CodeMirror.Doc(grammar, 'null');
   ohmEditor.ui.grammarEditor.swapDoc(doc);
 };
 
@@ -154,7 +154,7 @@ checkboxes.forEach(function(cb) {
   });
 });
 
-ohmEditor.restoreState(ohmEditor.ui.grammarEditor, 'grammar', $('#sampleGrammar'));
+ohmEditor.setGrammar(null /* restore local storage */);
 
 ohmEditor.ui.inputEditor.on('change', function(cm) {
   inputChanged = true;
