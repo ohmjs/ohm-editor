@@ -1,7 +1,7 @@
 <template>
   <div class="flex-fix">
-    <div class="editorWrapper">
-      <action-addtion v-show="loaded"></action-addtion>
+    <div class="editorWrapper" v-if="loaded">
+      <action-addtion></action-addtion>
       <suggestion-list></suggestion-list>
       <semantic-editor v-for="child in children"
                        :type="child.type" :id="child.id" :operation="child.operation">
