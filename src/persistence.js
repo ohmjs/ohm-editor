@@ -201,9 +201,10 @@ function initServer(grammars) {
     $('#username').value = '';
     var password = $('#password').value;
     $('#password').value = '';
-    gitHub = new GitHub({username: username, password: password});
-    loadUserGrammars(gitHub.getUser());
-
+    if (username !== '' && password !== '') {
+      gitHub = new GitHub({username: username, password: password});
+      loadUserGrammars(gitHub.getUser());
+    }
     localStorage.removeItem('gitHubAuth');
 
     e.preventDefault();
