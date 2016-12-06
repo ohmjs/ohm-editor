@@ -251,7 +251,7 @@ function initServer(grammars) {
     });
   }
 
-  saveButton.addEventListener('click', function(e) {
+  function save() {
     // TODO: check for GitHub user
 
     // FIXME: can only be checked if changes to examples are also noted
@@ -269,13 +269,16 @@ function initServer(grammars) {
     var examples = getExamples();
 
     saveToGist(description, grammarName, grammarText, examples, grammarHash);
-  });
-  saveAsButton.addEventListener('click', function(e) {
+  }
+  saveButton.addEventListener('click', save);
+
+  function saveAs() {
     // TODO: check for GitHub user
 
     showPrompt('newGrammarBox');
     $('#newGrammarName').focus();
-  });
+  }
+  saveAsButton.addEventListener('click', saveAs);
 
   $('#newGrammarForm').addEventListener('submit', function(e) {
     hidePrompt();
@@ -355,14 +358,11 @@ function initServer(grammars) {
 
   ohmEditor.ui.grammarEditor.setOption('extraKeys', {
     'Cmd-S': function(cm) {
-      var grammar = grammarList.options[grammarList.selectedIndex].value;
-      if (grammar === '') {
-        return;
+      if (saveButton.disabled) {
+        saveAs();
+      } else {
+        save();
       }
-
-      postToURL('../grammars/' + grammar, cm.getValue(), function(response) {
-        $('#saveIndicator').classList.remove('edited');
-      });
     }
   });
 
