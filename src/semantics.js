@@ -13,7 +13,8 @@ semanticsContainer.registerEvents({
   'hide:suggestions': [],
   'create:editor': ['type', 'id'],
   'select:suggestion': ['key'],
-  'highlight:suggestion': ['index']
+  'highlight:suggestion': ['index'],
+  'save:semantics': []
 });
 
 semanticsContainer.vue = new Vue({

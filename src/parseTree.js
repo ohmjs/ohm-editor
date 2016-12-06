@@ -26,7 +26,7 @@ parseTree.vue = new Vue({
   mounted: function() {
     ohmEditor.addListener('change:inputEditor', this.onEdit);
     ohmEditor.addListener('change:grammarEditor', this.onEdit);
-    ohmEditor.semanticsContainer.emit('toggle:semanticsButton', this.onEdit);
+
     // Refresh the parse tree after attempting to parse the input.
     var self = this;
     ohmEditor.addListener('parse:input', function(matchResult, trace) {
