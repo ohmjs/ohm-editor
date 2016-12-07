@@ -62,8 +62,8 @@ function checkExample(id) {
   } catch (e) {
     succeeded = false;
   }
-  el.classList.toggle('pass', succeeded === example.positive);
-  el.classList.toggle('fail', !succeeded === example.positive);
+  el.classList.toggle('pass', succeeded === example.shouldMatch);
+  el.classList.toggle('fail', !succeeded === example.shouldMatch);
 }
 
 function getListEl(exampleId) {
@@ -93,11 +93,12 @@ function addExample() {
     e.stopPropagation();  // Prevent selection.
   };
   sign.onclick = function() { // flip orientation
-    exampleValues[id].positive = !exampleValues[id].positive;
-    setExample(id, exampleValues[id].text, exampleValues[id].startRule, exampleValues[id].positive);
+    exampleValues[id].shouldMatch = !exampleValues[id].shouldMatch;
+    setExample(id, exampleValues[id].text, exampleValues[id].startRule,
+      exampleValues[id].shouldMatch);
     saveExamples();
   };
-  exampleValues[id].positive = true;
+  exampleValues[id].shouldMatch = true;
 
   var del = li.appendChild(domUtil.createElement('div.delete'));
   del.innerHTML = '&#x2716;';
@@ -140,7 +141,7 @@ function getExamples() {
 }
 
 // Set the contents of an example the given id to `value`.
-function setExample(id, text, optStartRule, isPositive) {
+function setExample(id, text, optStartRule, shouldMatch) {
   if (!(id in exampleValues)) {
     throw new Error(id + ' is not a valid example id');
   }
@@ -150,7 +151,7 @@ function setExample(id, text, optStartRule, isPositive) {
   var value = exampleValues[id] = {
     text: text,
     startRule: startRule,
-    positive: isPositive
+    shouldMatch: shouldMatch
   };
 
   var listItem = getListEl(id);
@@ -173,7 +174,7 @@ function setExample(id, text, optStartRule, isPositive) {
     startRuleEl.textContent = '';
   }
 
-  if (value.positive) {
+  if (value.shouldMatch) {
     sign.innerHTML = '&#x1F44D;';
     sign.setAttribute('title', 'Example should pass');
   } else {
@@ -248,13 +249,13 @@ function restoreExamples(key /* orExamples */) {
   domUtil.$$('#exampleContainer ul li.example').forEach(function(li) {
     delete exampleValues[li.id];
     li.remove();
-  })
+  });
 
   examples.forEach(function(ex) {
-    if (!ex.hasOwnProperty('positive')) {
-      ex.positive = true;
+    if (!ex.hasOwnProperty('shouldMatch')) {
+      ex.shouldMatch = true;
     }
-    setExample(addExample(), ex.text, ex.startRule, ex.positive);
+    setExample(addExample(), ex.text, ex.startRule, ex.shouldMatch);
   });
 
   // Select the first example.
@@ -284,8 +285,8 @@ var uiSave = function(cm) {
     var selectEl = domUtil.$('#startRuleDropdown');
     var value = cm.getValue();
     var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
-    var isPositive = exampleValues[selectedId].positive;
-    setExample(selectedId, value, startRule, isPositive);
+    var shouldMatch = exampleValues[selectedId].shouldMatch;
+    setExample(selectedId, value, startRule, shouldMatch);
     saveExamples();
   }
 };
