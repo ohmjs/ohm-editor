@@ -114,7 +114,7 @@ function initServer(grammars) {
 
       var grammarFile = res.files[grammarFilename];
       var exampleFile = res.files[exampleFilename];
-      cb(grammarFile && grammarFile.content, exampleFile && JSON.parse(exampleFile.content));
+      cb(res.description, grammarFile && grammarFile.content, exampleFile && JSON.parse(exampleFile.content));
     });
   }
 
@@ -306,7 +306,9 @@ function initServer(grammars) {
     prevSelection = grammarList.selectedIndex;
   });
 
-  function setGrammarAndExamples(grammar, examples) {
+  function setGrammarAndExamples(description, grammar, examples) {
+    document.title = 'Ohm' + (description ? ' - ' + description : '');
+
     ohmEditor.once('change:grammar', function(_) {
       $('#saveIndicator').classList.remove('edited');
     });
@@ -323,7 +325,7 @@ function initServer(grammars) {
   grammarList.addEventListener('change', function(e) {
     var grammarHash = grammarList.options[grammarList.selectedIndex].value;
     if (grammarHash === '') { // local storage
-      setGrammarAndExamples(null, 'examples' /* local storage key */);
+      setGrammarAndExamples(null, null, 'examples' /* local storage key */);
       saveButton.disabled = true;
       return false;
     } else if (grammarHash === '!login') {
