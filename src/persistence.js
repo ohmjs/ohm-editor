@@ -57,7 +57,7 @@ function initLocal() {
   });
 }
 
-function initServer(grammars) {
+function initServer(officialGrammars) {
   var $ = domUtil.$;
   var $$ = domUtil.$$;
 
@@ -180,7 +180,7 @@ function initServer(grammars) {
     });
   }
 
-  addGrammarGroup(grammarList, 'Official Ohm Grammars', grammars.official);
+  addGrammarGroup(grammarList, 'Official Ohm Grammars', officialGrammars);
 
   var gitHubAuth = localStorage.getItem('gitHubAuth');
   if (gitHubAuth) {
@@ -382,12 +382,10 @@ function initServer(grammars) {
 // -------
 
 if (window.location.protocol !== 'file:') {
-  var grammars = {
-    official: [
-      '7f62adb8df879a5eb8288dbbddcc663f' // Arithmetic
-    ]
-  };
-  initServer(grammars);
+  var officialGrammars = [
+    '7f62adb8df879a5eb8288dbbddcc663f' // Arithmetic
+  ];
+  initServer(officialGrammars);
 } else {
   initLocal();
 }
