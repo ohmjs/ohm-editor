@@ -384,9 +384,9 @@ function initServer(officialGrammars) {
       option.text = '[shared grammar]';
       option.classList.add('shared');
       grammarList.insertBefore(option, grammarList.querySelector('optgroup'));
-      options = Array.prototype.slice.apply(grammarList.options).reverse(); // FIXME
     }
-    grammarList.selectedIndex = options.reverse().indexOf(option);
+    options = Array.prototype.slice.apply(grammarList.options);
+    grammarList.selectedIndex = options.indexOf(option);
 
     if (grammarHash === '') { // local storage
       setGrammarAndExamples(null, null, 'examples' /* local storage key */);
