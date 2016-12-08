@@ -128,7 +128,7 @@ function initServer(officialGrammars) {
   }
 
   function addGrammarGroup(list, label, grammars, beforeElem) {
-    var group = list.querySelector('*[label="My Grammars"]');
+    var group = list.querySelector('#myGrammars');
     if (group) {
       group.remove();
     }
@@ -187,6 +187,7 @@ function initServer(officialGrammars) {
       option.text = '[Logout]';
 
       var group = addGrammarGroup(grammarList, 'My Grammars', grammars, option);
+      group.id = 'myGrammars';
 
       group.appendChild(option);
     });
@@ -200,6 +201,7 @@ function initServer(officialGrammars) {
     loadUserGrammars(gitHub.getUser());
   } else {
     var group = addGrammarGroup(grammarList, 'My Grammars');
+    group.id = 'myGrammars';
     var option = document.createElement('option');
     option.value = '!login';
     option.text = '[Log into GitHub...]';
@@ -250,7 +252,7 @@ function initServer(officialGrammars) {
     gist[gistIdOrNull ? 'update' : 'create'](gistData, function(err, res) {
       if (!gistIdOrNull) {
         var gistId = res.id;
-        var group = grammarList.querySelector('optGroup[label="My Grammars"]');
+        var group = grammarList.querySelector('#myGrammars');
         var option = document.createElement('option');
         option.value = gistId;
         option.text = description;
@@ -350,6 +352,7 @@ function initServer(officialGrammars) {
       localStorage.removeItem('gitHubAuth');
 
       var group = addGrammarGroup(grammarList, 'My Grammars');
+      group.id = 'myGrammars';
       var option = document.createElement('option');
       option.value = '!login';
       option.text = '[Log into GitHub...]';
@@ -392,7 +395,7 @@ function initServer(officialGrammars) {
     }
 
     var optGroup = grammarList[grammarList.selectedIndex].parentElement;
-    if (optGroup.label === 'My Grammars') {
+    if (optGroup.id === 'myGrammars') {
       saveButton.disabled = false;
     } else {
       saveButton.disabled = true;
