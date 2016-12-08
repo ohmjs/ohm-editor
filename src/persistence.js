@@ -105,6 +105,15 @@ function initServer(officialGrammars) {
   function loadFromGist(gistHash, cb) {
     var gist = gitHub.getGist(gistHash);
     gist.read(function(err, res, req) {
+      if (err) {
+        if (grammarList.selectedOptions[0].classList.contains('shared')) {
+          // delete option and select local storage
+          grammarList.selectedOptions[0].remove();
+          location.hash = '#';
+          return;
+        }
+      }
+
       var grammarFilename = Object.getOwnPropertyNames(res.files).find(function(filename) {
         return filename.slice(-4) === '.ohm';
       });
@@ -132,7 +141,10 @@ function initServer(officialGrammars) {
     }
 
     grammars.forEach(function(grammarHash) {
-      var option = document.createElement('option');
+      var option = list.querySelector('.shared[value="' + grammarHash + '"]');
+      if (!option) {
+        option = document.createElement('option');
+      }
       option.value = grammarHash;
       var gist = gitHub.getGist(grammarHash);
       gist.read(function(err, res) {
@@ -307,7 +319,12 @@ function initServer(officialGrammars) {
   });
 
   function setGrammarAndExamples(description, grammar, examples) {
-    document.title = 'Ohm' + (description ? ' - ' + description : '');
+    if (description) {
+      document.title = 'Ohm - ' + description;
+      grammarList.selectedOptions[0].text = description;
+    } else {
+      document.title = 'Ohm';
+    }
 
     ohmEditor.once('change:grammar', function(_) {
       $('#saveIndicator').classList.remove('edited');
@@ -324,11 +341,8 @@ function initServer(officialGrammars) {
 
   grammarList.addEventListener('change', function(e) {
     var grammarHash = grammarList.options[grammarList.selectedIndex].value;
-    if (grammarHash === '') { // local storage
-      setGrammarAndExamples(null, null, 'examples' /* local storage key */);
-      saveButton.disabled = true;
-      return false;
-    } else if (grammarHash === '!login') {
+
+    if (grammarHash === '!login') {
       showPrompt('loginBox');
       grammarList.selectedIndex = prevSelection;
       return;
@@ -344,19 +358,48 @@ function initServer(officialGrammars) {
       if ((grammarList.options.length - 1) > prevSelection) {
         grammarList.selectedIndex = prevSelection;
       } else {
-        grammarList.selectedIndex = 0; // select local storage
+        location.hash = '#';
       }
       return;
     }
 
-    var optGroup = grammarList.options[grammarList.selectedIndex].parentElement;
+    location.hash = '#' + grammarHash;
+    loadFromHash();
+  });
+
+  function loadFromHash() {
+    var grammarHash = location.hash.slice(1);
+
+    var options = Array.prototype.slice.apply(grammarList.options);
+    options.reverse(); // to match my grammars first
+    var option = options.find(function(option) {
+      return option.value === grammarHash;
+    });
+    if (!option) { // shared grammar or not yet loaded
+      option = document.createElement('option');
+      option.value = grammarHash;
+      option.text = '[shared grammar]';
+      option.classList.add('shared');
+      grammarList.insertBefore(option, grammarList.querySelector('optgroup'));
+      options = Array.prototype.slice.apply(grammarList.options).reverse(); // FIXME
+    }
+    grammarList.selectedIndex = options.reverse().indexOf(option);
+
+    if (grammarHash === '') { // local storage
+      setGrammarAndExamples(null, null, 'examples' /* local storage key */);
+      saveButton.disabled = true;
+      return false;
+    }
+
+    var optGroup = grammarList[grammarList.selectedIndex].parentElement;
     if (optGroup.label === 'My Grammars') {
       saveButton.disabled = false;
     } else {
       saveButton.disabled = true;
     }
     loadFromGist(grammarHash, setGrammarAndExamples);
-  });
+  }
+  window.loadFromHash = loadFromHash;
 
   ohmEditor.ui.grammarEditor.setOption('extraKeys', {
     'Cmd-S': function(cm) {
@@ -376,6 +419,11 @@ function initServer(officialGrammars) {
       $('#saveIndicator').classList.add('edited');
     }
   });
+
+  window.addEventListener('hashchange', loadFromHash);
+  if (location.hash !== '') {
+    loadFromHash();
+  }
 }
 
 // Main
