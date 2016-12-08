@@ -59,7 +59,13 @@ ohmEditor.semantics.registerEvents({
   'add:semanticEditor': ['type', 'name'],
 
   // Emitted when an operation is unselected.
-  'clear:semanticsEditorWrapper': []
+  'clear:semanticsEditorWrapper': [],
+
+  // Emitted when an operation is selected, or semantics is updated.
+  'render:semanticResult': ['traceNode', 'operation'],
+
+  // Emitted after a semantics action is saved.
+  'update:results': ['operation']
 });
 
 ohmEditor.ui = {

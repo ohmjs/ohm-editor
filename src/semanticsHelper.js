@@ -35,17 +35,17 @@ var forcing;
 var todoList;
 var errorList;
 var passThroughList;
-// function initializeSemanticsLog() {
-//   resultMap = Object.create(null);
-//   todoList = undefined;
-//   errorList = undefined;
-//   passThroughList = undefined;
-//   forcing = false;
-// }
+function initializeSemanticsLog() {
+  resultMap = Object.create(null);
+  todoList = undefined;
+  errorList = undefined;
+  passThroughList = undefined;
+  forcing = false;
+}
 
-function nodeKey(cstNode) {
+function nodeKey(cstNode, optSource) {
   var ctorName = cstNode.ctorName;
-  var source = cstNode.source;
+  var source = cstNode.source || optSource;
   return ctorName + '_from_' + source.startIdx + '_to_' + source.endIdx;
 }
 
@@ -198,7 +198,7 @@ ohmEditor.semantics.addListener('add:operation', function(type, operationInfo) {
 function populateSemanticsResult(traceNode, operationName, optArgs) {
   var semantics = ohmEditor.semantics.value;
   try {
-    var nodeWrapper = semantics._getSemantics().wrap(traceNode.bindings[0]);
+    var nodeWrapper = semantics._getSemantics().wrap(traceNode.bindings[0], traceNode.source);
     if (operationName in semantics._getSemantics().operations) {
       var argValues = toValueList(Object.create(null));
       nodeWrapper[operationName].apply(nodeWrapper, argValues);
@@ -210,10 +210,10 @@ function populateSemanticsResult(traceNode, operationName, optArgs) {
     /* All the error will be an ErrorWrapper which already recorded in the resultMap */
   }
 }
-// ohmEditor.parseTree.addListener('refresh:parseTree', function(traceNode, operation) {
-//   initializeSemanticsLog();
-//   populateSemanticsResult(traceNode, operation);
-// });
+ohmEditor.semantics.addListener('render:semanticResult', function(traceNode, operation) {
+  initializeSemanticsLog();
+  populateSemanticsResult(traceNode, operation);
+});
 
 function forceResults(traceNode) {
   var semantics = ohmEditor.semantics.value;
@@ -331,7 +331,7 @@ ohmEditor.semantics.addListener('save:action', function(operationName, key, args
 // Exports
 // -------
 ohmEditor.semantics.forceResult = function(traceNode, name, optArgs) {
-  var key = nodeKey(traceNode.bindings[0]);
+  var key = nodeKey(traceNode.bindings[0], traceNode.source);
   forcing = true;
   populateSemanticsResult(traceNode, name, optArgs);
   var resultWrapper = getResult(key, name, optArgs);
@@ -340,7 +340,7 @@ ohmEditor.semantics.forceResult = function(traceNode, name, optArgs) {
 };
 
 ohmEditor.semantics.getResults = function(traceNode) {
-  var key = nodeKey(traceNode.bindings[0]);
+  var key = nodeKey(traceNode.bindings[0], traceNode.source);
   // If the node has not been evaluated yet, or all its existing semantic results are
   // forced, then we force the evaluation on it to make sure all the available operations
   // are evaluated at this node.

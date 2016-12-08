@@ -81,6 +81,7 @@
     return argDisplayList;
   }
 
+  // TODO: focus on editor
   module.exports = {
     components: {
       'argument-block': argumentBlock
@@ -140,19 +141,8 @@
           return block.real;
         });
         ohmEditor.semantics.emit('save:action', this.operation, this.id, args, body);
+        ohmEditor.semantics.emit('update:results', this.operation);
       }
-    },
-    created: function() {
-      // bus.$on('focusEditor', function(type, id) {
-      //   if (self.id === id && self.type === type) {
-      //     self.$nextTick(function() {
-      //       self.$el.focus();
-      //       self.codemirror.setCursor({line: self.codemirror.lineCount()});
-      //       self.codemirror.refresh();
-      //       self.codemirror.focus();
-      //     });
-      //   }
-      // });
     }
   };
 </script>

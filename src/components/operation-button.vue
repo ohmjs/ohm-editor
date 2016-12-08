@@ -25,6 +25,12 @@
           ohmEditor.semantics.emit('select:operation', self.operation);
         }
       });
+
+      ohmEditor.addListener('parse:input', function(matchResult, trace) {
+        if (self.select) {
+          ohmEditor.semantics.emit('render:semanticResult', trace, self.operation);
+        }
+      });
     },
     methods: {
       toggleSelection: function() {

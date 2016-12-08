@@ -38,6 +38,7 @@
       ohmEditor.semantics.addListener('select:operation', function(operationName) {
         self.operation = operationName;
         self.populateChildren();
+        self.loaded = true;
       });
 
       ohmEditor.semantics.addListener('clear:semanticsEditorWrapper', function() {
@@ -67,7 +68,7 @@
         var operation = this.operation;
         var actionDict = ohmEditor.semantics.value._getActionDict(this.operation);
         if (!actionDict) {
-          return children;
+          return;
         }
 
         Object.keys(actionDict).forEach(function(key) {
@@ -82,32 +83,7 @@
           };
           children.push(child);
         });
-
-        this.loaded = true;
       }
-      // updateChildern: function() {
-      //   var children = this.children = [];
-      //   var operation = this.operation;
-      //   this.loaded = true;
-      //   // check if rule/helper
-      //   var actionDict = ohmEditor.semantics.getActionDict(operation);
-      //   if (!actionDict) {
-      //     return;
-      //   }
-
-      //   Object.keys(actionDict).forEach(function(key) {
-      //     var action = actionDict[key];
-      //     if (!action || action._isDefault || key === '_default') {
-      //       return;
-      //     }
-      //     var child = {
-      //       type: 'rule',
-      //       id: key,
-      //       operation: operation
-      //     };
-      //     children.push(child);
-      //   });
-      // }
     }
   };
 </script>

@@ -63,9 +63,5 @@ parseTree.registerEvents({
   'render:parseTree': ['traceNode'],
 
   // Emitted after cmd/ctrl + 'click' on a label
-  'cmdOrCtrlClick:traceElement': ['wrapper'],
-
-  // Emitted when parseTree.refresh is called by semantics related action.
-  // TODO: maybe there is a better way to trigger semantics evaluation.
-  'refresh:parseTree': ['rootTrace', 'operation']
+  'cmdOrCtrlClick:traceElement': ['wrapper']
 });
