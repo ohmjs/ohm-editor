@@ -52,6 +52,9 @@
         }
         var idx = 0;
         var nextStep = false;
+        var passThrough = true;
+        var optNextStep = false;
+        var hasResults = false;
         Object.keys(results).forEach(function(operation) {
           var resultList = results[operation];
           resultList.forEach(function(resultWrapper) {
@@ -70,25 +73,37 @@
               optNextStep: !resultWrapper.forced && resultWrapper.isError,
               leftBorder: idx++ > 0
             };
-            blocks.push({
-              operation: signature,
-              classObj: classObj,
-              classId: generateResultBlockClassId(operation, resultWrapper.args),
-              result: resultWrapper.isError ?
-                resultWrapper.result :
-                JSON.stringify(resultWrapper.result)
+            var noResult = resultWrapper.missingSemanticsAction;
+            if (!noResult) {
+              blocks.push({
+                operation: signature,
+                classObj: classObj,
+                classId: generateResultBlockClassId(operation, resultWrapper.args),
+                result: resultWrapper.result
+              });
+            }
 
-            });
             nextStep = nextStep || !resultWrapper.forced && resultWrapper.isNextStep;
+            passThrough = passThrough && resultWrapper.isPassThrough;
+            optNextStep = optNextStep || !resultWrapper.forced && resultWrapper.isError;
+            hasResults = resultWrapper.forced && noResult ? hasResults : true;
           });
         });
+        passThrough = hasResults && passThrough;
+        this.passedClassObj = {
+          passThrough: passThrough,
+          nextStep: nextStep,
+          optNextStep: optNextStep
+        };
+        this.$emit('styleUpdate', this.passedClassObj);
         return blocks;
       }
     },
     data: function() {
       return {
         updated: false,
-        initialBlocks: []
+        initialBlocks: [],
+        passedClassObj: {}
       };
     },
     mounted: function() {

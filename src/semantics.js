@@ -14,7 +14,8 @@ semanticsContainer.registerEvents({
   'create:editor': ['type', 'id'],
   'select:suggestion': ['key'],
   'highlight:suggestion': ['index'],
-  'save:semantics': []
+  'save:semantics': [],
+  'hover:resultBlock': ['classId', 'shouldHighlight']
 });
 
 semanticsContainer.vue = new Vue({

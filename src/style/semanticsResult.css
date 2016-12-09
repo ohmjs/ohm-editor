@@ -1,7 +1,6 @@
 .pexpr:not(.failed) > .self.nextStep .label,
 .pexpr:not(.failed) > .self.tmpNextStep .label {
   background: rgba(100, 149, 237, 0.4);
-  border-bottom: 0px;
 }
 .pexpr:not(.failed) > .self.nextStep .label:hover,
 .pexpr:not(.failed) > .self.tmpNextStep .label:hover {
@@ -10,12 +9,9 @@
 }
 .pexpr:not(.collapsed) > .self.passThrough {
   border-bottom: 1px solid #ddd;
+  margin-bottom: -1px;
 }
-.pexpr:not(.collapsed) > .self.passThrough {
-   margin-bottom: -1px;
-}
-
-.self.passThrough > .result:not(.showing) {
+.pexpr:not(.collapsed) > .self.passThrough > .result:not(.showing) {
   display: none;
 }
 

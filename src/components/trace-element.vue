@@ -1,10 +1,11 @@
 <template>
   <div class="pexpr" :class="classObj" id="id">
-    <div v-if="labeled" class="self">
+    <div v-if="labeled" class="self" :class="selfClassObj">
       <trace-label :traceNode="traceNode" :minWidth="minWidth"
                    @hover="onHover" @unhover="onUnhover" @click="onClick"
                    @showContextMenu="onShowContextMenu" />
-      <semantics-result v-if="hasResult" :traceNode="traceNode" />
+      <semantics-result v-if="hasResult" :traceNode="traceNode"
+                        @styleUpdate="updateSelfStyle"/>
     </div>
     <div v-if="!isLeaf" ref="children"
          class="children" :class="{vbox: vbox}"
@@ -264,7 +265,8 @@
       return {
         collapsed: false,
         hasUserToggledCollapsedState: false,
-        hasResult: this.showResult
+        hasResult: this.showResult,
+        selfClassObj: {}
       };
     },
     beforeMount: function() {
@@ -293,6 +295,7 @@
 
       ohmEditor.semantics.addListener('clear:semanticsEditorWrapper', function() {
         self.hasResult = false;
+        self.selfClassObj = {};
       });
     },
     beforeUpdate: function() {
@@ -356,6 +359,7 @@
       setCollapsed: function(collapse, optDurationInMs) {
         this.collapsed = collapse;
         this.hasUserToggledCollapsedState = true;
+        this.selfClassObj.tmpNextStep = this.collapsed && this.selfClassObj.optNextStep;
 
         var duration = optDurationInMs != null ? optDurationInMs : 500;
         var el = this.$el;
@@ -440,6 +444,12 @@
         };
         measuringDiv.removeChild(clone);
         return result;
+      },
+      updateSelfStyle: function(classObj, optNextStep) {
+        this.selfClassObj = classObj;
+        if (this.collapsed) {
+          this.selfClassObj.tmpNextStep = !!this.selfClassObj.optNextStep;
+        }
       }
     }
   };
