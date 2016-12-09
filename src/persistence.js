@@ -235,6 +235,10 @@ function initServer(officialGrammars) {
   // GITHUB ADD GRAMMARS (GISTS)
   // -------------------------------------------------------
 
+  function isLoggedIn() {
+    return !gitHub.__auth.username;
+  }
+
   function saveToGist(description, grammarName, grammarText, examples, gistIdOrNull) {
     var gist = gitHub.getGist(gistIdOrNull);
     var gistData = {
@@ -258,13 +262,17 @@ function initServer(officialGrammars) {
     gist[gistIdOrNull ? 'update' : 'create'](gistData, function(err, res) {
       if (!gistIdOrNull) {
         var gistId = res.id;
-        var group = grammarList.querySelector('#myGrammars');
         var option = document.createElement('option');
         option.value = gistId;
         option.text = description;
-        group.insertBefore(option, group.lastChild);
+        if (isLoggedIn()) {
+          var group = grammarList.querySelector('#myGrammars');
+          group.insertBefore(option, group.lastChild);
+          saveButton.disabled = false;
+        } else {
+          grammarList.insertBefore(option, grammarList.querySelector('optgroup'));
+        }
         grammarList.value = gistId;
-        saveButton.disabled = false;
       }
 
       $('#saveIndicator').classList.remove('edited');
@@ -291,7 +299,11 @@ function initServer(officialGrammars) {
   saveButton.addEventListener('click', save);
 
   function saveAs() {
-    // TODO: check for GitHub user
+    if (isLoggedIn()) { // not logged in
+      showPrompt('newGrammarBox', 'Warning: You are not logged in and cannot update your grammar after saving!');
+      // showPrompt('newGrammarBox', 'Warning: You are not logged in! You will not be able to update your grammar after saving!');
+      return;
+    }
 
     showPrompt('newGrammarBox');
   }
