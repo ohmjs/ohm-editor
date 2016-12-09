@@ -60,8 +60,5 @@ parseTree.registerEvents({
   'contextMenu': ['target', 'traceNode'],
 
   // Emitted before start rendering the parse tree
-  'render:parseTree': ['traceNode'],
-
-  // Emitted after cmd/ctrl + 'click' on a label
-  'cmdOrCtrlClick:traceElement': ['wrapper']
+  'render:parseTree': ['traceNode']
 });

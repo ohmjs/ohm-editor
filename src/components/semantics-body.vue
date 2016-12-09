@@ -47,18 +47,18 @@
       });
 
       ohmEditor.semanticsContainer.addListener('create:editor', function(type, id) {
-        var hasEditor = self.children.filter(function(child) {
+        var child = self.children.filter(function(child) {
           return child.type === type && child.id === id;
-        });
-        if (hasEditor.length > 0) {
-          // bus.$emit('focusEditor', type, id);
-          return;
+        })[0];
+        if (!child) {
+          self.children.push({
+            type: type,
+            id: id,
+            operation: self.operation
+          });
         }
-        self.children.push({
-          type: type,
-          id: id,
-          operation: self.operation
-        });
+
+        // TODO: focusing on the editor.
         ohmEditor.semanticsContainer.emit('hide:suggestions');
       });
     },

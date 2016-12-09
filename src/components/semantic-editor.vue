@@ -118,7 +118,8 @@
     },
     mounted: function() {
       var cm = this.codemirror = CodeMirror(this.$refs.body, {
-        value: this.bodyContent
+        value: this.bodyContent,
+        autofocus: true
       });
       cm.setOption('extraKeys', {
         'Cmd-S': function() {

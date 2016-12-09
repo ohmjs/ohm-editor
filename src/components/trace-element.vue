@@ -343,7 +343,15 @@
           console.log(this.traceNode);  // eslint-disable-line no-console
         } else if (modifier === 'cmd') {
           // cmd/ctrl + click to open or close semantic editor
-          ohmEditor.parseTree.emit('cmdOrCtrlClick:traceElement', this.$el);
+          var id;
+          if (this.traceNode.expr instanceof ohm.pexprs.Iter) {
+            id = '_iter';
+          } else if (this.traceNode.expr instanceof ohm.pexprs.Terminal) {
+            id = '_terminal';
+          } else {
+            id = this.traceNode.expr.ruleName;
+          }
+          ohmEditor.semanticsContainer.emit('create:editor', 'rule', id);
         } else if (!isLeaf(this.traceNode)) {
           this.toggleCollapsed();
         }
