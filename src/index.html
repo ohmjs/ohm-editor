@@ -386,6 +386,18 @@
       margin: 0;
     }
 
+    #loginBoxMessage, #newGrammarBoxMessage {
+      margin: 8px 8px 0;
+      display: inline-block;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: bold;
+    }
+
+    #loginBoxMessage:empty, #newGrammarBoxMessage:empty {
+      display: none;
+    }
+
     #promptScreen label {
       display: inline-block;
       font-size: 14px;
@@ -514,6 +526,7 @@
     <div id="loginBox" hidden>
       <span class="close">×</span>
       <h2>Log into GitHub</h1>
+      <p id="loginBoxMessage"></p>
       <form id="gitHubForm">
         <label for="username">Username:</label>
         <input type="text" name="username" id="username"><br>
@@ -524,11 +537,12 @@
     </div>
     <div id="newGrammarBox" hidden>
       <span class="close">×</span>
-      <h2>New Grammar</h1>
+      <h2>Save Grammar As</h1>
+      <p id="newGrammarBoxMessage"></p>
       <form id="newGrammarForm">
         <label for="newGrammarName" style="width: 110px">Grammar name:</label>
         <input type="text" name="newGrammarName" id="newGrammarName" style="width: 290px"><br>
-        <input type="submit" value="Create">
+        <input type="submit" value="Save">
         <input type="reset" value="Cancel">
       </form>
     </div>

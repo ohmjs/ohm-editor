@@ -76,12 +76,18 @@ function initServer(officialGrammars) {
   // PROMPT STUFF
   // -------------------------------------------------------
 
-  function showPrompt(dialogId) {
+  function showPrompt(dialogId, optMessage) {
     $('#promptScreen').style.display = 'block';
     Array.prototype.slice.apply($$('#promptScreen > *')).forEach(function(dialog) {
       dialog.hidden = true;
     });
-    $('#' + dialogId).hidden = false;
+    var messageField = $('#' + dialogId + 'Message');
+    if (messageField) {
+      messageField.textContent = optMessage || '';
+    }
+    var dialog = $('#' + dialogId);
+    dialog.hidden = false;
+    dialog.querySelector('input').focus();
   }
   function hidePrompt() {
     $('#promptScreen').style.display = 'none';
@@ -266,8 +272,6 @@ function initServer(officialGrammars) {
   }
 
   function save() {
-    // TODO: check for GitHub user
-
     // FIXME: can only be checked if changes to examples are also noted
     // var active = $('#saveIndicator').classList.contains('edited');
     // if (!active) {
@@ -290,7 +294,6 @@ function initServer(officialGrammars) {
     // TODO: check for GitHub user
 
     showPrompt('newGrammarBox');
-    $('#newGrammarName').focus();
   }
   saveAsButton.addEventListener('click', saveAs);
 
@@ -350,6 +353,7 @@ function initServer(officialGrammars) {
       return;
     } else if (grammarHash === '!logout') {
       localStorage.removeItem('gitHubAuth');
+      gitHub = new GitHub();
 
       var group = addGrammarGroup(grammarList, 'My Grammars');
       group.id = 'myGrammars';
