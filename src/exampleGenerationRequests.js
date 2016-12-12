@@ -44,7 +44,11 @@ exampleWorkerManager.addListener('received:neededExamples', function(updatedNeed
   var inputList = domUtil.$('#neededExamples > ul');
   var startRuleDropdown = domUtil.$('#startRuleDropdown');
 
-  var startRule = ohmEditor.examples.getSelected().startRule;
+  var selectedExample = ohmEditor.examples.getSelected();
+  var startRule = null;
+  if (selectedExample) {
+    startRule = selectedExample.startRule;
+  }
 
   if (startRuleDropdown) {
     startRuleDropdown.parentElement.removeChild(startRuleDropdown);

@@ -51,7 +51,12 @@ function handleMouseDown(e) {
 }
 
 function checkExample(id) {
-  var example = getExample(id);
+  var example;
+  try {
+    example = getExample(id);
+  } catch (e) {
+    return; // FIXME
+  }
   var text = example.text;
   var startRule = example.startRule;
   var el = getListEl(id);
