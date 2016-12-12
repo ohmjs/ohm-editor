@@ -129,7 +129,8 @@ function initServer(officialGrammars) {
 
       var grammarFile = res.files[grammarFilename];
       var exampleFile = res.files[exampleFilename];
-      cb(res.description, grammarFile && grammarFile.content, exampleFile && JSON.parse(exampleFile.content));
+      cb(res.description, grammarFile && grammarFile.content,
+        exampleFile && JSON.parse(exampleFile.content));
     });
   }
 
@@ -173,14 +174,18 @@ function initServer(officialGrammars) {
   function loadUserGrammars(ghUser) {
     ghUser.listGists(function(err, res) {
       if (err) {
-        console.log('Error loading Gists: ' + err.message + '(' + err.status + ')'); // eslint-disable-line no-console
+        // login incorrect or other network problems
         return;
       }
       var grammars = res
         .filter(function(gist) {
           var filenames = Object.getOwnPropertyNames(gist.files);
-          var hasJSON = filenames.find(function(filename) { return filename.toLowerCase().slice(-5) === '.json'; });
-          var hasOhm = filenames.find(function(filename) { return filename.toLowerCase().slice(-4) === '.ohm'; });
+          var hasJSON = filenames.find(function(filename) {
+            return filename.toLowerCase().slice(-5) === '.json';
+          });
+          var hasOhm = filenames.find(function(filename) {
+            return filename.toLowerCase().slice(-4) === '.ohm';
+          });
           return hasJSON && hasOhm;
         })
         .sort(function(a, b) { return a.description < b.description; })
@@ -236,7 +241,7 @@ function initServer(officialGrammars) {
   // -------------------------------------------------------
 
   function isLoggedIn() {
-    return !gitHub.__auth.username;
+    return gitHub.__auth.username;
   }
 
   function saveToGist(description, grammarName, grammarText, examples, gistIdOrNull) {
@@ -260,6 +265,12 @@ function initServer(officialGrammars) {
     };
 
     gist[gistIdOrNull ? 'update' : 'create'](gistData, function(err, res) {
+      if (err) {
+        // could not save grammar, potential network problem
+        console.warn('Could not save Gist:', gistData); // eslint-disable-line no-console
+        return;
+      }
+
       if (!gistIdOrNull) {
         var gistId = res.id;
         var option = document.createElement('option');
@@ -280,12 +291,6 @@ function initServer(officialGrammars) {
   }
 
   function save() {
-    // FIXME: can only be checked if changes to examples are also noted
-    // var active = $('#saveIndicator').classList.contains('edited');
-    // if (!active) {
-    //   return;
-    // }
-
     var option = grammarList.options[grammarList.selectedIndex];
     var grammarHash = option.value;
 
@@ -299,13 +304,10 @@ function initServer(officialGrammars) {
   saveButton.addEventListener('click', save);
 
   function saveAs() {
-    if (isLoggedIn()) { // not logged in
-      showPrompt('newGrammarBox', 'Warning: You are not logged in and cannot update your grammar after saving!');
-      // showPrompt('newGrammarBox', 'Warning: You are not logged in! You will not be able to update your grammar after saving!');
-      return;
-    }
-
-    showPrompt('newGrammarBox');
+    showPrompt('newGrammarBox', isLoggedIn() ?
+      null :
+      'Warning: You are not logged in and cannot update your grammar after saving!'
+    );
   }
   saveAsButton.addEventListener('click', saveAs);
 
@@ -313,6 +315,7 @@ function initServer(officialGrammars) {
     hidePrompt();
 
     var description = $('#newGrammarName').value;
+    $('#newGrammarName').value = '';
     var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
     var grammarText = ohmEditor.ui.grammarEditor.getValue();
     var examples = getExamples();
