@@ -1,6 +1,6 @@
 <template>
   <div class="entry" :class="[type, {selected: isSelected}]" :id="id"
-       @mouseover="highlight()" @mousedown="select">
+       @mouseover="highlight" @click="select">
     {{ name }}
     <span class="case" v-if="extra && extra.length > 0">{{ extra }}</span>
   </div>

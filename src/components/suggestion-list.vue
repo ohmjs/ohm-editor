@@ -1,9 +1,10 @@
 <template>
-  <div id="suggestions" v-show="showing">
+  <div id="suggestions">
     <suggestion-entry v-for="(suggestion, index) in suggestions"
                       :type="suggestion.type" :name="suggestion.name"
                       :extra="suggestion.extra" :id="suggestion.id" :index="index">
     </suggestion-entry>
+  </div>
 </template>
 
 <script>
@@ -28,11 +29,6 @@
     computed: {
       suggestions: function() {
         var suggestions = [];
-
-        if (!this.showing) {
-          return suggestions;
-        }
-
         var prefix = this.prefix;
         if (prefix) {
           suggestions.push({
@@ -60,21 +56,14 @@
     },
     data: function() {
       return {
-        showing: false,
         prefix: ''
       };
     },
     mounted: function() {
       var self = this;
       ohmEditor.semanticsContainer.addListener('show:suggestions', function(prefix) {
-        self.showing = true;
         self.prefix = prefix;
       });
-
-      ohmEditor.semanticsContainer.addListener('hide:suggestions', function() {
-        self.showing = false;
-      });
-
     }
   };
 </script>

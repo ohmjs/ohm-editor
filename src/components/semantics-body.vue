@@ -2,7 +2,7 @@
   <div class="flex-fix">
     <div class="editorWrapper" v-if="loaded">
       <action-addtion></action-addtion>
-      <suggestion-list></suggestion-list>
+      <suggestion-list v-if="showSuggestions"></suggestion-list>
       <semantic-editor v-for="child in children"
                        :type="child.type" :id="child.id" :operation="child.operation">
       </semantic-editor>
@@ -29,7 +29,8 @@
       return {
         loaded: false,
         operation: undefined,
-        children: []
+        children: [],
+        showSuggestions: false
       };
     },
     mounted: function() {
@@ -59,7 +60,15 @@
         }
 
         // TODO: focusing on the editor.
-        ohmEditor.semanticsContainer.emit('hide:suggestions');
+        // ohmEditor.semanticsContainer.emit('hide:suggestions');
+        self.showSuggestions = false;
+        self.$nextTick(function() {
+          ohmEditor.semanticsContainer.emit('focus:editor', type, id);
+        });
+      });
+
+      ohmEditor.semanticsContainer.addListener('show:suggestions', function(prefix) {
+        self.showSuggestions = true;
       });
     },
     methods: {

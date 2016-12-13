@@ -12,6 +12,7 @@ semanticsContainer.registerEvents({
   'show:suggestions': ['prefix'],
   'hide:suggestions': [],
   'create:editor': ['type', 'id'],
+  'focus:editor': ['type', 'id'],
   'select:suggestion': ['key'],
   'highlight:suggestion': ['index'],
   'save:semantics': [],

@@ -118,8 +118,7 @@
     },
     mounted: function() {
       var cm = this.codemirror = CodeMirror(this.$refs.body, {
-        value: this.bodyContent,
-        autofocus: true
+        value: this.bodyContent
       });
       cm.setOption('extraKeys', {
         'Cmd-S': function() {
@@ -133,6 +132,12 @@
       var self = this;
       ohmEditor.semanticsContainer.addListener('save:semantics', function() {
         self.saveAction();
+      });
+
+      ohmEditor.semanticsContainer.addListener('focus:editor', function(type, id) {
+        if (type === self.type && id === self.id) {
+          cm.focus();
+        }
       });
     },
     methods: {
