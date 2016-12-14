@@ -11,6 +11,10 @@ module.exports = {
   entry: {
     visualizer: './src/index.js'
   },
+  resolve: {
+    // Use the standalone version of Vue that includes the template compiler.
+    alias: {'vue$': 'vue/dist/vue.common.js'}  // eslint-disable-line quote-props
+  },
   output: {
     path: path.join(__dirname, 'build'),
     publicPath: 'assets/',
