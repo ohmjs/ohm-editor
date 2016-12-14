@@ -37,16 +37,10 @@ function resetWorker(grammar) {
   Object.keys(examples).forEach(function(id) {
     var example = examples[id];
     var match;
-    try {
+    if (example.startRule in grammar.rules) {
       match = grammar.match(example.text, example.startRule);
-    } catch (e) {
-      var regex = /Rule ([a-zA-Z_]*) is not declared in grammar [a-zA-Z_]*/;
-      var m;
-      if ((m = regex.exec(e.message)) !== null && m[1] === example.startRule) {
-        ohmEditor.examples.setExample(id, example.text, null, example.positive);
-        example.startRule = null;
-        match = grammar.match(example.text, example.startRule);
-      }
+    } else {
+      match = grammar.match(example.text);
     }
 
     if (match.succeeded()) {
