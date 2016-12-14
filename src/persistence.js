@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global CheckedEmitter, saveAs */
+/* global CheckedEmitter, CodeMirror, saveAs */
 
 'use strict';
 
