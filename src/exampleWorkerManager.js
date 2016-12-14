@@ -40,7 +40,7 @@ function resetWorker(grammar) {
     try {
       match = grammar.match(example.text, example.startRule);
     } catch (e) {
-      var regex = /Rule ([a-zA-Z_]* ) is not declared in grammar [a-zA-Z_]*/;
+      var regex = /Rule ([a-zA-Z_]*) is not declared in grammar [a-zA-Z_]*/;
       var m;
       if ((m = regex.exec(e.message)) !== null && m[1] === example.startRule) {
         ohmEditor.examples.setExample(id, example.text, null, example.positive);
