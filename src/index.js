@@ -62,6 +62,18 @@ function parseGrammar() {
   };
 }
 
+// Return the name of a valid start rule for grammar, or null if `optRuleName` is
+// not valid and the grammar has no default starting rule.
+function getValidStartRule(grammar, optRuleName) {
+  if (optRuleName && optRuleName in grammar.rules) {
+    return optRuleName;
+  }
+  if (grammar.defaultStartRule) {
+    return grammar.defaultStartRule;
+  }
+  return null;
+}
+
 function refresh() {
   var grammarEditor = ohmEditor.ui.grammarEditor;
   var inputEditor = ohmEditor.ui.inputEditor;
@@ -95,17 +107,19 @@ function refresh() {
     ohmEditor.emit('parse:grammar', result.matchResult, result.grammar, result.error);
   }
 
-  if (ohmEditor.grammar && ohmEditor.grammar.defaultStartRule) {
-    var startRule = ohmEditor.startRule || ohmEditor.grammar.defaultStartRule;
-    var trace = ohmEditor.grammar.trace(inputSource, startRule);
+  if (ohmEditor.grammar) {
+    var startRule = getValidStartRule(ohmEditor.grammar, ohmEditor.startRule);
+    if (startRule) {
+      var trace = ohmEditor.grammar.trace(inputSource, startRule);
 
-    // When the input fails to parse, turn on "show failures" automatically.
-    if (showFailuresImplicitly) {
-      var checked = $('input[name=showFailures]').checked = trace.result.failed();
-      ohmEditor.options.showFailures = checked;
+      // When the input fails to parse, turn on "show failures" automatically.
+      if (showFailuresImplicitly) {
+        var checked = $('input[name=showFailures]').checked = trace.result.failed();
+        ohmEditor.options.showFailures = checked;
+      }
+
+      ohmEditor.emit('parse:input', trace.result, trace);
     }
-
-    ohmEditor.emit('parse:input', trace.result, trace);
   }
 }
 
