@@ -36,7 +36,12 @@ function resetWorker(grammar) {
   var examples = ohmEditor.examples.getExamples();
   Object.keys(examples).forEach(function(id) {
     var example = examples[id];
-    var match = grammar.match(example.text, example.startRule);
+    var match;
+    if (example.startRule in grammar.rules) {
+      match = grammar.match(example.text, example.startRule);
+    } else {
+      match = grammar.match(example.text);
+    }
 
     if (match.succeeded()) {
       exampleWorkerManager.addUserExample(example.startRule || grammar.defaultStartRule,
