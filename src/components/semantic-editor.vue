@@ -86,7 +86,7 @@
     components: {
       'argument-block': argumentBlock
     },
-    props: ['type', 'id', 'operation'],
+    props: ['type', 'id', 'operation', 'opArgs'],
     computed: {
       blocks: function() {
         var blocks = [];
@@ -147,7 +147,7 @@
           return block.real;
         });
         ohmEditor.semantics.emit('save:action', this.operation, this.id, args, body);
-        ohmEditor.semantics.emit('update:results', this.operation);
+        ohmEditor.semantics.emit('update:results', this.operation, this.opArgs);
       }
     }
   };

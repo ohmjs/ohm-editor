@@ -9,7 +9,7 @@
   var ohmEditor = require('../ohmEditor');
 
   module.exports = {
-    props: ['title', 'operation'],
+    props: ['title', 'operation', 'args'],
     data: function() {
       return {
         select: false
@@ -22,13 +22,13 @@
         self.select = el === target;
         if (self.select) {
           ohmEditor.semantics.operation = self.operation;
-          ohmEditor.semantics.emit('select:operation', self.operation);
+          ohmEditor.semantics.emit('select:operation', self.operation, self.args);
         }
       });
 
       ohmEditor.addListener('parse:input', function(matchResult, trace) {
         if (self.select) {
-          ohmEditor.semantics.emit('render:semanticResult', trace, self.operation);
+          ohmEditor.semantics.emit('render:semanticResult', trace, self.operation, self.args);
         }
       });
     },

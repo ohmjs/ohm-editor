@@ -200,7 +200,11 @@ function populateSemanticsResult(traceNode, operationName, optArgs) {
   try {
     var nodeWrapper = semantics._getSemantics().wrap(traceNode.bindings[0], traceNode.source);
     if (operationName in semantics._getSemantics().operations) {
-      var argValues = toValueList(Object.create(null));
+      var argValues = optArgs ?
+        toValueList(optArgs) :
+        semantics._getSemantics().operations[operationName].formals.map(function() {
+          return undefined;
+        });
       nodeWrapper[operationName].apply(nodeWrapper, argValues);
     } else {
       nodeWrapper._forgetMemoizedResultFor(operationName);
@@ -210,9 +214,9 @@ function populateSemanticsResult(traceNode, operationName, optArgs) {
     /* All the error will be an ErrorWrapper which already recorded in the resultMap */
   }
 }
-ohmEditor.semantics.addListener('render:semanticResult', function(traceNode, operation) {
+ohmEditor.semantics.addListener('render:semanticResult', function(traceNode, operation, optArgs) {
   initializeSemanticsLog();
-  populateSemanticsResult(traceNode, operation);
+  populateSemanticsResult(traceNode, operation, optArgs);
 });
 
 function forceResults(traceNode) {

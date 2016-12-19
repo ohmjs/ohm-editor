@@ -4,7 +4,8 @@
       <action-addtion></action-addtion>
       <suggestion-list v-if="showSuggestions"></suggestion-list>
       <semantic-editor v-for="child in children"
-                       :type="child.type" :id="child.id" :operation="child.operation">
+                       :type="child.type" :id="child.id" :operation="child.operation"
+                       :opArgs="child.opArgs">
       </semantic-editor>
     </div>
   </div>
@@ -29,6 +30,7 @@
       return {
         loaded: false,
         operation: undefined,
+        args: undefined,
         children: [],
         showSuggestions: false
       };
@@ -36,8 +38,10 @@
     mounted: function() {
       var self = this;
 
-      ohmEditor.semantics.addListener('select:operation', function(operationName) {
+      ohmEditor.semantics.addListener('select:operation', function(operationName, optArgs) {
+        // TODO: handle arguments
         self.operation = operationName;
+        self.args = optArgs;
         self.populateChildren();
         self.loaded = true;
       });
@@ -45,6 +49,7 @@
       ohmEditor.semantics.addListener('clear:semanticsEditorWrapper', function() {
         self.loaded = false;
         self.operation = '';
+        self.args = undefined;
       });
 
       ohmEditor.semanticsContainer.addListener('create:editor', function(type, id) {
@@ -55,7 +60,8 @@
           self.children.push({
             type: type,
             id: id,
-            operation: self.operation
+            operation: self.operation,
+            opArgs: self.args
           });
         }
 
@@ -75,6 +81,7 @@
       populateChildren: function() {
         var children = this.children = [];
         var operation = this.operation;
+        var args = this.args;
         var actionDict = ohmEditor.semantics.value._getActionDict(this.operation);
         if (!actionDict) {
           return;
@@ -88,7 +95,8 @@
           var child = {
             type: 'rule',
             id: key,
-            operation: operation
+            operation: operation,
+            opArgs: args
           };
           children.push(child);
         });

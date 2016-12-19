@@ -1,7 +1,8 @@
 <template>
   <div id="semantics">
     <operation-button v-for="child in children"
-                      :title="child.title" :operation="child.operation">
+                      :title="child.title" :operation="child.operation"
+                      :args="child.args">
     </operation-button>
     <textarea class="opName" ref="input" v-show="adding" v-model="value"
               v-bind:class="{selected: adding}" @keydown.enter.prevent.stop="save"
@@ -42,7 +43,7 @@
       info.name = signature.substring(0, leftParentIdx);
       info.arguments = Object.create(null);
       var args = signature.substring(leftParentIdx + 1, rightParentIdx).split(',');
-      if (args.length > 1) {
+      if (rightParentIdx - leftParentIdx > 1) {
         args.forEach(function(arg) {
           arg = arg.trim();
           if (!isNameValid(arg)) {
@@ -92,7 +93,7 @@
           this.$refs.input.focus();
           return;
         }
-        var child = {title: this.value, operation: info.name};
+        var child = {title: this.value, operation: info.name, args: info.arguments};
         this.children.push(child);
         this.adding = false;
         this.value = '';

@@ -289,7 +289,7 @@
       }
 
       var self = this;
-      ohmEditor.semantics.addListener('select:operation', function(operation) {
+      ohmEditor.semantics.addListener('select:operation', function(operation, optArgs) {
         self.hasResult = true;
       });
 

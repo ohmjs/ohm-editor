@@ -50,7 +50,7 @@ ohmEditor.semantics.registerEvents({
   'add:operation': ['type', 'signature'],
 
   // Emitted after selecting an operation button.
-  'select:operation': ['operationName'],
+  'select:operation': ['operationName', 'optArgs'],
 
   // Emitted after pressing cmd/ctrl-S in semantics editor
   'save:action': ['operation', 'key', 'args', 'body'],
@@ -62,10 +62,10 @@ ohmEditor.semantics.registerEvents({
   'clear:semanticsEditorWrapper': [],
 
   // Emitted when an operation is selected, or semantics is updated.
-  'render:semanticResult': ['traceNode', 'operation'],
+  'render:semanticResult': ['traceNode', 'operation', 'optArgs'],
 
   // Emitted after a semantics action is saved.
-  'update:results': ['operation']
+  'update:results': ['operation', 'optArgs']
 });
 
 ohmEditor.ui = {

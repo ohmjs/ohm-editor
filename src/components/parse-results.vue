@@ -31,12 +31,12 @@
     },
     mounted: function() {
       var self = this;
-      ohmEditor.semantics.addListener('select:operation', function(operation) {
-        ohmEditor.semantics.emit('render:semanticResult', self.trace, operation);
+      ohmEditor.semantics.addListener('select:operation', function(operation, optArgs) {
+        ohmEditor.semantics.emit('render:semanticResult', self.trace, operation, optArgs);
       });
 
-      ohmEditor.semantics.addListener('update:results', function(operation) {
-        ohmEditor.semantics.emit('render:semanticResult', self.trace, operation);
+      ohmEditor.semantics.addListener('update:results', function(operation, optArgs) {
+        ohmEditor.semantics.emit('render:semanticResult', self.trace, operation, optArgs);
       });
     },
     methods: {

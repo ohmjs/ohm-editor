@@ -108,7 +108,7 @@
     },
     mounted: function() {
       var self = this;
-      ohmEditor.semantics.addListener('render:semanticResult', function(trace, operation) {
+      ohmEditor.semantics.addListener('render:semanticResult', function(trace, operation, optArgs) {
         self.updated = true;
       });
     }
