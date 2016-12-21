@@ -259,19 +259,25 @@ function getDefaultArgExpression(traceNode) {
 
 // Build the action that called from the wrapper, which includes renaming the
 // operation arguments, and actual action body that user typed.
-function buildAction(opArgs, actionArguments, actionBody) {  // eslint-disable-line no-unused-vars
+/* eslint-disable no-unused-vars */
+function buildAction(opArgs, actionArguments, actionBody, helpers) {
+/* eslint-enable no-unused-vars */
   // Constructs the code that renames the operation arguments, so we could refer
   // them by name directly. i.e. `var <argument name> = this.args.<argument name>`
   var renameOpArgStr = opArgs && Object.keys(opArgs).map(function(argName) {
     return 'var ' + argName + ' = this.args.' + argName + ';';
   }).join('\n');
 
-  actionBody = renameOpArgStr + '\n' + actionBody;
+  var renameHelpers = helpers && Object.keys(helpers).map(function(helperFuncName) {
+    return 'var ' + helperFuncName + ' = ' + helpers[helperFuncName];
+  }).join('\n');
+
+  actionBody = renameOpArgStr + '\n' + renameHelpers + '\n' + actionBody;
   var formals = actionArguments.join(',');
   return new Function(formals, actionBody);    // eslint-disable-line no-new-func
 }
 
-function wrapAction(operation, args, body) {
+function wrapAction(operation, args, body, helpers) {
   if (!body.trim()) {
     return undefined;
   }
@@ -291,7 +297,7 @@ function wrapAction(operation, args, body) {
   '  var result;\n' +
   '  var action;\n' +
   '  try {\n' +
-  '    action = buildAction(this.args, args, body);\n' +
+  '    action = buildAction(this.args, args, body, helpers);\n' +
   '  } catch (error) {\n' +
   '    result = new ErrorWrapper(nOpKey, error);\n' +
   '    errorList = errorList || [];\n' +
@@ -328,8 +334,30 @@ function wrapAction(operation, args, body) {
 
 ohmEditor.semantics.addListener('save:action', function(operationName, key, args, body) {
   var semantics = ohmEditor.semantics.value;
-  var actionWrapper = wrapAction(operationName, args, body);
+  var helpers;
+  if (operationName in semantics._getSemantics().operations) {
+    helpers = semantics._getSemantics().operations[operationName]._helper;
+  } else {
+    helpers = semantics._getSemantics().attributes[operationName]._helper;
+  }
+  var actionWrapper = wrapAction(operationName, args, body, helpers);
   semantics._getActionDict(operationName)[key] = actionWrapper;
+});
+
+ohmEditor.semantics.addListener('save:helper', function(operationName, key, args, body) {
+  var helper;
+  var semantics = ohmEditor.semantics.value;
+  if (operationName in semantics._getSemantics().operations) {
+    helper = semantics._getSemantics().operations[operationName]._helper || Object.create(null);
+    semantics._getSemantics().operations[operationName]._helper = helper;
+  } else {
+    helper = semantics._getSemantics().attributes[operationName]._helper || Object.create(null);
+    semantics._getSemantics().attributes[operationName]._helper = helper;
+  }
+
+  helper[key] = new Function(args, body); // eslint-disable-line no-new-func
+  helper[key]._args = args;
+  helper[key]._body = body;
 });
 
 // Exports
@@ -392,4 +420,20 @@ ohmEditor.semantics.getSemantics = function() {
     attributes: semantics._getSemantics().attributes
   };
   return semanticOperations;
+};
+
+ohmEditor.semantics.getHelpers = function(operation) {
+  var helpers;
+  var semantics = ohmEditor.semantics.value;
+  if (operation in semantics._getSemantics().operations) {
+    helpers = semantics._getSemantics().operations[operation]._helper;
+  } else {
+    helpers = semantics._getSemantics().attributes[operation]._helper;
+  }
+  return helpers;
+};
+
+ohmEditor.semantics.getHelper = function(operation, key) {
+  var helpers = ohmEditor.semantics.getHelpers(operation);
+  return helpers && helpers[key];
 };

@@ -1,0 +1,34 @@
+.editor .helper {
+  display: flex;
+  color: gray;
+  flex: 1;
+  overflow: scroll;
+}
+
+.editor .helper::after {
+  content: '\0029\2192';
+  margin: 0 8px;
+}
+
+.editor .helper .name::after {
+  content: '\0028';
+  margin: 0 8px;
+}
+
+.editor .helper .args,
+.editor .helper .args > div {
+  display: flex;
+}
+
+.editor .helper .args .arg {
+  color: slateblue;
+  text-align: center;
+  outline: none;
+  width: 25px;
+  border: 0;
+  border-bottom: 1px solid black;
+}
+
+.editor .helper .args span {
+  margin: 0 8px 0 2px;
+}

@@ -15,6 +15,7 @@ semanticsContainer.registerEvents({
   'focus:editor': ['type', 'id'],
   'select:suggestion': ['key'],
   'highlight:suggestion': ['index'],
+  'save:helpers': [],
   'save:semantics': [],
   'hover:resultBlock': ['classId', 'shouldHighlight']
 });

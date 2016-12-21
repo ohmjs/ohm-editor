@@ -67,8 +67,8 @@
 
         // TODO: focusing on the editor.
         // ohmEditor.semanticsContainer.emit('hide:suggestions');
-        self.showSuggestions = false;
         self.$nextTick(function() {
+          self.showSuggestions = false;
           ohmEditor.semanticsContainer.emit('focus:editor', type, id);
         });
       });
@@ -94,6 +94,21 @@
           }
           var child = {
             type: 'rule',
+            id: key,
+            operation: operation,
+            opArgs: args
+          };
+          children.push(child);
+        });
+
+        var helperDict = ohmEditor.semantics.getHelpers(operation);
+        if (!helperDict) {
+          return;
+        }
+
+        Object.keys(helperDict).forEach(function(key) {
+          var child = {
+            type: 'helper',
             id: key,
             operation: operation,
             opArgs: args
