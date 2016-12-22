@@ -66,7 +66,6 @@
         }
 
         // TODO: focusing on the editor.
-        // ohmEditor.semanticsContainer.emit('hide:suggestions');
         self.$nextTick(function() {
           self.showSuggestions = false;
           ohmEditor.semanticsContainer.emit('focus:editor', type, id);

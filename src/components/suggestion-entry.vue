@@ -20,13 +20,19 @@
     mousePos = currMousePos;
   };
 
+  // Check if a name is a restrict JS identifier
+  // TODO: it less restrictive in the future
+  function isNameValid(name) {
+    return /^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(name);
+  }
+
   var ohmEditor = require('../ohmEditor');
 
   module.exports = {
     props: ['type', 'name', 'extra', 'id', 'index'],
     data: function() {
       return {
-        isSelected: false
+        isSelected: this.index === 0
       };
     },
     mounted: function() {
@@ -36,27 +42,32 @@
           return;
         }
 
-        var idx = self.index;
         if (key === 'current') {
           self.select();
         } else if (key === 'previous') {
           self.$nextTick(function() {
             ohmEditor.semanticsContainer.emit('highlight:suggestion',
-              self.$el.previousSibling ? idx - 1 : idx);
+              self.$el.previousSibling || self.$el);
           });
         } else if (key === 'next') {
           self.$nextTick(function() {
             ohmEditor.semanticsContainer.emit('highlight:suggestion',
-              self.$el.nextSibling ? idx + 1 : idx);
+              self.$el.nextSibling || self.$el);
           });
         }
       });
 
-      ohmEditor.semanticsContainer.addListener('highlight:suggestion', function(idx) {
-        self.isSelected = idx === self.index;
+      ohmEditor.semanticsContainer.addListener('highlight:suggestion', function(elem) {
+        self.isSelected = elem === self.$el;
         if (self.isSelected) {
           self.$el.scrollIntoView(false);
         }
+      });
+
+      ohmEditor.semanticsContainer.addListener('show:suggestions', function(prefix) {
+        self.$nextTick(function() {
+          self.isSelected = prefix ? self.id === prefix : self.index === 0;
+        });
       });
     },
     methods: {
@@ -64,15 +75,13 @@
         if (isScrolled) {
           return;
         }
-        ohmEditor.semanticsContainer.emit('highlight:suggestion', this.index);
+        ohmEditor.semanticsContainer.emit('highlight:suggestion', this.$el);
       },
       select: function() {
+        if (!isNameValid(this.id)) {
+          return;
+        }
         ohmEditor.semanticsContainer.emit('create:editor', this.type, this.id);
-      }
-    },
-    created: function() {
-      if (this.index === 0) {
-        this.isSelected = true;
       }
     }
   };

@@ -1,6 +1,7 @@
 <template>
   <div class="addition">
-    <textarea v-model="value" @click="showSuggestions" @blur="hideSuggestions"
+    <textarea v-model="value" @click="showSuggestions"
+              @input="showSuggestions"
               @keydown.esc.stop.prevent="selectSuggestion"
               @keydown.enter.stop.prevent="selectSuggestion"
               @keydown.up.stop.prevent="toPrevSuggestion"
@@ -21,15 +22,9 @@
         value: ''
       };
     },
-    updated: function() {
-      ohmEditor.semanticsContainer.emit('show:suggestions', this.value);
-    },
     methods: {
       showSuggestions: function(event) {
         ohmEditor.semanticsContainer.emit('show:suggestions', this.value);
-      },
-      hideSuggestions: function() {
-        ohmEditor.semanticsContainer.emit('hide:suggestions');
       },
       selectSuggestion: function(event) {
         this.value = '';
