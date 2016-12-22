@@ -2,7 +2,8 @@
   <div class="rule">
     <div class="cstNodeName">{{ id }}</div>
     <div class="blocks">
-      <argument-block v-for="block in blocks" :display="block.display" :real="block.real">
+      <argument-block v-for="block in blocks" @setArg="setArg"
+                      :display="block.display" :real="block.real">
       </argument-block>
     </div>
   </div>
@@ -85,8 +86,11 @@
     props: ['id', 'operation'],
     computed: {
       blocks: function() {
-        var blocks = [];
+        var blocks = this.initialBlocks;
         var ruleKey = this.id;
+        if (ruleKey.charAt(0) === '_') {
+          return blocks;
+        }
         var action = ohmEditor.semantics.getAction(this.operation, this.id);
 
         var argList = action ? action._actionArguments :
@@ -103,6 +107,16 @@
         return blocks;
       }
     },
+    data: function() {
+      return {
+        initialBlocks: []
+      };
+    },
+    watch: {
+      operation: function() {
+        this.initialBlocks = [];
+      }
+    },
     mounted: function() {
       var self = this;
       ohmEditor.semanticsContainer.addListener('save:semantics', function() {
@@ -111,6 +125,13 @@
         });
         self.$emit('setArgs', args);
       });
+    },
+    methods: {
+      setArg: function(display, real) {
+        this.blocks.find(function(block) {
+          return block.display === display;
+        }).real = real;
+      }
     }
   };
 </script>

@@ -29,19 +29,28 @@
         return this.type === 'rule';
       },
       bodyContent: function() {
+        var content = this.initialContent;
         var target = this.isRule ?
           ohmEditor.semantics.getAction(this.operation, this.id) :
           ohmEditor.semantics.getHelper(this.operation, this.id);
-        return target ?
-          (this.isRule ? target._actionBody : target._body) :
-          '';
+        if (target) {
+          content = this.isRule ? target._actionBody : target._body;
+        }
+        return content;
       }
     },
     data: function() {
       return {
         codemirror: undefined,
+        initialContent: '',
         args: []
       };
+    },
+    watch: {
+      operation: function(newValue, oldValue) {
+        this.initialContent = '';
+        this.codemirror.setValue(this.bodyContent);
+      }
     },
     mounted: function() {
       var self = this;
