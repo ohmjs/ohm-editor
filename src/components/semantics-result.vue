@@ -75,11 +75,14 @@
             };
             var noResult = resultWrapper.missingSemanticsAction;
             if (!noResult) {
+              var result = resultWrapper.isError ?
+                  resultWrapper.result.toString() :
+                  JSON.stringify(resultWrapper.result);
               blocks.push({
                 operation: signature,
                 classObj: classObj,
                 classId: generateResultBlockClassId(operation, resultWrapper.args),
-                result: resultWrapper.result
+                result: result
               });
             }
 
