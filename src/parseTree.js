@@ -1,8 +1,9 @@
 /* eslint-env browser */
-/* global CheckedEmitter, Vue */
+/* global CheckedEmitter */
 
 'use strict';
 
+var Vue = require('vue');
 var ohmEditor = require('./ohmEditor');
 
 var parseTree = ohmEditor.parseTree = new CheckedEmitter();

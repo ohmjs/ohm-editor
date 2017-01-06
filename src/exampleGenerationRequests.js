@@ -59,8 +59,9 @@ exampleWorkerManager.addListener('received:neededExamples', function(updatedNeed
 });
 
 ohmEditor.examples.addListener('set:selected', function(id) {
+  var value;
   try {
-    var value = ohmEditor.examples.getExample(id);
+    value = ohmEditor.examples.getExample(id);
   } catch (e) {
     return;
   }

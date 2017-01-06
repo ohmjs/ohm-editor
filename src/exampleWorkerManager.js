@@ -36,11 +36,10 @@ function resetWorker(grammar) {
   var examples = ohmEditor.examples.getExamples();
   Object.keys(examples).forEach(function(id) {
     var example = examples[id];
-    var match = grammar.match(example.text, example.startRule);
-
-    if (match.succeeded()) {
-      exampleWorkerManager.addUserExample(example.startRule || grammar.defaultStartRule,
-                                          example.text);
+    var startRule = example.startRule in grammar.rules ?
+        example.startRule : grammar.defaultStartRule;
+    if (startRule && grammar.match(example.text, startRule).succeeded()) {
+      exampleWorkerManager.addUserExample(startRule, example.text);
     }
   });
 }
@@ -102,7 +101,6 @@ function relayEvent(eventName, args) {
 exampleWorkerManager.neededExamples = null;
 exampleWorkerManager.addListener('received:neededExamples', function(neededExamples) {
   exampleWorkerManager.neededExamples = neededExamples;
-
 });
 
 // Exports
