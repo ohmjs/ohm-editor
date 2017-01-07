@@ -66,7 +66,7 @@
 
       ohmEditor.semanticsContainer.addListener('show:suggestions', function(prefix) {
         self.$nextTick(function() {
-          self.isSelected = prefix ? self.id === prefix : self.index === 0;
+          self.isSelected = self.index === 0;
         });
       });
     },

@@ -7,7 +7,7 @@
               @keydown.up.stop.prevent="toPrevSuggestion"
               @keydown.down.stop.prevent="toNextSuggestion">
     </textarea>
-    <button>add</button>
+    <button @click="selectSuggestion">add</button>
   </div>
 </template>
 

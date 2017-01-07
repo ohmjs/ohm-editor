@@ -16,7 +16,7 @@
 
   var ohmEditor = require('../ohmEditor');
 
-  var actionAddtion = require('./action-addtion.vue');
+  var actionAddtion = require('./add-action-control.vue');
   var suggestionList = require('./suggestion-list.vue');
   var semanticEditor = require('./semantic-editor.vue');
   
