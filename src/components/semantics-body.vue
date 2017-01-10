@@ -1,8 +1,6 @@
 <template>
   <div class="flex-fix">
     <div class="editorWrapper" v-if="loaded">
-      <action-addtion></action-addtion>
-      <suggestion-list v-if="showSuggestions"></suggestion-list>
       <semantic-editor v-for="child in children"
                        :type="child.type" :id="child.id" :operation="child.operation"
                        :opArgs="child.opArgs">
@@ -16,14 +14,10 @@
 
   var ohmEditor = require('../ohmEditor');
 
-  var actionAddtion = require('./add-action-control.vue');
-  var suggestionList = require('./suggestion-list.vue');
   var semanticEditor = require('./semantic-editor.vue');
   
   module.exports = {
     components: {
-      'action-addtion': actionAddtion,
-      'suggestion-list': suggestionList,
       'semantic-editor': semanticEditor
     },
     data: function() {
@@ -31,8 +25,7 @@
         loaded: false,
         operation: undefined,
         args: undefined,
-        children: [],
-        showSuggestions: false
+        children: []
       };
     },
     mounted: function() {
@@ -67,13 +60,8 @@
 
         // TODO: focusing on the editor.
         self.$nextTick(function() {
-          self.showSuggestions = false;
           ohmEditor.semanticsContainer.emit('focus:editor', type, id);
         });
-      });
-
-      ohmEditor.semanticsContainer.addListener('show:suggestions', function(prefix) {
-        self.showSuggestions = true;
       });
     },
     methods: {
