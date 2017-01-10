@@ -33,6 +33,11 @@ ohmEditor.examples.registerEvents({
   'remove:example': ['id']
 });
 
+module.exports = {
+  restoreExamples: restoreExamples,
+  getExamples: getExamples
+};
+
 // Helpers
 // -------
 
@@ -46,7 +51,12 @@ function handleMouseDown(e) {
 }
 
 function checkExample(id) {
-  var example = getExample(id);
+  var example;
+  try {
+    example = getExample(id);
+  } catch (e) {
+    return; // FIXME
+  }
   var text = example.text;
   var startRule = example.startRule;
   var el = getListEl(id);
@@ -57,8 +67,8 @@ function checkExample(id) {
   } catch (e) {
     succeeded = false;
   }
-  el.classList.toggle('pass', succeeded === example.positive);
-  el.classList.toggle('fail', !succeeded === example.positive);
+  el.classList.toggle('pass', succeeded === example.shouldMatch);
+  el.classList.toggle('fail', !succeeded === example.shouldMatch);
 }
 
 function getListEl(exampleId) {
@@ -88,11 +98,12 @@ function addExample() {
     e.stopPropagation();  // Prevent selection.
   };
   sign.onclick = function() { // flip orientation
-    exampleValues[id].positive = !exampleValues[id].positive;
-    setExample(id, exampleValues[id].text, exampleValues[id].startRule, exampleValues[id].positive);
+    exampleValues[id].shouldMatch = !exampleValues[id].shouldMatch;
+    setExample(id, exampleValues[id].text, exampleValues[id].startRule,
+      exampleValues[id].shouldMatch);
     saveExamples();
   };
-  exampleValues[id].positive = true;
+  exampleValues[id].shouldMatch = true;
 
   var del = li.appendChild(domUtil.createElement('div.delete'));
   del.innerHTML = '&#x2716;';
@@ -135,7 +146,7 @@ function getExamples() {
 }
 
 // Set the contents of an example the given id to `value`.
-function setExample(id, text, optStartRule, isPositive) {
+function setExample(id, text, optStartRule, shouldMatch) {
   if (!(id in exampleValues)) {
     throw new Error(id + ' is not a valid example id');
   }
@@ -145,7 +156,7 @@ function setExample(id, text, optStartRule, isPositive) {
   var value = exampleValues[id] = {
     text: text,
     startRule: startRule,
-    positive: isPositive
+    shouldMatch: shouldMatch
   };
 
   var listItem = getListEl(id);
@@ -168,7 +179,7 @@ function setExample(id, text, optStartRule, isPositive) {
     startRuleEl.textContent = '';
   }
 
-  if (value.positive) {
+  if (value.shouldMatch) {
     sign.innerHTML = '&#x1F44D;';
     sign.setAttribute('title', 'Example should pass');
   } else {
@@ -220,26 +231,36 @@ function setSelected(id) {
   ohmEditor.examples.emit('set:selected', id);
 }
 
-// Restore the examples from localStorage.
-function restoreExamples(editor, key) {
-  var value = localStorage.getItem(key);
+// Restore the examples from localStorage or the given object.
+function restoreExamples(key /* orExamples */) {
   var examples = [];
-  if (value) {
-    examples = JSON.parse(value);
+  if (typeof key === 'string') {
+    var value = localStorage.getItem(key);
+    if (value) {
+      examples = JSON.parse(value);
+    } else {
+      examples = domUtil.$$('#sampleExamples pre').map(function(elem) {
+        return {
+          text: elem.textContent,
+          startRule: null
+        };
+      });
+    }
   } else {
-    examples = domUtil.$$('#sampleExamples pre').map(function(elem) {
-      return {
-        text: elem.textContent,
-        startRule: null
-      };
-    });
+    examples = key;
   }
 
+  // remove previous examples
+  domUtil.$$('#exampleContainer ul li.example').forEach(function(li) {
+    delete exampleValues[li.id];
+    li.remove();
+  });
+
   examples.forEach(function(ex) {
-    if (!ex.hasOwnProperty('positive')) {
-      ex.positive = true;
+    if (!ex.hasOwnProperty('shouldMatch')) {
+      ex.shouldMatch = true;
     }
-    setExample(addExample(), ex.text, ex.startRule, ex.positive);
+    setExample(addExample(), ex.text, ex.startRule, ex.shouldMatch);
   });
 
   // Select the first example.
@@ -269,8 +290,8 @@ var uiSave = function(cm) {
     var selectEl = domUtil.$('#startRuleDropdown');
     var value = cm.getValue();
     var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
-    var isPositive = exampleValues[selectedId].positive;
-    setExample(selectedId, value, startRule, isPositive);
+    var shouldMatch = exampleValues[selectedId].shouldMatch;
+    setExample(selectedId, value, startRule, shouldMatch);
     saveExamples();
   }
 };
@@ -294,4 +315,4 @@ ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
 // Hide the inputEditor by default, only showing it when there is a selected example.
 ohmEditor.ui.inputEditor.getWrapperElement().hidden = true;
 
-restoreExamples(ohmEditor.ui.inputEditor, 'examples');
+restoreExamples('examples');
