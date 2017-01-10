@@ -24,6 +24,7 @@
     "build": "rm build/*.worker.js; NODE_ENV=production webpack -p",
     "build-visualizer": "bash bin/build-visualizer.sh",
     "build-electron": "cd build && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
+    "ci-test": "npm run lint && npm test && npm run build-electron",
     "electron": "electron electron-main.js",
     "lint": "eslint . --ext .js,.vue",
     "test": "tape test/*.js test/**/*.js | tap-spec",
