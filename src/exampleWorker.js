@@ -78,7 +78,7 @@ module.exports = function(workerGlobalScope) {
 
         var examplesForRule = generator.examplePieces[ruleName] || null;
         self.postMessage({name: 'received:examples',
-                          args: [ruleName, examplesForRule]});
+          args: [ruleName, examplesForRule]});
         break;
       case 'update:neededExamples':
         generator.examplesNeeded = utils.difference(
@@ -87,7 +87,7 @@ module.exports = function(workerGlobalScope) {
         );
 
         self.postMessage({name: 'received:neededExamples',
-                          args: [generator.examplesNeeded]});
+          args: [generator.examplesNeeded]});
         break;
       case 'add:userExample':
         ruleName = e.data.args[0];
@@ -106,7 +106,7 @@ module.exports = function(workerGlobalScope) {
       Object.keys(examplePieces)
     );
     self.postMessage({name: 'received:neededExamples',
-                      args: [this.examplesNeeded]});
+      args: [this.examplesNeeded]});
 
     this.currentRuleIndex = 0;
   }
@@ -135,7 +135,7 @@ module.exports = function(workerGlobalScope) {
     });
     if (this.examplesNeeded.length < oldSize) {
       self.postMessage({name: 'received:neededExamples',
-                        args: [this.examplesNeeded]});
+        args: [this.examplesNeeded]});
     }
 
     // resume generation process on user example
@@ -146,6 +146,11 @@ module.exports = function(workerGlobalScope) {
   };
 
   ExampleGenerator.prototype.next = function() {
+    if (this.rules.length === 0) {
+      this.paused = true;
+      return;
+    }
+
     var currentRuleName = this.rules[this.currentRuleIndex];
 
     var that = this;
@@ -192,7 +197,7 @@ module.exports = function(workerGlobalScope) {
         self.postMessage('generated ' + ruleName +
                          ' ' + JSON.stringify(this.examplesNeeded));
         self.postMessage({name: 'received:neededExamples',
-                          args: [this.examplesNeeded]});
+          args: [this.examplesNeeded]});
       }
       if (!this.examplePieces.hasOwnProperty(ruleName)) {
         this.examplePieces[ruleName] = [];
