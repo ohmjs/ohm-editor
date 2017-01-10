@@ -64,9 +64,9 @@ module.exports = {
     var margin = scrollInfo.clientHeight - (endHeight - startHeight);
     if (startHeight < scrollInfo.top ||
         endHeight > (scrollInfo.top + scrollInfo.clientHeight)) {
-      cm.scrollIntoView({left: 0, top: startHeight,
-                         right: 0, bottom: endHeight},
-                        margin > 0 ? margin / 2 : undefined);
+      cm.scrollIntoView(
+          {left: 0, top: startHeight, right: 0, bottom: endHeight},
+          margin > 0 ? margin / 2 : undefined);
     }
   }
 };

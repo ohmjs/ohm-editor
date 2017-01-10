@@ -55,7 +55,7 @@ function checkExample(id) {
   try {
     example = getExample(id);
   } catch (e) {
-    return; // FIXME
+    return;  // TODO: Handle this in a better way.
   }
   var text = example.text;
   var startRule = example.startRule;

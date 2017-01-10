@@ -77,8 +77,10 @@ module.exports = function(workerGlobalScope) {
         var ruleName = e.data.args[0];
 
         var examplesForRule = generator.examplePieces[ruleName] || null;
-        self.postMessage({name: 'received:examples',
-          args: [ruleName, examplesForRule]});
+        self.postMessage({
+          name: 'received:examples',
+          args: [ruleName, examplesForRule]
+        });
         break;
       case 'update:neededExamples':
         generator.examplesNeeded = utils.difference(
@@ -86,8 +88,10 @@ module.exports = function(workerGlobalScope) {
           Object.keys(generator.examplePieces)
         );
 
-        self.postMessage({name: 'received:neededExamples',
-          args: [generator.examplesNeeded]});
+        self.postMessage({
+          name: 'received:neededExamples',
+          args: [generator.examplesNeeded]
+        });
         break;
       case 'add:userExample':
         ruleName = e.data.args[0];
@@ -105,8 +109,10 @@ module.exports = function(workerGlobalScope) {
       Object.keys(grammar.rules),
       Object.keys(examplePieces)
     );
-    self.postMessage({name: 'received:neededExamples',
-      args: [this.examplesNeeded]});
+    self.postMessage({
+      name: 'received:neededExamples',
+      args: [this.examplesNeeded]
+    });
 
     this.currentRuleIndex = 0;
   }
@@ -134,8 +140,10 @@ module.exports = function(workerGlobalScope) {
       return !that.examplePieces.hasOwnProperty(ruleName);
     });
     if (this.examplesNeeded.length < oldSize) {
-      self.postMessage({name: 'received:neededExamples',
-        args: [this.examplesNeeded]});
+      self.postMessage({
+        name: 'received:neededExamples',
+        args: [this.examplesNeeded]
+      });
     }
 
     // resume generation process on user example
@@ -196,8 +204,10 @@ module.exports = function(workerGlobalScope) {
         });
         self.postMessage('generated ' + ruleName +
                          ' ' + JSON.stringify(this.examplesNeeded));
-        self.postMessage({name: 'received:neededExamples',
-          args: [this.examplesNeeded]});
+        self.postMessage({
+          name: 'received:neededExamples',
+          args: [this.examplesNeeded]
+        });
       }
       if (!this.examplePieces.hasOwnProperty(ruleName)) {
         this.examplePieces[ruleName] = [];
