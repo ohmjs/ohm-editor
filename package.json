@@ -3,7 +3,7 @@
   "productName": "Ohm Editor",
   "version": "0.1.0",
   "description": "An IDE for the Ohm language (JavaScript edition)",
-  "repository": "https://github.com/cdglabs/ohm-editor",
+  "repository": "https://github.com/harc/ohm-editor",
   "keywords": [
     "editor",
     "ide",
@@ -14,8 +14,8 @@
     "visualizer",
     "prototyping"
   ],
-  "homepage": "http://cdglabs.org/ohm/visualizer/",
-  "bugs": "https://github.com/cdglabs/ohm-editor/issues",
+  "homepage": "https://ohmlang.github.io/editor/",
+  "bugs": "https://github.com/harc/ohm-editor/issues",
   "main": "index.js",
   "bin": {
     "ohm-editor": "cli.js"
@@ -45,7 +45,7 @@
   ],
   "dependencies": {
     "electron-prebuilt": "^1.1.0",
-    "ohm-js": "git://github.com/cdglabs/ohm.git#c888659"
+    "ohm-js": "git://github.com/harc/ohm.git#c888659"
   },
   "devDependencies": {
     "css-loader": "^0.26.0",
