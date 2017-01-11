@@ -10,6 +10,7 @@ semanticsContainer.registerEvents({
   'create:inputBox': [],
   'toggle:semanticsButton': ['inputBox'],
   'show:suggestions': ['prefix'],
+  'hide:suggestions': [],
   'create:editor': ['type', 'id'],
   'focus:editor': ['type', 'id'],
   'select:suggestion': ['key'],

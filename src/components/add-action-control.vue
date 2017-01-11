@@ -1,7 +1,7 @@
 <template>
-  <div v-if="loaded">
+  <div v-if="loaded" class="addNew">
     <div class="addition">
-      <textarea v-model="value" @click="showSuggestions"
+      <textarea v-model="value" @click.stop.prevent="showSuggestions"
                 @input="showSuggestions"
                 @keydown.esc.stop.prevent="selectSuggestion"
                 @keydown.enter.stop.prevent="selectSuggestion"
@@ -10,14 +10,18 @@
       </textarea>
       <button @click="selectSuggestion">add</button>
     </div>
-    <suggestion-list v-if="show"></suggestion-list>
+    <suggestion-list v-if="show" :prefix="value"></suggestion-list>
   </div>
 </template>
 
 <script>
+  /* global window */
   'use strict';
 
   var ohmEditor = require('../ohmEditor');
+  window.onclick = function() {
+    ohmEditor.semanticsContainer.emit('hide:suggestions');
+  };
 
   var suggestionList = require('./suggestion-list.vue');
 
@@ -42,7 +46,7 @@
         self.loaded = false;
       });
 
-      ohmEditor.semanticsContainer.addListener('create:editor', function(type, id) {
+      ohmEditor.semanticsContainer.addListener('hide:suggestions', function() {
         self.show = false;
       });
     },
@@ -53,6 +57,7 @@
       },
       selectSuggestion: function(event) {
         this.value = '';
+        this.show = false;
         ohmEditor.semanticsContainer.emit('select:suggestion', 'current');
       },
       toPrevSuggestion: function(event) {

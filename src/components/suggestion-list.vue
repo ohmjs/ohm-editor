@@ -26,6 +26,7 @@
     components: {
       'suggestion-entry': suggestionEntry
     },
+    props: ['prefix'],
     computed: {
       suggestions: function() {
         var suggestions = [];
@@ -53,17 +54,6 @@
 
         return suggestions;
       }
-    },
-    data: function() {
-      return {
-        prefix: ''
-      };
-    },
-    mounted: function() {
-      var self = this;
-      ohmEditor.semanticsContainer.addListener('show:suggestions', function(prefix) {
-        self.prefix = prefix;
-      });
     }
   };
 </script>
