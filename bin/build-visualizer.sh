@@ -29,8 +29,7 @@ cp -r ../src/index.html ../src/style ../src/third_party visualizer
 
 # Sync $BUILD_DIR/visualizer with the user-specified destination dir.
 read -p "Copy visualizer to $1 (y/n)? " -n 1 -r
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
+if [[ $REPLY =~ ^[Yy]$ ]]; then
   popd
-  rsync -av --delete "${BUILD_DIR}/visualizer" $(dirname "$1")
+  rsync -av --delete "${BUILD_DIR}/visualizer/" "$1"
 fi
