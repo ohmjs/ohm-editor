@@ -1,6 +1,7 @@
 'use strict';
 
 var path = require('path');
+var webpack = require('webpack');
 
 module.exports = {
   module: {
@@ -20,6 +21,12 @@ module.exports = {
     publicPath: 'assets/',
     filename: '[name]-bundle.js'
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      // Ensure this processes's NODE_ENV is exposed to the built scripts.
+      'process.env': {NODE_ENV: process.env.NODE_ENV}
+    })
+  ],
   devServer: {
     contentBase: path.join(__dirname, 'src'),
     inline: true,
