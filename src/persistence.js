@@ -8,6 +8,9 @@ var domUtil = require('./domUtil');
 var restoreExamples = require('./examples').restoreExamples;
 var getExamples = require('./examples').getExamples;
 
+var Vue = require('vue');
+var ps = require('./components/prompt.vue');
+
 function initLocal() {
   var $ = domUtil.$;
 
@@ -59,7 +62,6 @@ function initLocal() {
 
 function initServer(officialGrammars) {
   var $ = domUtil.$;
-  var $$ = domUtil.$$;
 
   $('#grammars').hidden = false;
   $('#grammarName').hidden = true;
@@ -72,31 +74,43 @@ function initServer(officialGrammars) {
   saveButton.textContent = 'Save';
   saveButton.disabled = true;
 
+  var gitHub = new GitHub();
+
   // -------------------------------------------------------
   // PROMPT STUFF
   // -------------------------------------------------------
 
-  function showPrompt(dialogId, optMessage) {
-    $('#promptScreen').style.display = 'block';
-    Array.prototype.slice.apply($$('#promptScreen > *')).forEach(function(dialog) {
-      dialog.hidden = true;
-    });
-    var messageField = $('#' + dialogId + 'Message');
-    if (messageField) {
-      messageField.textContent = optMessage || '';
+  var promptScreen = new Vue({
+    el: '#promptScreen',
+    components: {
+      promptScreen: ps
+    },
+    template: '<promptScreen :on-save-grammar="onSaveGrammar" :on-login="onLogin" ' +
+      ':dialog-id="dialogId" :dialog-message="dialogMessage" />',
+    data: {
+      onSaveGrammar: function(description) {
+        var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
+        var grammarText = ohmEditor.ui.grammarEditor.getValue();
+        var examples = getExamples();
+
+        saveToGist(description, grammarName, grammarText, examples);
+      },
+      onLogin: function(username, password) {
+        if (username !== '' && password !== '') {
+          gitHub = new GitHub({username: username, password: password});
+          loadUserGrammars(gitHub.getUser());
+        }
+        localStorage.removeItem('gitHubAuth');
+      },
+      dialogId: null,
+      dialogMessage: null
+    },
+    methods: {
+      show: function(dialogId, optMessage) {
+        this.dialogMessage = optMessage || null;
+        this.dialogId = dialogId;
+      }
     }
-    var dialog = $('#' + dialogId);
-    dialog.hidden = false;
-    dialog.querySelector('input').focus();
-  }
-  function hidePrompt() {
-    $('#promptScreen').style.display = 'none';
-    Array.prototype.slice.apply($$('#promptScreen > *')).forEach(function(dialog) {
-      dialog.hidden = true;
-    });
-  }
-  Array.prototype.slice.apply($$('#promptScreen .close')).forEach(function(close) {
-    close.addEventListener('click', hidePrompt);
   });
 
   // -------------------------------------------------------
@@ -105,8 +119,6 @@ function initServer(officialGrammars) {
 
   var grammarList = $('#grammarList');
   grammarList.hidden = false;
-
-  var gitHub = new GitHub();
 
   function loadFromGist(gistHash, cb) {
     var gist = gitHub.getGist(gistHash);
@@ -219,23 +231,6 @@ function initServer(officialGrammars) {
     group.appendChild(option);
   }
 
-  $('#gitHubForm').addEventListener('submit', function(e) {
-    hidePrompt();
-
-    var username = $('#username').value;
-    $('#username').value = '';
-    var password = $('#password').value;
-    $('#password').value = '';
-    if (username !== '' && password !== '') {
-      gitHub = new GitHub({username: username, password: password});
-      loadUserGrammars(gitHub.getUser());
-    }
-    localStorage.removeItem('gitHubAuth');
-
-    e.preventDefault();
-    return false;
-  });
-
   // -------------------------------------------------------
   // GITHUB ADD GRAMMARS (GISTS)
   // -------------------------------------------------------
@@ -304,30 +299,12 @@ function initServer(officialGrammars) {
   saveButton.addEventListener('click', save);
 
   function saveAs() {
-    showPrompt('newGrammarBox', isLoggedIn() ?
+    promptScreen.show('newGrammarBox', isLoggedIn() ?
       null :
       'Warning: You are not logged in and cannot update your grammar after saving!'
     );
   }
   saveAsButton.addEventListener('click', saveAs);
-
-  $('#newGrammarForm').addEventListener('submit', function(e) {
-    hidePrompt();
-
-    var description = $('#newGrammarName').value;
-    $('#newGrammarName').value = '';
-    var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
-    var grammarText = ohmEditor.ui.grammarEditor.getValue();
-    var examples = getExamples();
-
-    saveToGist(description, grammarName, grammarText, examples);
-
-    e.preventDefault();
-    return false;
-  });
-  $('#newGrammarForm').addEventListener('reset', function(e) {
-    hidePrompt();
-  });
 
   // -------------------------------------------------------
   // GRAMMAR SELECTION
@@ -363,7 +340,7 @@ function initServer(officialGrammars) {
     var grammarHash = grammarList.options[grammarList.selectedIndex].value;
 
     if (grammarHash === '!login') {
-      showPrompt('loginBox');
+      promptScreen.show('loginBox');
       grammarList.selectedIndex = prevSelection;
       return;
     } else if (grammarHash === '!logout') {
