@@ -98,7 +98,7 @@
         var body = this.codemirror.getValue();
         if (this.isRule) {
           ohmEditor.semantics.emit('save:action', this.operation, this.id, this.args, body);
-        } else {
+        } else if (this.args.length > 0 || body.trim().length > 0) {
           ohmEditor.semantics.emit('save:helper', this.operation, this.id, this.args, body);
         }
       }

@@ -21,7 +21,9 @@
     computed: {
       styleObj: function() {
         return {
-          width: 10 * this.realValue.length + 'px'
+          width: this.realValue ?
+            10 * this.realValue.length + 'px' :
+            '10px'
         };
       }
     },
