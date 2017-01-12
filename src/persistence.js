@@ -9,7 +9,7 @@ var restoreExamples = require('./examples').restoreExamples;
 var getExamples = require('./examples').getExamples;
 
 var Vue = require('vue');
-var ps = require('./components/prompt.vue');
+var Prompt = Vue.extend(require('./components/prompt.vue'));
 
 function initLocal() {
   var $ = domUtil.$;
@@ -80,35 +80,22 @@ function initServer(officialGrammars) {
   // PROMPT STUFF
   // -------------------------------------------------------
 
-  var promptScreen = new Vue({
+  var promptScreen = new Prompt({
     el: '#promptScreen',
-    components: {
-      promptScreen: ps
-    },
-    template: '<promptScreen :on-save-grammar="onSaveGrammar" :on-login="onLogin" ' +
-      ':dialog-id="dialogId" :dialog-message="dialogMessage" />',
-    data: {
-      onSaveGrammar: function(description) {
+    methods: {
+      saveGrammar: function(description) {
         var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
         var grammarText = ohmEditor.ui.grammarEditor.getValue();
         var examples = getExamples();
 
         saveToGist(description, grammarName, grammarText, examples);
       },
-      onLogin: function(username, password) {
+      login: function(username, password) {
         if (username !== '' && password !== '') {
           gitHub = new GitHub({username: username, password: password});
           loadUserGrammars(gitHub.getUser());
         }
         localStorage.removeItem('gitHubAuth');
-      },
-      dialogId: null,
-      dialogMessage: null
-    },
-    methods: {
-      show: function(dialogId, optMessage) {
-        this.dialogMessage = optMessage || null;
-        this.dialogId = dialogId;
       }
     }
   });

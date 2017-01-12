@@ -31,7 +31,6 @@
 
   module.exports = {
     name: 'promptScreen',
-    props: ['onSaveGrammar', 'onLogin', 'dialogId', 'dialogMessage'],
     computed: {
       showPrompt: function() {
         return this.dialogId !== null;
@@ -44,16 +43,21 @@
       }
     },
     methods: {
+      // saveGrammar and login must be implemented in an extension (see persistence.js)
       createGrammar: function() {
         this.hide();
-        this.onSaveGrammar(this.newGrammarName);
+        this.saveGrammar(this.newGrammarName);
         this.newGrammarName = '';
       },
       tryLogin: function() {
         this.hide();
-        this.onLogin(this.username, this.password);
+        this.login(this.username, this.password);
         this.username = '';
         this.password = '';
+      },
+      show: function(dialogId, optMessage) {
+        this.dialogMessage = optMessage || null;
+        this.dialogId = dialogId;
       },
       hide: function() {
         this.dialogId = null;
@@ -63,73 +67,75 @@
       return {
         newGrammarName: '',
         username: '',
-        password: ''
+        password: '',
+        dialogId: null,
+        dialogMessage: ''
       };
     }
   };
 </script>
 
 <style>
-#promptScreen {
-  position: fixed;
-  z-index: 15; /* z-index = 11 is .contexMenu */
-  padding-top: 200px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.4);
-}
+  #promptScreen {
+    position: fixed;
+    z-index: 15; /* z-index = 11 is .contexMenu */
+    padding-top: 200px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+  }
 
-#promptScreen > * {
-  background-color: #fefefe;
-  margin: auto;
-  padding: 15px;
-  border: 1px solid #888;
-  width: 300px;
-}
+  #promptScreen > * {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 15px;
+    border: 1px solid #888;
+    width: 300px;
+  }
 
-#promptScreen h2 {
-  margin: 0;
-}
+  #promptScreen h2 {
+    margin: 0;
+  }
 
-#loginBoxMessage, #newGrammarBoxMessage {
-  margin: 8px 8px 0;
-  display: inline-block;
-  font-size: 14px;
-  font-style: italic;
-  font-weight: bold;
-}
+  #loginBoxMessage, #newGrammarBoxMessage {
+    margin: 8px 8px 0;
+    display: inline-block;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+  }
 
-#loginBoxMessage:empty, #newGrammarBoxMessage:empty {
-  display: none;
-}
+  #loginBoxMessage:empty, #newGrammarBoxMessage:empty {
+    display: none;
+  }
 
-#promptScreen label {
-  display: inline-block;
-  font-size: 14px;
-  width: 85px;
-}
+  #promptScreen label {
+    display: inline-block;
+    font-size: 14px;
+    width: 85px;
+  }
 
-#promptScreen label,
-#promptScreen input[type="submit"],
-#promptScreen input[type="reset"] {
-  margin-top: 10px;
-}
+  #promptScreen label,
+  #promptScreen input[type="submit"],
+  #promptScreen input[type="reset"] {
+    margin-top: 10px;
+  }
 
-.close {
-  color: #aaaaaa;
-  float: right;
-  margin: -10px -5px 0 0;
-  font-size: 20px;
-  font-weight: bold;
-}
+  .close {
+    color: #aaaaaa;
+    float: right;
+    margin: -10px -5px 0 0;
+    font-size: 20px;
+    font-weight: bold;
+  }
 
-.close:hover, .close:focus {
-  color: #e0a;
-  text-decoration: none;
-  cursor: pointer;
-}
+  .close:hover, .close:focus {
+    color: #e0a;
+    text-decoration: none;
+    cursor: pointer;
+  }
 </style>
