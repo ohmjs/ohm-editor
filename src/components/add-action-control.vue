@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loaded" class="addNew">
+  <div v-if="initalLoaded" v-show="loaded" class="addNew">
     <div class="addition">
       <textarea v-model="value" @click.stop.prevent="showSuggestions"
                 @input="showSuggestions"
@@ -10,7 +10,7 @@
       </textarea>
       <button @click="selectSuggestion">add</button>
     </div>
-    <suggestion-list v-if="show" :prefix="value"></suggestion-list>
+    <suggestion-list v-show="show" :prefix="value"></suggestion-list>
   </div>
 </template>
 
@@ -31,6 +31,7 @@
     },
     data: function() {
       return {
+        initalLoaded: false,
         loaded: false,
         show: false,
         value: ''
@@ -39,7 +40,7 @@
     mounted: function() {
       var self = this;
       ohmEditor.semantics.addListener('select:operation', function(operationName, optArgs) {
-        self.loaded = true;
+        self.loaded = self.initalLoaded = true;
       });
 
       ohmEditor.semantics.addListener('clear:semanticsEditorWrapper', function() {
