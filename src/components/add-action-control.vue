@@ -31,9 +31,15 @@
     },
     data: function() {
       return {
+        // Inital loading state of the add_action node.
         initalLoaded: false,
+
+        // Show the add_action node when `loaded`  is true.
         loaded: false,
+
+        // Show suggestion list when `show` is true.
         show: false,
+
         value: ''
       };
     },

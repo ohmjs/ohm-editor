@@ -66,7 +66,10 @@
     data: function() {
       return {
         children: [],
+
+        // Hide/show the addition area for a new operation.
         adding: false,
+
         value: ''
       };
     },

@@ -114,6 +114,7 @@
     },
     watch: {
       operation: function() {
+        // This triggers the `blocks` updating.
         this.initialBlocks = [];
       }
     },

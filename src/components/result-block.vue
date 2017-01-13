@@ -29,6 +29,8 @@
     mounted: function() {
       var self = this;
 
+      // The result block is highlighted when a user hover a result block
+      // represents the result of the same operation.
       ohmEditor.semanticsContainer.addListener('hover:resultBlock',
         function(target, shouldHighlight) {
           if (target === self.classId) {

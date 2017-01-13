@@ -14,7 +14,9 @@
     props: ['display', 'real'],
     data: function() {
       return {
-        showing: true,
+        // Hide/show real argument
+        showing: this.display !== this.real,
+
         realValue: this.real
       };
     },
@@ -32,9 +34,6 @@
         this.realValue = newValue;
         this.showing = this.display !== this.real;
       }
-    },
-    created: function() {
-      this.showing = this.display !== this.real;
     },
     mounted: function() {
       var self = this;

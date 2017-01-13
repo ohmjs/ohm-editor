@@ -17,7 +17,6 @@
   var ruleArgs = require('./rule-arguments.vue');
   var functionArgs = require('./function-arguments.vue');
 
-  // TODO: focus on editor
   module.exports = {
     components: {
       'rule-arguments': ruleArgs,
@@ -48,6 +47,7 @@
     },
     watch: {
       operation: function(newValue, oldValue) {
+        // This triggers the `bodyContent` updating.
         this.initialContent = '';
         this.codemirror.setValue(this.bodyContent);
       }
