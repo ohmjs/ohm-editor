@@ -34,15 +34,19 @@
         var args = self.blocks.map(function(block, idx) {
           return block.text;
         });
+
+        // Remove the last argument if it is an empty string
         if (!args[args.length - 1]) {
           args.pop();
         }
+
         self.$emit('setArgs', args);
       });
     },
     methods: {
       addNew: function(idx, event) {
         if (idx === this.blocks.length - 1 && event.code !== 'Tab') {
+          // Append a new argument input area.
           this.blocks.push(Object.create(null));
         }
       },

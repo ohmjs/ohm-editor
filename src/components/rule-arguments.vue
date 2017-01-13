@@ -86,7 +86,7 @@
     props: ['id', 'operation'],
     computed: {
       blocks: function() {
-        var blocks = [];
+        var blocks = this.initialBlocks;
         var ruleKey = this.id;
         if (ruleKey.charAt(0) === '_') {
           return blocks;
@@ -105,6 +105,17 @@
           blocks.push(block);
         });
         return blocks;
+      }
+    },
+    data: function() {
+      return {
+        initialBlocks: []
+      };
+    },
+    watch: {
+      operation: function() {
+        // This triggers the `blocks` updating.
+        this.initialBlocks = [];
       }
     },
     mounted: function() {

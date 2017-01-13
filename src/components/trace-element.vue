@@ -14,7 +14,7 @@
                      :id="child.id" :traceNode="child.traceNode" :context="child.context"
                      :currentLR="child.currentLR" :measureInputText="measureInputText"
                      :isInVBox="child.isInVBox" :eventHandlers="eventHandlers"
-                     :showResult="hasResult">
+                     :initallyHasResult="hasResult">
       </trace-element>
     </div>
   </div>
@@ -143,13 +143,14 @@
       measureInputText: {type: Function},
       isInVBox: {type: Boolean},
 
-      // from parent element
+      // Pass from parent element
       context: {type: Object},
 
       eventHandlers: {type: Object},
       currentLR: {type: Object},
 
-      showResult: {type: Boolean}
+      // Indicate whether there should be a result append to the node by defalut
+      initallyHasResult: {type: Boolean}
     },
     computed: {
       id: function() {
@@ -236,7 +237,7 @@
             },
             isInVBox: self.vbox,
             currentLR: lrObj,
-            showResult: self.hasResult
+            initallyHasResult: self.hasResult
           };
           children.push(traceElement);
         });
@@ -252,7 +253,7 @@
             context: this.context,
             isInVBox: true,
             currentLR: lrObj,
-            showResult: this.hasResult
+            initallyHasResult: this.hasResult
           });
         }
         return children;
@@ -265,7 +266,7 @@
       return {
         collapsed: false,
         hasUserToggledCollapsedState: false,
-        hasResult: this.showResult,
+        hasResult: this.initallyHasResult,
         selfClassObj: {}
       };
     },

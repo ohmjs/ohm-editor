@@ -20,6 +20,12 @@
     mousePos = currMousePos;
   };
 
+  // Check if a name is a restrict JS identifier
+  // TODO: it less restrictive in the future
+  function isNameValid(name) {
+    return /^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(name);
+  }
+
   var ohmEditor = require('../ohmEditor');
 
   module.exports = {
@@ -60,7 +66,7 @@
 
       ohmEditor.semanticsContainer.addListener('show:suggestions', function(prefix) {
         self.$nextTick(function() {
-          self.isSelected = self.id === prefix;
+          self.isSelected = self.index === 0;
         });
       });
     },
@@ -72,6 +78,9 @@
         ohmEditor.semanticsContainer.emit('highlight:suggestion', this.$el);
       },
       select: function() {
+        if (!isNameValid(this.id)) {
+          return;
+        }
         ohmEditor.semanticsContainer.emit('create:editor', this.type, this.id);
       }
     }

@@ -14,19 +14,26 @@
     props: ['display', 'real'],
     data: function() {
       return {
-        showing: true,
+        // Hide/show real argument
+        showing: this.display !== this.real,
+
         realValue: this.real
       };
     },
     computed: {
       styleObj: function() {
         return {
-          width: 10 * this.realValue.length + 'px'
+          width: this.realValue ?
+            10 * this.realValue.length + 'px' :
+            '10px'
         };
       }
     },
-    created: function() {
-      this.showing = this.display !== this.real;
+    watch: {
+      real: function(newValue) {
+        this.realValue = newValue;
+        this.showing = this.display !== this.real;
+      }
     },
     mounted: function() {
       var self = this;

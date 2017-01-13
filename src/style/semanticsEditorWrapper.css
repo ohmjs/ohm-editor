@@ -1,6 +1,9 @@
+#semanticsContainer .addNew {
+  overflow: auto;
+}
+
 #semanticsContainer .addition {
   display: flex;
-  flex: 1;
   height: 21px;
   margin: 10px;
 }
