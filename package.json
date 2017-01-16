@@ -62,7 +62,7 @@
     "tap-spec": "^4.1.1",
     "tape": "^4.6.2",
     "uglify": "^0.1.5",
-    "vue": "2.1.8",
+    "vue": "2.1.9",
     "vue-loader": "10.0.2",
     "vue-template-compiler": "2.1.8",
     "webpack": "^1.13.3",
