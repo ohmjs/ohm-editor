@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "css-loader": "^0.26.0",
-    "electron-packager": "^8.4.0",
+    "electron-packager": "^8.5.1",
     "eslint": "3.13.1",
     "eslint-config-google": "0.6.0",
     "eslint-plugin-camelcase-ohm": "0.2.1",
