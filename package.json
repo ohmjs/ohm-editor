@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "electron-prebuilt": "^1.1.0",
-    "ohm-js": "git://github.com/harc/ohm.git#c888659"
+    "ohm-js": "git://github.com/harc/ohm.git#537ff61"
   },
   "devDependencies": {
     "css-loader": "^0.26.0",

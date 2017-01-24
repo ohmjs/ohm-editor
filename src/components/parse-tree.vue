@@ -38,7 +38,7 @@
   function couldZoom(currentRootTrace, traceNode) {
     return currentRootTrace !== traceNode &&
            traceNode.succeeded &&
-           !isLeaf(traceNode);
+           !isLeaf(ohmEditor.grammar, traceNode);
   }
 
   function clearMarks() {

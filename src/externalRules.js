@@ -4,6 +4,7 @@
 'use strict';
 
 var domUtil = require('./domUtil');
+var isPrimitiveRule = require('./traceUtil').isPrimitiveRule;
 var ohmEditor = require('./ohmEditor');
 
 var $ = domUtil.$;
@@ -65,6 +66,29 @@ semantics.addAttribute('identifiers', {
   }
 });
 
+function getBuiltInRuleDefinition(ruleName) {
+  var ruleInfo = builtInRules.rules[ruleName];
+  var ans = ruleName;
+
+  if (ruleInfo.formals.length > 0) {
+    ans += '<' + ruleInfo.formals.join(', ') + '>';
+  }
+
+  if (ruleInfo.description) {
+    ans += ' (' + ruleInfo.description + ')';
+  }
+  ans += ' = ';
+
+  if (isPrimitiveRule(builtInRules, ruleName)) {
+    ans += '/* primitive rule */';
+  } else {
+    var body = ruleInfo.body;
+    ans += body.source ? body.source.contents : body.toString();
+  }
+
+  return ans;
+}
+
 // Returns an object whose keys represent all externally-defined rules which
 // are referenced in the Ohm grammar represented by `matchResult`.
 function getExternalRules(rulesObj) {
@@ -80,8 +104,7 @@ function getExternalRules(rulesObj) {
 
   ruleNames.forEach(function(name) {
     if (name in builtInRules.rules) {
-      var body = builtInRules.rules[name].body;
-      ans[name] = body.source ? body.source.contents : body.toString();
+      ans[name] = getBuiltInRuleDefinition(name);
     }
   });
 
@@ -140,7 +163,7 @@ LastLineWidget.prototype.update = function(cm, matchResult, grammar) {
   for (var ruleName in this._rules) {
     var pre = document.createElement('pre');
     pre.id = 'externalRules-' + ruleName;
-    pre.textContent = ruleName + ' = ' + this._rules[ruleName] + '\n';
+    pre.textContent = this._rules[ruleName] + '\n';
     container.appendChild(pre);
   }
 };

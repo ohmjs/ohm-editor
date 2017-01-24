@@ -160,7 +160,7 @@
         return this.traceNode.ruleName === 'spaces';
       },
       isLeaf: function() {
-        var leaf = isLeaf(this.traceNode);
+        var leaf = isLeaf(ohmEditor.grammar, this.traceNode);
         if (this.traceNode.isMemoized) {
           var memoKey = this.traceNode.expr.toMemoKey();
           var stack = this.currentLR[memoKey];
@@ -334,7 +334,7 @@
         } else if (modifier === 'cmd') {
           // cmd/ctrl + click to open or close semantic editor
           ohmEditor.parseTree.emit('cmdOrCtrlClick:traceElement', this.$el);
-        } else if (!isLeaf(this.traceNode)) {
+        } else if (!isLeaf(ohmEditor.grammar, this.traceNode)) {
           this.toggleCollapsed();
         }
       },

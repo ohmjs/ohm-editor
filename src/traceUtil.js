@@ -1,10 +1,20 @@
 /* global ohm */
 'use strict';
 
-function isPrimitive(expr) {
-  return expr instanceof ohm.pexprs.Terminal ||
-         expr instanceof ohm.pexprs.Range ||
+// A primitive is any expression that should appear as a leaf in the parse tree.
+function isPrimitive(grammar, expr) {
+  // An application of a primitive rule is considered to be a primitive expression.
+  if (expr instanceof ohm.pexprs.Apply && isPrimitiveRule(grammar, expr.ruleName)) {
+    return true;
+  }
+  return expr instanceof ohm.pexprs.Range ||
+         expr instanceof ohm.pexprs.Terminal ||
          expr instanceof ohm.pexprs.UnicodeChar;
+}
+
+// Primitive rules are ones whose body can't meaningfully be shown.
+function isPrimitiveRule(grammar, ruleName) {
+  return grammar.rules[ruleName].primitive;
 }
 
 function isLRBaseCase(traceNode) {
@@ -14,9 +24,8 @@ function isLRBaseCase(traceNode) {
 }
 
 // Return true if `traceNode` should be treated as a leaf node in the parse tree.
-function isLeaf(traceNode) {
-  var pexpr = traceNode.expr;
-  if (isPrimitive(pexpr)) {
+function isLeaf(grammar, traceNode) {
+  if (isPrimitive(grammar, traceNode.expr)) {
     return true;
   }
   if (isLRBaseCase(traceNode)) {
@@ -28,5 +37,6 @@ function isLeaf(traceNode) {
 module.exports = {
   isLeaf: isLeaf,
   isLRBaseCase: isLRBaseCase,
-  isPrimitive: isPrimitive
+  isPrimitive: isPrimitive,
+  isPrimitiveRule: isPrimitiveRule
 };
