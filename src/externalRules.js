@@ -65,25 +65,25 @@ semantics.addAttribute('identifiers', {
   }
 });
 
-function getBuiltInRuleBody(ruleName) {
-  var body = builtInRules.rules[ruleName].body;
-  return body.source ? body.source.contents : body.toString();
-}
-
 // Returns an object whose keys represent all externally-defined rules which
 // are referenced in the Ohm grammar represented by `matchResult`.
 function getExternalRules(rulesObj) {
   var ans = {};
-  Object.keys(rulesObj).forEach(function(ruleName) {
-    if (ruleName in builtInRules.rules) {
-      ans[ruleName] = getBuiltInRuleBody(ruleName);
+  var ruleNames = Object.keys(rulesObj);
+
+  // Always include `space` and `spaces` when the "Show spaces" option is enabled.
+  if (ohmEditor.options.showSpaces) {
+    ruleNames.push('space');
+    ruleNames.push('spaces');
+  }
+  ruleNames.sort();  // Sort to ensure a stable order.
+
+  ruleNames.forEach(function(name) {
+    if (name in builtInRules.rules) {
+      var body = builtInRules.rules[name].body;
+      ans[name] = body.source ? body.source.contents : body.toString();
     }
   });
-
-  // When 'Show spaces' is enabled, include spaces even if it's not explicitly referenced.
-  if (ohmEditor.options.showSpaces && !('spaces' in ans)) {
-    ans.spaces = getBuiltInRuleBody('spaces');
-  }
 
   return ans;
 }
