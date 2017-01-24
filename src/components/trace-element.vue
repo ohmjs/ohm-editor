@@ -174,10 +174,21 @@
         if (!this.labeled || this.isLeaf) {
           return false;
         }
+
         // Collapse uppermost failure nodes.
         if (!this.traceNode.succeeded) {
           return true;
         }
+
+        // Collapse if the rule body has no source (e.g. anything from ProtoBuiltInRules).
+        var pexpr = this.traceNode.expr;
+        if (pexpr instanceof ohm.pexprs.Apply) {
+          var body = ohmEditor.grammar.rules[pexpr.ruleName].body;
+          if (!body.source) {
+            return true;
+          }
+        }
+
         // Collapse the non-syntactic nodes that are in syntactic contexts.
         return this.context.syntactic && !isSyntactic(this.traceNode);
       },
