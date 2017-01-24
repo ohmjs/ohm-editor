@@ -33,15 +33,13 @@
       },
       inlineRuleNameParts: function() {
         var ruleName = this.traceNode.expr.ruleName;
-        if (ruleName) {
-          return ruleName.split('_');
-        }
+        return ruleName ? ruleName.split('_') : [];
       },
       labelData: function() {
         if (this.traceNode.terminatesLR) {
           return {text: '[Grow LR]'};
         }
-        if (this.inlineRuleNameParts) {
+        if (this.inlineRuleNameParts.length > 1) {
           return {
             text: this.inlineRuleNameParts[0],
             caseName: this.inlineRuleNameParts[1]
