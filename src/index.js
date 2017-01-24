@@ -158,14 +158,19 @@ function resetGrammarMatcher() {
 checkboxes = $$('#options input[type=checkbox]');
 checkboxes.forEach(function(cb) {
   cb.addEventListener('click', function(e) {
+    var optionName = cb.name;
+
     // Respect the user's wishes if they automatically enable/disable "show failures".
-    if (e.target.name === 'showFailures') {
+    if (optionName === 'showFailures') {
       showFailuresImplicitly = false;
-    } else if (e.target.name === 'showExampleGenerator') {
+    } else if (optionName === 'showExampleGenerator') {
+      // TODO: Move this code out of this file, and just listen for 'change:option'.
       $$('.exampleGeneratorUI').forEach(function(el) {
-        el.classList.toggle('hidden', !e.target.checked);
+        el.classList.toggle('hidden', !cb.checked);
       });
     }
+    ohmEditor.options[optionName] = cb.checked;
+    ohmEditor.emit('change:option', e.target.name);
     triggerRefresh();
   });
 });

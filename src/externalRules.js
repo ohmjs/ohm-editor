@@ -65,16 +65,26 @@ semantics.addAttribute('identifiers', {
   }
 });
 
+function getBuiltInRuleBody(ruleName) {
+  var body = builtInRules.rules[ruleName].body;
+  return body.source ? body.source.contents : body.toString();
+}
+
 // Returns an object whose keys represent all externally-defined rules which
 // are referenced in the Ohm grammar represented by `matchResult`.
 function getExternalRules(rulesObj) {
   var ans = {};
   Object.keys(rulesObj).forEach(function(ruleName) {
     if (ruleName in builtInRules.rules) {
-      var body = builtInRules.rules[ruleName].body;
-      ans[ruleName] = body.source ? body.source.contents : body.toString();
+      ans[ruleName] = getBuiltInRuleBody(ruleName);
     }
   });
+
+  // When 'Show spaces' is enabled, include spaces even if it's not explicitly referenced.
+  if (ohmEditor.options.showSpaces && !('spaces' in ans)) {
+    ans.spaces = getBuiltInRuleBody('spaces');
+  }
+
   return ans;
 }
 
@@ -135,13 +145,29 @@ LastLineWidget.prototype.update = function(cm, matchResult, grammar) {
   }
 };
 
-// The singleton widget (since there's only one grammar editor).
+// Singletons associated with the current grammar (ok since there's only one grammar editor).
 var widget;
+var grammarState = {
+  matchResult: null,
+  grammar: null
+};
 
-ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
+function updateExternalRules() {
   var grammarEditor = ohmEditor.ui.grammarEditor;
   widget = widget || new LastLineWidget(grammarEditor);
-  widget.update(grammarEditor, matchResult, grammar);
+  widget.update(grammarEditor, grammarState.matchResult, grammarState.grammar);
+}
+
+ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
+  grammarState.matchResult = matchResult;
+  grammarState.grammar = grammar;
+  updateExternalRules();
+});
+
+ohmEditor.addListener('change:option', function(name) {
+  if (name === 'showSpaces') {
+    updateExternalRules(grammarState.grammarMatchResult, grammarState.grammar);
+  }
 });
 
 ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
