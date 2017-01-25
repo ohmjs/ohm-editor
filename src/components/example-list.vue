@@ -1,3 +1,4 @@
+<style src="./example-list.css"></style>
 <script>
   /* eslint-env browser */
 
