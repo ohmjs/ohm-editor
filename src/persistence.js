@@ -5,8 +5,6 @@
 
 var ohmEditor = require('./ohmEditor');
 var domUtil = require('./domUtil');
-var restoreExamples = require('./examples').restoreExamples;
-var getExamples = require('./examples').getExamples;
 
 function initLocal() {
   var $ = domUtil.$;
@@ -297,7 +295,7 @@ function initServer(officialGrammars) {
     var description = option.label;
     var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
     var grammarText = ohmEditor.ui.grammarEditor.getValue();
-    var examples = getExamples();
+    var examples = ohmEditor.examples.getExamples();
 
     saveToGist(description, grammarName, grammarText, examples, grammarHash);
   }
@@ -318,7 +316,7 @@ function initServer(officialGrammars) {
     $('#newGrammarName').value = '';
     var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
     var grammarText = ohmEditor.ui.grammarEditor.getValue();
-    var examples = getExamples();
+    var examples = ohmEditor.examples.getExamples();
 
     saveToGist(description, grammarName, grammarText, examples);
 
@@ -351,11 +349,11 @@ function initServer(officialGrammars) {
     });
     if (examples) {
       ohmEditor.once('parse:grammar', function(matchResult, grammar, err) {
-        restoreExamples(examples);
+        ohmEditor.examples.restoreExamples(examples);
       });
     }
 
-    restoreExamples([]); // clear examples
+    ohmEditor.examples.restoreExamples([]); // clear examples
     ohmEditor.setGrammar(grammar);
   }
 

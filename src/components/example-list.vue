@@ -4,8 +4,8 @@
   'use strict';
 
   var CheckedEmitter = require('checked-emitter');
-  var ohmEditor = require('./ohmEditor');
-  var domUtil = require('./domUtil');
+  var ohmEditor = require('../ohmEditor');
+  var domUtil = require('../domUtil');
 
   var idCounter = 0;
   var selectedId = -1;

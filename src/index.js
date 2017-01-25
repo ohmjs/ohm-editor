@@ -8,8 +8,6 @@ var ohmEditor = require('./ohmEditor');
 
 require('./editorErrors');
 require('./examples');
-require('./exampleGenerationRequests');  // Required for examples.
-require('./exampleGenerationLinks');
 require('./externalRules');
 require('./parseTree');
 require('./ruleHyperlinks');
