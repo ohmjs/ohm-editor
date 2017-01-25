@@ -49,6 +49,7 @@
     "ohm-js": "git://github.com/harc/ohm.git#537ff61"
   },
   "devDependencies": {
+    "checked-emitter": "^1.0.1",
     "css-loader": "^0.26.0",
     "electron-packager": "^8.4.0",
     "eslint": "3.13.1",

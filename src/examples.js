@@ -1,8 +1,8 @@
 /* eslint-env browser */
-/* global CheckedEmitter */
 
 'use strict';
 
+var CheckedEmitter = require('checked-emitter');
 var ohmEditor = require('./ohmEditor');
 var domUtil = require('./domUtil');
 

@@ -1,7 +1,9 @@
 /* eslint-env browser */
-/* global CheckedEmitter, CodeMirror */
+/* global CodeMirror */
 
 'use strict';
+
+var CheckedEmitter = require('checked-emitter');
 
 var ohmEditor = new CheckedEmitter();
 

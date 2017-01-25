@@ -6,9 +6,9 @@
   if (typeof exports === 'object') {
     module.exports = initModule;
   } else {
-    initModule(root.ohm, root.domUtil, root.ohmEditor, root.CheckedEmitter, root.es6);
+    initModule(root.ohm, root.domUtil, root.ohmEditor, root.es6);
   }
-})(this, function(ohm, domUtil, ohmEditor, CheckedEmitter, es6) {
+})(this, function(ohm, domUtil, ohmEditor, es6) {
 
   // Privates
   // --------

@@ -1,11 +1,11 @@
 /* eslint-env browser */
-/* global CheckedEmitter */
 
 'use strict';
 
 // TODO: handle invalid grammar in textbox
 // TODO: fix needed eamples bug (need force update to get rid of ident)
 
+var CheckedEmitter = require('checked-emitter');
 var ExampleWorker = require('worker!./exampleWorker-shim');
 var ohmEditor = require('./ohmEditor');
 
