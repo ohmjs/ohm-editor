@@ -1,10 +1,28 @@
 <style src="./example-list.css"></style>
+<template>
+  <div id="exampleContainer">
+    <div id="userExampleContainer">
+      <h2>Examples
+        <input id="addExampleButton" type="button" value="+"></input>
+      </h2>
+      <ul id="exampleList"></ul>
+      <div id="exampleBottom" class="flex-fix">
+        <div class="editorWrapper"></div>
+        <div id="neededExamples">
+          <ul class="exampleGeneratorUI hidden"></ul>
+        </div>
+      </div>
+    </div>
+    <div id="exampleSplitter" class="splitter vertical disabled"></div>
+  </div>
+</div>
+</template>
 <script>
   /* eslint-env browser */
+  /* global CodeMirror */
 
   'use strict';
 
-  var CheckedEmitter = require('checked-emitter');
   var ohmEditor = require('../ohmEditor');
   var domUtil = require('../domUtil');
 
@@ -15,7 +33,7 @@
   // Exports
   // -------
 
-  ohmEditor.examples = Object.assign(new CheckedEmitter(), {
+  Object.assign(ohmEditor.examples, {
     addExample: addExample,
     getExample: getExample,
     getExamples: getExamples,
@@ -25,19 +43,51 @@
     saveExamples: saveExamples
   });
 
-  // each of these events is emitted after the action they refer to
-  //   takes place. For example, 'add:example' is emitted after an
-  //   example is added to the list.
-  ohmEditor.examples.registerEvents({
-    'add:example': ['id'],
-    'set:example': ['id', 'oldValue', 'newValue'],
-    'set:selected': ['id'],
-    'remove:example': ['id']
-  });
-
   module.exports = {
-    restoreExamples: restoreExamples,
-    getExamples: getExamples
+    name: 'example-list',
+    methods: {
+      handleSave: function(cm) {
+        if (selectedId) {
+          var selectEl = domUtil.$('#startRuleDropdown');
+          var value = cm.getValue();
+          var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
+          var shouldMatch = exampleValues[selectedId].shouldMatch;
+          setExample(selectedId, value, startRule, shouldMatch);
+          saveExamples();
+        }
+      },
+      initializeInputEditor: function() {
+        ohmEditor.ui.inputEditor = CodeMirror(domUtil.$('#exampleContainer .editorWrapper'));
+
+        // Hide the inputEditor by default, only showing it when there is a selected example.
+        ohmEditor.ui.inputEditor.getWrapperElement().hidden = true;
+
+        ohmEditor.ui.inputEditor.setOption('extraKeys', {
+          'Cmd-S': this.handleSave,
+          'Ctrl-S': this.handleSave
+        });
+        ohmEditor.emit('init:inputEditor', ohmEditor.ui.inputEditor);
+      }
+    },
+    mounted: function() {
+      this.initializeInputEditor();
+
+      domUtil.$('#addExampleButton').onclick = function(e) {
+        setSelected(addExample());
+      };
+      restoreExamples('examples');
+
+      ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
+        Object.keys(exampleValues).forEach(function(id) {
+          var el = getListEl(id);
+          if (err) {
+            el.classList.remove('pass', 'fail');
+          } else {
+            checkExample(id);
+          }
+        });
+      });
+    }
   };
 
   // Helpers
@@ -280,42 +330,4 @@
     ));
   }
 
-  // Main
-  // ----
-
-  domUtil.$('#addExampleButton').onclick = function(e) {
-    setSelected(addExample());
-  };
-
-  var uiSave = function(cm) {
-    if (selectedId) {
-      var selectEl = domUtil.$('#startRuleDropdown');
-      var value = cm.getValue();
-      var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
-      var shouldMatch = exampleValues[selectedId].shouldMatch;
-      setExample(selectedId, value, startRule, shouldMatch);
-      saveExamples();
-    }
-  };
-
-  ohmEditor.ui.inputEditor.setOption('extraKeys', {
-    'Cmd-S': uiSave,
-    'Ctrl-S': uiSave
-  });
-
-  ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
-    Object.keys(exampleValues).forEach(function(id) {
-      var el = getListEl(id);
-      if (err) {
-        el.classList.remove('pass', 'fail');
-      } else {
-        checkExample(id);
-      }
-    });
-  });
-
-  // Hide the inputEditor by default, only showing it when there is a selected example.
-  ohmEditor.ui.inputEditor.getWrapperElement().hidden = true;
-
-  restoreExamples('examples');
 </script>

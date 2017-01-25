@@ -84,16 +84,18 @@ function makeStartRuleDropdown(grammar, neededExamples, optStartRule) {
   var dropdown = domUtil.createElement('select');
   dropdown.id = 'startRuleDropdown';
 
-  Object.keys(grammar.rules).forEach(function(ruleName) {
-    var item = domUtil.createElement('option', ruleName);
-    item.value = ruleName;
+  if (grammar) {
+    Object.keys(grammar.rules).forEach(function(ruleName) {
+      var item = domUtil.createElement('option', ruleName);
+      item.value = ruleName;
 
-    if (neededExamples.includes(ruleName)) {
-      item.classList.add('needed');
-    }
+      if (neededExamples.includes(ruleName)) {
+        item.classList.add('needed');
+      }
 
-    dropdown.appendChild(item);
-  });
+      dropdown.appendChild(item);
+    });
+  }
 
   if (startRule !== null) {
     var option = Array.prototype.find.call(

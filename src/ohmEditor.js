@@ -63,11 +63,19 @@ ohmEditor.semantics.registerEvents({
   'add:semanticEditor': ['type', 'name']
 });
 
+ohmEditor.examples = new CheckedEmitter();
+ohmEditor.examples.registerEvents({
+  'add:example': ['id'],
+  'set:example': ['id', 'oldValue', 'newValue'],
+  'set:selected': ['id'],
+  'remove:example': ['id']
+});
+
 ohmEditor.ui = {
-  inputEditor: CodeMirror(document.querySelector('#exampleContainer .editorWrapper')),
+  inputEditor: null,  // Initialized in example-list.vue.
   grammarEditor: CodeMirror(document.querySelector('#grammarContainer .editorWrapper'))
 };
-ohmEditor.emit('init:inputEditor', ohmEditor.ui.inputEditor);
+
 ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
 
 // Exports
