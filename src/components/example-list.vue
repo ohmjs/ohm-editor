@@ -92,18 +92,21 @@
       }
     },
     watch: {
-      // When the grammar changes, re-check all the examples.
       grammar: function() {
+        // Re-check all the examples.
         Object.keys(this.exampleValues).forEach(this.updateExampleStatus);
       },
       selectedId: function(id) {
-        var example = this.getExample(id);
+        var inputEditor = ohmEditor.ui.inputEditor;
+        var example = this.getSelected();
         if (example) {
           // Update the inputEditor contents whenever the selected example changes.
-          var inputEditor = ohmEditor.ui.inputEditor;
-          inputEditor.setValue(id ? example.text : '');
+          inputEditor.setValue(example.text);
           this.selectedStartRule = example.startRule;
           this.$nextTick(function() { inputEditor.focus(); });
+        } else {
+          inputEditor.setValue('');
+          this.selectedStartRule = null;
         }
         ohmEditor.examples.emit('set:selected', id);
       },
