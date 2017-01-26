@@ -27,10 +27,9 @@
         <div id="neededExamples">
           <ul class="exampleGeneratorUI hidden"></ul>
           <!-- TODO: Move startRuleDropdown out of neededExamples -->
-          <select id="startRuleDropdown" v-model="selectedStartRule">
-            <option v-for="ruleName in startRuleOptions" :value="ruleName"
-                    :class="{needed: false /* TODO */}"
-                    :selected="ruleName === activeStartRule">{{ ruleName }}
+          <select id="startRuleDropdown" v-model="exampleStartRuleValue">
+            <option v-for="option in startRuleOptions" :value="option.value"
+                    :class="{needed: false /* TODO */}">{{ option.text }}
             </option>
           </select>
         </div>
@@ -73,22 +72,20 @@
         // Maps an example id to a string: either 'pass' or 'fail'.
         exampleStatus: Object.create(null),
 
-        // Two-way binding with the value of the selected option in #startRuleDropdown.
-        selectedStartRule: null
+        // Two-way binding with the currently-selected option in #startRuleDropdown.
+        exampleStartRuleValue: ''
       };
     },
     computed: {
-      activeStartRule: function() {
-        var example = this.getSelected();
-        if (example && example.startRule) {
-          return example.startRule;
-        }
-        if (this.grammar) {
-          return this.grammar.defaultStartRule;
-        }
-      },
+      // An array of objects representing the options to show in #startRuleDropdown.
       startRuleOptions: function() {
-        return this.grammar ? Object.keys(this.grammar.rules) : [];
+        var options = [{text: '(default)', value: ''}];
+        if (this.grammar) {
+          Object.keys(this.grammar.rules).forEach(function(ruleName) {
+            options.push({text: ruleName, value: ruleName});
+          });
+        }
+        return options;
       }
     },
     watch: {
@@ -102,11 +99,10 @@
         if (example) {
           // Update the inputEditor contents whenever the selected example changes.
           inputEditor.setValue(example.text);
-          this.selectedStartRule = example.startRule;
+          this.exampleStartRuleValue = example.startRule || '';
           this.$nextTick(function() { inputEditor.focus(); });
         } else {
           inputEditor.setValue('');
-          this.selectedStartRule = null;
         }
         ohmEditor.examples.emit('set:selected', id);
       },
@@ -132,7 +128,7 @@
       handleSave: function(cm) {
         if (this.selectedId) {
           Object.assign(this.exampleValues[this.selectedId], {
-            startRule: this.selectedStartRule,
+            startRule: this.exampleStartRuleValue,
             text: cm.getValue()
           });
         }
