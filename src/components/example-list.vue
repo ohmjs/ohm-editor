@@ -92,6 +92,10 @@
       }
     },
     watch: {
+      // When the grammar changes, re-check all the examples.
+      grammar: function() {
+        Object.keys(this.exampleValues).forEach(this.updateExampleStatus);
+      },
       selectedId: function(id) {
         var example = this.getExample(id);
         if (example) {
@@ -264,15 +268,19 @@
           this.$delete(this.exampleStatus, id);
           return;
         }
-        var example = this.getExample(id);
-        var matched;
-        try {
-          var matchResult = this.grammar.match(example.text, example.startRule);
-          matched = matchResult.succeeded();
-        } catch (e) {
-          matched = false;
+        if (this.grammar) {
+          var example = this.getExample(id);
+          var status;
+          try {
+            var matched = this.grammar.match(example.text, example.startRule).succeeded();
+            status = matched === example.shouldMatch ? 'pass' : 'fail';
+          } catch (e) {
+            status = 'fail';
+          }
+          this.$set(this.exampleStatus, id, status);
+        } else {
+          this.$delete(this.exampleStatus, id);
         }
-        this.$set(this.exampleStatus, id, matched === example.shouldMatch ? 'pass' : 'fail');
       },
 
       _initializeInputEditor: function() {
@@ -300,11 +308,12 @@
       this._initializeInputEditor();
       this.restoreExamples('examples');
 
-      // When the grammar changes, re-check all the examples.
       var self = this;
+      ohmEditor.addListener('change:grammar', function(source) {
+        self.grammar = null;
+      });
       ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
         self.grammar = grammar;
-        Object.keys(self.exampleValues).forEach(self.updateExampleStatus);
       });
     }
   };
