@@ -26,6 +26,13 @@
         <div class="editorWrapper"></div>
         <div id="neededExamples">
           <ul class="exampleGeneratorUI hidden"></ul>
+          <!-- TODO: Move startRuleDropdown out of neededExamples -->
+          <select id="startRuleDropdown" v-model="selectedStartRule">
+            <option v-for="ruleName in startRuleOptions" :value="ruleName"
+                    :class="{needed: false /* TODO */}"
+                    :selected="ruleName === activeStartRule">{{ ruleName }}
+            </option>
+          </select>
         </div>
       </div>
     </div>
@@ -59,20 +66,41 @@
     props: [],
     data: function() {
       return {
+        grammar: null,
         selectedId: null,
         exampleValues: Object.create(null),
 
         // Maps an example id to a string: either 'pass' or 'fail'.
-        exampleStatus: Object.create(null)
+        exampleStatus: Object.create(null),
+
+        // Two-way binding with the value of the selected option in #startRuleDropdown.
+        selectedStartRule: null
       };
+    },
+    computed: {
+      activeStartRule: function() {
+        var example = this.getSelected();
+        if (example && example.startRule) {
+          return example.startRule;
+        }
+        if (this.grammar) {
+          return this.grammar.defaultStartRule;
+        }
+      },
+      startRuleOptions: function() {
+        return this.grammar ? Object.keys(this.grammar.rules) : [];
+      }
     },
     watch: {
       selectedId: function(id) {
-        // Update the inputEditor contents whenever the selected example changes.
-        var inputEditor = ohmEditor.ui.inputEditor;
-        inputEditor.setValue(id ? this.getExample(id).text : '');
-        this.$nextTick(function() { inputEditor.focus(); });
-
+        var example = this.getExample(id);
+        if (example) {
+          // Update the inputEditor contents whenever the selected example changes.
+          var inputEditor = ohmEditor.ui.inputEditor;
+          inputEditor.setValue(id ? example.text : '');
+          this.selectedStartRule = example.startRule;
+          this.$nextTick(function() { inputEditor.focus(); });
+        }
         ohmEditor.examples.emit('set:selected', id);
       },
       exampleValues: {
@@ -96,11 +124,8 @@
       },
       handleSave: function(cm) {
         if (this.selectedId) {
-          var selectEl = domUtil.$('#startRuleDropdown');
-          var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
-
           Object.assign(this.exampleValues[this.selectedId], {
-            startRule: startRule,
+            startRule: this.selectedStartRule,
             text: cm.getValue()
           });
         }
@@ -230,6 +255,9 @@
         var data = JSON.stringify(Object.keys(this.exampleValues).map(this.getExample));
         localStorage.setItem('examples', data);
       },
+
+      // Try to match the example given by `id` against the current grammar.
+      // Automatically executed whenever anything in `this.examplesValues` changes.
       updateExampleStatus: function(id) {
         // If the example was deleted, delete its status as well.
         if (!(id in this.exampleValues)) {
@@ -239,13 +267,14 @@
         var example = this.getExample(id);
         var matched;
         try {
-          var matchResult = ohmEditor.grammar.match(example.text, example.startRule);
+          var matchResult = this.grammar.match(example.text, example.startRule);
           matched = matchResult.succeeded();
         } catch (e) {
           matched = false;
         }
         this.$set(this.exampleStatus, id, matched === example.shouldMatch ? 'pass' : 'fail');
       },
+
       _initializeInputEditor: function() {
         ohmEditor.ui.inputEditor = CodeMirror(domUtil.$('#exampleContainer .editorWrapper'));
         ohmEditor.ui.inputEditor.setOption('extraKeys', {
@@ -254,6 +283,7 @@
         });
         ohmEditor.emit('init:inputEditor', ohmEditor.ui.inputEditor);
       },
+
       // Watch for changes to the example with the given id. When any of its data changes,
       // `callback` will be called with the example id as its only argument.
       _watchExample: function(id, callback) {
@@ -273,6 +303,7 @@
       // When the grammar changes, re-check all the examples.
       var self = this;
       ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
+        self.grammar = grammar;
         Object.keys(self.exampleValues).forEach(self.updateExampleStatus);
       });
     }
