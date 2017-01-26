@@ -47,10 +47,11 @@
   font-size: 12px;
 }
 
-#exampleList .example .delete, #exampleList .example .sign {
+#exampleList .example .delete,
+#exampleList .example .sign {
   padding: 0 4px 0 4px;
   cursor: default;
-  display: block;
+  display: inline-block;
 }
 
 #exampleList .example .delete {

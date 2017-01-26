@@ -1,12 +1,28 @@
 <style src="./example-list.css"></style>
+
 <template>
   <div id="exampleContainer">
     <div id="userExampleContainer">
       <h2>Examples
-        <input id="addExampleButton" type="button" value="+"></input>
+        <input id="addExampleButton" type="button" value="+" @click.prevent="handleAddClick"></input>
       </h2>
-      <ul id="exampleList"></ul>
-      <div id="exampleBottom" class="flex-fix">
+
+      <ul id="exampleList">
+        <li v-for="(ex, id) in exampleValues" :id="id" :key="id" :class="classesForExample(id)"
+            @mousedown.prevent="handleMouseDown">
+          <code>
+            <span class="code">{{ ex.text }}</span>
+            <span class="startRule"></span>
+          </code>
+          <div class="sign" @click.prevent="handleSignClick">
+            <span v-if="ex.shouldMatch" title="Example should pass">&#x1F44D;</span>
+            <span v-else title="Example should fail">&#x1F44E;</span>
+          </div>
+          <div class="delete" @mousedown.prevent @click.prevent="handleDeleteClick">&#x2716;</div>
+        </li>
+      </ul>
+
+      <div id="exampleBottom" class="flex-fix" v-show="selectedId != null">
         <div class="editorWrapper"></div>
         <div id="neededExamples">
           <ul class="exampleGeneratorUI hidden"></ul>
@@ -15,8 +31,8 @@
     </div>
     <div id="exampleSplitter" class="splitter vertical disabled"></div>
   </div>
-</div>
 </template>
+
 <script>
   /* eslint-env browser */
   /* global CodeMirror */
@@ -32,11 +48,7 @@
   // -------
 
   function uniqueId() {
-    return 'example-' + idCounter++;
-  }
-
-  function getListEl(exampleId) {
-    return domUtil.$('#' + exampleId);
+    return 'example' + idCounter++;
   }
 
   // Exports
@@ -47,86 +59,90 @@
     props: [],
     data: function() {
       return {
-        selectedId: -1,
-        exampleValues: Object.create(null)
+        selectedId: null,
+        exampleValues: Object.create(null),
+
+        // Maps an example id to a string: either 'pass' or 'fail'.
+        exampleStatus: Object.create(null)
       };
     },
-    methods: {
-      handleSave: function(cm) {
-        var id = this.selectedId;
-        if (id !== -1) {
-          var selectEl = domUtil.$('#startRuleDropdown');
-          var value = cm.getValue();
-          var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
-          var shouldMatch = this.exampleValues[id].shouldMatch;
-          this.setExample(id, value, startRule, shouldMatch);
+    watch: {
+      selectedId: function(id) {
+        // Update the inputEditor contents whenever the selected example changes.
+        var inputEditor = ohmEditor.ui.inputEditor;
+        inputEditor.setValue(id ? this.getExample(id).text : '');
+        this.$nextTick(function() { inputEditor.focus(); });
+
+        ohmEditor.examples.emit('set:selected', id);
+      },
+      exampleValues: {
+        deep: true,
+        handler: function(values) {
           this.saveExamples();
         }
+      }
+    },
+    methods: {
+      classesForExample: function(id) {
+        var classes = {
+          example: true,
+          selected: this.selectedId === id
+        };
+        // Add a class for the example status (either "pass" or "fail").
+        if (id in this.exampleStatus) {
+          classes[this.exampleStatus[id]] = true;
+        }
+        return classes;
       },
-      initializeInputEditor: function() {
-        ohmEditor.ui.inputEditor = CodeMirror(domUtil.$('#exampleContainer .editorWrapper'));
+      handleSave: function(cm) {
+        if (this.selectedId) {
+          var selectEl = domUtil.$('#startRuleDropdown');
+          var startRule = selectEl && selectEl.options[selectEl.selectedIndex].value;
 
-        // Hide the inputEditor by default, only showing it when there is a selected example.
-        ohmEditor.ui.inputEditor.getWrapperElement().hidden = true;
-
-        ohmEditor.ui.inputEditor.setOption('extraKeys', {
-          'Cmd-S': this.handleSave,
-          'Ctrl-S': this.handleSave
-        });
-        ohmEditor.emit('init:inputEditor', ohmEditor.ui.inputEditor);
+          Object.assign(this.exampleValues[this.selectedId], {
+            startRule: startRule,
+            text: cm.getValue()
+          });
+        }
       },
+      handleAddClick: function(e) {
+        this.setSelected(this.addExample());
+      },
+      handleSignClick: function(e) {
+        var id = e.target.closest('li.example').id;
+        var example = this.exampleValues[id];
+        example.shouldMatch = !example.shouldMatch;  // Toggle value.
+      },
+      handleDeleteClick: function(e) {
+        var li = e.target.closest('li.example');
+        var id = li.id;
+
+        var elToSelect = li.previousSibling || li.nextSibling;
+        this.$delete(this.exampleValues, id);
+
+        if (this.selectedId === id) {
+          this.setSelected(elToSelect ? elToSelect.id : null);
+        }
+        ohmEditor.examples.emit('remove:example', id);
+      },
+      handleMouseDown: function(e) {
+        var li = e.target.closest('li.example');
+        this.selectedId = li.id;
+      },
+
       // Add a new example to the list, and return its ID.
-      addExample: function() {
-        var li = domUtil.createElement('li.example');
-        var id = li.id = uniqueId();
-        li.onmousedown = this.handleMouseDown;
-
-        var codeEl = li.appendChild(domUtil.createElement('code'));
-        var exampleTextEl = codeEl.appendChild(domUtil.createElement('span.code'));
-        var startRuleEl = codeEl.appendChild(domUtil.createElement('span.startRule'));
-
-        exampleTextEl.onmousedown = this.handleMouseDown;
-        startRuleEl.onmousedown = this.handleMouseDown;
-
-        this.exampleValues[id] = {
+      // Every example added to the list must go through this function!
+      addExample: function(optData) {
+        var id = uniqueId();
+        this.$set(this.exampleValues, id, {
           text: '',
-          startRule: null
-        };
+          startRule: null,
+          shouldMatch: true
+        });
 
-        var self = this;
-        var sign = li.appendChild(domUtil.createElement('div.sign'));
-        sign.onmousedown = function(e) {
-          e.stopPropagation();  // Prevent selection.
-        };
-        sign.onclick = function() {
-          var example = this.exampleValues[id];
-          example.shouldMatch = !example.shouldMatch;  // Toggle value.
+        this._watchExample(id, this.updateExampleStatus);
 
-          this.setExample(id, example.text, example.startRule, example.shouldMatch);
-          this.saveExamples();
-        };
-        this.exampleValues[id].shouldMatch = true;
-
-        var del = li.appendChild(domUtil.createElement('div.delete'));
-        del.innerHTML = '&#x2716;';
-        del.onmousedown = function(e) {
-          e.stopPropagation();  // Prevent selection.
-        };
-        del.onclick = function() {
-          var elToSelect = li.previousSibling || li.nextSibling;
-          li.remove();
-          delete this.exampleValues[id];
-          self.saveExamples();
-          if (self.selectedId === id) {
-            self.setSelected(elToSelect ? elToSelect.id : -1);
-          }
-
-          ohmEditor.examples.emit('remove:example', id);
-        };
-
-        domUtil.$('#exampleContainer ul').appendChild(li);
         ohmEditor.ui.inputEditor.focus();
-
         ohmEditor.examples.emit('add:example', id);
 
         return id;
@@ -136,99 +152,42 @@
       getExample: function(id) {
         if (!(id in this.exampleValues)) {
           throw new Error(id + ' is not a valid example id');
-        } else {
-          return this.exampleValues[id];
         }
+        return this.exampleValues[id];
       },
 
       getExamples: function() {
-        return this.exampleValues;
+        // Return a deep clone.
+        return JSON.parse(JSON.stringify(this.exampleValues));
       },
 
-      // Set the contents of an example the given id to `value`.
-      setExample: function(id, text, optStartRule, shouldMatch) {
+      // Set the contents of an example with the given id to `value`.
+      setExample: function(id, text, optStartRule, optShouldMatch) {
         if (!(id in this.exampleValues)) {
           throw new Error(id + ' is not a valid example id');
         }
 
-        var startRule = optStartRule || null;
-        var oldValue = this.exampleValues[id];
-        var value = this.exampleValues[id] = {
+        var example = this.exampleValues[id];
+        var oldValue = Object.assign({}, example);
+        var newValue = {
           text: text,
-          startRule: startRule,
-          shouldMatch: shouldMatch
+          startRule: optStartRule || null,
+          shouldMatch: optShouldMatch == null ? true : optShouldMatch
         };
 
-        var listItem = getListEl(id);
-        var code = listItem.querySelector('code > span.code');
-        var startRuleEl = listItem.querySelector('code > span.startRule');
-        var sign = listItem.querySelector('div.sign');
-
-        code.startRule = startRule;
-        code.parentElement.classList.remove('pass', 'fail');
-        setTimeout(this.checkExample.bind(this, id), 0);
-        if (value.text.length > 0) {
-          code.textContent = text;
-        } else {
-          code.innerHTML = '&nbsp;';
-        }
-
-        if (startRule !== null) {
-          startRuleEl.textContent = startRule;
-        } else {
-          startRuleEl.textContent = '';
-        }
-
-        if (value.shouldMatch) {
-          sign.innerHTML = '&#x1F44D;';
-          sign.setAttribute('title', 'Example should pass');
-        } else {
-          sign.innerHTML = '&#x1F44E;';
-          sign.setAttribute('title', 'Example should fail');
-        }
-
-        ohmEditor.examples.emit('set:example', id, oldValue, value);
+        Object.assign(example, newValue);
+        ohmEditor.examples.emit('set:example', id, oldValue, newValue);
       },
 
       getSelected: function() {
-        if (this.selectedId !== -1) {
+        if (this.selectedId) {
           return this.exampleValues[this.selectedId];
-        } else {
-          return null;
         }
       },
 
       // Select the example with the given id.
       setSelected: function(id) {
-        var el;
-        var value = {
-          text: '',
-          startRule: null
-        };
-        var inputEditor = ohmEditor.ui.inputEditor;
-        if (id !== -1) {
-          value = this.getExample(id);
-          el = getListEl(id);
-        }
         this.selectedId = id;
-
-        inputEditor.setValue(value.text);
-
-        // Update the DOM.
-        var current = domUtil.$('#exampleContainer .selected');
-        if (current !== el) {
-          if (current) {
-            current.classList.remove('selected');
-          }
-          if (el) {
-            el.classList.add('selected');
-          }
-        }
-
-        inputEditor.getWrapperElement().hidden = !el;
-        inputEditor.focus();
-
-        ohmEditor.examples.emit('set:selected', id);
       },
 
       // Restore the examples from localStorage or the given object.
@@ -240,88 +199,81 @@
             examples = JSON.parse(value);
           } else {
             examples = domUtil.$$('#sampleExamples pre').map(function(elem) {
-              return {
-                text: elem.textContent,
-                startRule: null
-              };
+              return {text: elem.textContent, startRule: null};
             });
           }
         } else {
           examples = key;
         }
 
-        // remove previous examples
-        var self = this;
-        domUtil.$$('#exampleContainer ul li.example').forEach(function(li) {
-          delete self.exampleValues[li.id];
-          li.remove();
-        });
+        var newExampleValues = {};
 
+        var self = this;
         examples.forEach(function(ex) {
+          var id = self.addExample();
           if (!ex.hasOwnProperty('shouldMatch')) {
             ex.shouldMatch = true;
           }
-          self.setExample(self.addExample(), ex.text, ex.startRule, ex.shouldMatch);
+          newExampleValues[id] = ex;
         });
+        this.exampleValues = newExampleValues;
 
-        // Select the first example.
-        var firstEl = domUtil.$('#exampleList li:first-child');
-        var firstId = firstEl ? firstEl.id : -1;
-        this.setSelected(firstId);
+        this.$nextTick(function() {
+          // Select the first example.
+          var firstEl = domUtil.$('#exampleList li:first-child');
+          this.selectedId = firstEl ? firstEl.id : null;
+        });
       },
 
       // Save the current contents of all examples to localStorage.
       saveExamples: function() {
-        var self = this;
-        localStorage.setItem('examples', JSON.stringify(
-          Object.keys(this.exampleValues).map(function(key) {
-            return self.exampleValues[key];
-          })
-        ));
+        var data = JSON.stringify(Object.keys(this.exampleValues).map(this.getExample));
+        localStorage.setItem('examples', data);
       },
-      handleMouseDown: function(e) {
-        var li = e.target.closest('li.example');
-        this.setSelected(li.id);
+      updateExampleStatus: function(id) {
+        // If the example was deleted, delete its status as well.
+        if (!(id in this.exampleValues)) {
+          this.$delete(this.exampleStatus, id);
+          return;
+        }
+        var example = this.getExample(id);
+        var matched;
+        try {
+          var matchResult = ohmEditor.grammar.match(example.text, example.startRule);
+          matched = matchResult.succeeded();
+        } catch (e) {
+          matched = false;
+        }
+        this.$set(this.exampleStatus, id, matched === example.shouldMatch ? 'pass' : 'fail');
       },
-      checkExample: function(id) {
-        var example;
-        try {
-          example = this.getExample(id);
-        } catch (e) {
-          return;  // TODO: Handle this in a better way.
-        }
-        var text = example.text;
-        var startRule = example.startRule;
-        var el = getListEl(id);
-        var succeeded;
-        try {
-          var matchResult = ohmEditor.grammar.match(text, startRule);
-          succeeded = matchResult.succeeded();
-        } catch (e) {
-          succeeded = false;
-        }
-        el.classList.toggle('pass', succeeded === example.shouldMatch);
-        el.classList.toggle('fail', !succeeded === example.shouldMatch);
+      _initializeInputEditor: function() {
+        ohmEditor.ui.inputEditor = CodeMirror(domUtil.$('#exampleContainer .editorWrapper'));
+        ohmEditor.ui.inputEditor.setOption('extraKeys', {
+          'Cmd-S': this.handleSave,
+          'Ctrl-S': this.handleSave
+        });
+        ohmEditor.emit('init:inputEditor', ohmEditor.ui.inputEditor);
+      },
+      // Watch for changes to the example with the given id. When any of its data changes,
+      // `callback` will be called with the example id as its only argument.
+      _watchExample: function(id, callback) {
+        var opts = {deep: true};
+        var unwatch = this.$watch('exampleValues.' + id, function(newVal, oldVal) {
+          callback(id);
+          if (newVal == null) {
+            unwatch();
+          }
+        }, opts);
       }
     },
     mounted: function() {
-      this.initializeInputEditor();
-
-      var self = this;
-      domUtil.$('#addExampleButton').onclick = function(e) {
-        self.setSelected(self.addExample());
-      };
+      this._initializeInputEditor();
       this.restoreExamples('examples');
 
+      // When the grammar changes, re-check all the examples.
+      var self = this;
       ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
-        Object.keys(self.exampleValues).forEach(function(id) {
-          var el = getListEl(id);
-          if (err) {
-            el.classList.remove('pass', 'fail');
-          } else {
-            self.checkExample(id);
-          }
-        });
+        Object.keys(self.exampleValues).forEach(self.updateExampleStatus);
       });
     }
   };
