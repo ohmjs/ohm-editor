@@ -27,6 +27,9 @@ module.exports = {
       'process.env': {NODE_ENV: process.env.NODE_ENV}
     })
   ],
+  node: {
+    fs: 'empty'
+  },
   devServer: {
     contentBase: path.join(__dirname, 'src'),
     inline: true,
