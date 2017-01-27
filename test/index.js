@@ -4,3 +4,4 @@
 'use strict';
 
 require('./test-exampleWorker');
+require('./test-example-list');

@@ -40,13 +40,13 @@
 </template>
 
 <script>
-  /* eslint-env browser */
   /* global CodeMirror */
 
   'use strict';
 
   var ohmEditor = require('../ohmEditor');
   var domUtil = require('../domUtil');
+  var localStorage = require('global/window').localStorage;
 
   var idCounter = 0;
 
@@ -134,7 +134,7 @@
         }
       },
       handleAddClick: function(e) {
-        this.setSelected(this.addExample());
+        this.addExample();
       },
       handleSignClick: function(e) {
         var id = e.target.closest('li.example').id;
@@ -169,6 +169,7 @@
         });
 
         this._watchExample(id, this.updateExampleStatus);
+        this.setSelected(id);
 
         ohmEditor.ui.inputEditor.focus();
         ohmEditor.examples.emit('add:example', id);
