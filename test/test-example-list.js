@@ -98,3 +98,35 @@ test('deleting', function(t) {
     });
   });
 });
+
+test('toggleShouldMatch', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  localStorageExamples = [];
+
+  var id = vm.addExample();
+  vm.toggleShouldMatch(id);
+
+  var example = vm.getSelected();
+  t.equal(example.shouldMatch, false);
+
+  Vue.nextTick(function() {
+    t.deepEqual(
+        localStorageExamples,
+        [{text: '', startRule: null, shouldMatch: false}],
+        'new value is saved to localStorage');
+
+    vm.toggleShouldMatch(id);  // Toggle it back.
+    t.equal(example.shouldMatch, true);
+
+    Vue.nextTick(function() {
+      t.deepEqual(
+          localStorageExamples,
+          [{text: '', startRule: null, shouldMatch: true}],
+          'new value is saved to localStorage');
+
+      t.end();
+    });
+  });
+});

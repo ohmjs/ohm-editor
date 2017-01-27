@@ -138,8 +138,7 @@
       },
       handleSignClick: function(e) {
         var id = e.target.closest('li.example').id;
-        var example = this.exampleValues[id];
-        example.shouldMatch = !example.shouldMatch;  // Toggle value.
+        this.toggleShouldMatch(id);
       },
       handleDeleteClick: function(e) {
         var li = e.target.closest('li.example');
@@ -209,6 +208,11 @@
 
         Object.assign(example, newValue);
         ohmEditor.examples.emit('set:example', id, oldValue, newValue);
+      },
+
+      toggleShouldMatch: function(id) {
+        var example = this.exampleValues[id];
+        example.shouldMatch = !example.shouldMatch;
       },
 
       getSelected: function() {
