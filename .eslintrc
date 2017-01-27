@@ -45,6 +45,7 @@
     guard-for-in: 0,
 
     max-len: ["error", {code: 100, ignoreUrls: true}],
+    max-nested-callbacks: 0,
     max-statements-per-line: ["error", {max: 2}],
 
     // Don't require `new` when calling functions whose name starts with a capital letter.

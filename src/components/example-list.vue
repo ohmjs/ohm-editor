@@ -143,15 +143,7 @@
       },
       handleDeleteClick: function(e) {
         var li = e.target.closest('li.example');
-        var id = li.id;
-
-        var elToSelect = li.previousSibling || li.nextSibling;
-        this.$delete(this.exampleValues, id);
-
-        if (this.selectedId === id) {
-          this.setSelected(elToSelect ? elToSelect.id : null);
-        }
-        ohmEditor.examples.emit('remove:example', id);
+        this.deleteExample(li.id);
       },
       handleMouseDown: function(e) {
         var li = e.target.closest('li.example');
@@ -175,6 +167,17 @@
         ohmEditor.examples.emit('add:example', id);
 
         return id;
+      },
+
+      deleteExample: function(id, optListEl) {
+        var li = optListEl || this.$el.querySelector('#' + id);
+        var elToSelect = li.previousSibling || li.nextSibling;
+        this.$delete(this.exampleValues, id);
+
+        if (this.selectedId === id) {
+          this.setSelected(elToSelect ? elToSelect.id : null);
+        }
+        ohmEditor.examples.emit('remove:example', id);
       },
 
       // Return the contents of the example with the given id.
