@@ -9,6 +9,7 @@ module.exports = function(config) {
   config.set({
     plugins: [
       require('karma-chrome-launcher'),
+      require('karma-phantomjs-launcher'),
       require('karma-tap'),
       require('karma-webpack')
     ],
