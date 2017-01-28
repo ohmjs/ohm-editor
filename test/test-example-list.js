@@ -2,7 +2,11 @@
 
 var Vue = require('vue');
 var assert = require('assert');
+var ohm = require('ohm-js');
 var test = require('tape');
+
+// Dependencies w/ mocks
+// ---------------------
 
 // Returns a stub instance of CodeMirror.
 global.CodeMirror = function() {
@@ -12,6 +16,8 @@ global.CodeMirror = function() {
     setValue: function(val) {}
   };
 };
+
+var ohmEditor = require('../src/ohmEditor');  // Requires CodeMirror()
 
 var localStorageExamples;
 
@@ -29,6 +35,20 @@ var ExampleList = Vue.extend(exampleListInjector({
     }
   }
 }));
+
+// Helpers
+// -------
+
+function simulateGrammarEdit(source, cb) {
+  ohmEditor.emit('change:grammar', source);
+  Vue.nextTick(function() {
+    ohmEditor.emit('parse:grammar', null, ohm.grammar(source), null);
+    Vue.nextTick(cb);
+  });
+}
+
+// Tests
+// -----
 
 test('adding and updating examples', function(t) {
   var vm = new ExampleList();
@@ -127,6 +147,45 @@ test('toggleShouldMatch', function(t) {
           'new value is saved to localStorage');
 
       t.end();
+    });
+  });
+});
+
+test('pass/fail status', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  var id = vm.addExample();
+  vm.setExample(id, 'abcdefg');
+
+  Vue.nextTick(function() {
+    t.equal(vm.exampleStatus[id], undefined, 'status is undefined without a grammar');
+
+    simulateGrammarEdit('G { start = letter+ }', function() {
+      t.equal(vm.exampleStatus[id], 'pass');
+      vm.exampleValues[id].shouldMatch = false;
+
+      Vue.nextTick(function() {
+        t.equal(vm.exampleStatus[id], 'fail', 'fails now that shouldMatch is false');
+
+        simulateGrammarEdit('G { start = digit+ }', function() {
+          t.equal(vm.exampleStatus[id], 'pass', 'passes when example fails matching');
+
+          var id2 = vm.addExample();
+          vm.setExample(id2, '123');
+          Vue.nextTick(function() {
+            t.equal(vm.exampleStatus[id2], 'pass');
+
+            ohmEditor.emit('change:grammar', '');
+            Vue.nextTick(function() {
+              for (var k in vm.exampleStatus) {
+                t.equal(vm.exampleStatus[k], undefined);
+              }
+              t.end();
+            });
+          });
+        });
+      });
     });
   });
 });
