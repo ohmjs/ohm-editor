@@ -12,7 +12,7 @@
             @mousedown.prevent="handleMouseDown">
           <code>
             <span class="code">{{ ex.text }}</span>
-            <span class="startRule"></span>
+            <span class="startRule">{{ ex.startRule }}</span>
           </code>
           <div class="sign" @click.prevent="handleSignClick">
             <span v-if="ex.shouldMatch" title="Example should pass">&#x1F44D;</span>
@@ -28,7 +28,7 @@
           <ul class="exampleGeneratorUI hidden"></ul>
           <!-- TODO: Move startRuleDropdown out of neededExamples -->
           <select id="startRuleDropdown" v-model="exampleStartRuleValue">
-            <option v-for="option in startRuleOptions" :value="option.value"
+            <option v-for="option in startRuleOptions" :key="option.value" :value="option.value"
                     :class="{needed: false /* TODO */}">{{ option.text }}
             </option>
           </select>

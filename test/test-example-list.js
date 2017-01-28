@@ -47,6 +47,10 @@ function simulateGrammarEdit(source, cb) {
   });
 }
 
+function findEl(vm, query) {
+  return vm.$el.querySelector(query);
+}
+
 // Tests
 // -----
 
@@ -185,6 +189,29 @@ test('pass/fail status', function(t) {
             });
           });
         });
+      });
+    });
+  });
+});
+
+test('start rule text', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  var id = vm.addExample();
+
+  simulateGrammarEdit('G { start = letter }', function() {
+    t.equal(findEl(vm, '.startRule').textContent, '');
+
+    vm.setExample(id, '', 'noSuchRule');
+    Vue.nextTick(function() {
+      t.equal(findEl(vm, '.startRule').textContent, 'noSuchRule');
+      vm.setExample(id, '', 'start');
+
+      Vue.nextTick(function() {
+        t.equal(findEl(vm, '.startRule').textContent, 'start');
+
+        t.end();
       });
     });
   });
