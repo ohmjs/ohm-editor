@@ -69,6 +69,11 @@
   padding: 0 4px 0 4px;
 }
 
+#exampleList .example.selected .thumbsUpButton:not(:hover) {
+  filter: grayscale(1.0);
+  opacity: 0.6;
+}
+
 #exampleList .example .delete {
   color: #999;
   font-size: 12px;
@@ -224,11 +229,14 @@ option.needed {
 }
 
 #exampleBottom .header {
-  padding: 0 5px 0 12px;
+  padding: 0 12px 0 12px;
+}
+
+#exampleBottom .header .gap {
+  flex: 1;
 }
 
 #exampleBottom .header label {
-  flex: 1;
   margin-right: 4px;
   text-align: right;
 }
@@ -240,6 +248,12 @@ option.needed {
   flex-direction: row;
   font-size: 12px;
   padding: 4px 0;
+}
+
+#exampleBottom .header-contents .thumbsUpButton {
+  cursor: default;
+  font-size: 16px;
+  margin: 0 12px 0 8px;
 }
 
 #exampleBottom .CodeMirror-lines pre {

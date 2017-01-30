@@ -10,7 +10,7 @@
             @mousedown.prevent="handleMouseDown">
           <code>{{ ex.text }}</code>
           <div class="startRule">{{ ex.startRule }}</div>
-          <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="handleSignClick" />
+          <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="toggleShouldMatch(id)" />
           <div class="delete" @mousedown.prevent @click.prevent="handleDeleteClick"><span>&#x2715;</span></div>
         </li>
       </ul>
@@ -18,14 +18,16 @@
 
       <div id="exampleBottom" class="flex-fix">
         <!-- Use a v-for just to bind `ex` to the currently-selected example. -->
-        <div v-for="ex in selectedExampleAsArray" key="header" class="header">
+        <div v-for="(ex, id) in selectedExampleAsObj" key="header" class="header">
           <div class="header-contents">
             <label>Start rule:</label>
             <select id="startRuleDropdown" v-model="ex.startRule">
-              <option v-for="option in startRuleOptionsForExample(ex)" :key="option.value" :value="option.value"
+              <option v-for="option in startRuleOptionsForExample(id)" :key="option.value" :value="option.value"
                       :class="{needed: false /* TODO */}">{{ option.text }}
               </option>
             </select>
+            <div class="gap"></div>
+            <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="toggleShouldMatch(id)" />
           </div>
         </div>
         <div v-show="selectedId" class="editorWrapper"></div>
@@ -89,8 +91,12 @@
         }
         return options;
       },
-      selectedExampleAsArray: function() {
-        return this.selectedId ? [this.exampleValues[this.selectedId]] : [];
+      selectedExampleAsObj: function() {
+        var obj = {};
+        if (this.selectedId) {
+          obj[this.selectedId] = this.getSelected();
+        }
+        return obj;
       }
     },
     watch: {
@@ -132,7 +138,8 @@
         return classes;
       },
       // An array of objects representing the options to show in #startRuleDropdown.
-      startRuleOptionsForExample: function(ex) {
+      startRuleOptionsForExample: function(id) {
+        var ex = this.exampleValues[id];
         var options = this.commonStartRuleOptions;
 
         // Ensure the example's start rule always appears in the dropdown, even if the
