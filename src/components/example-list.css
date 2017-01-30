@@ -8,6 +8,7 @@
 }
 
 #exampleList .example {
+  align-items: center;
   border-bottom: 1px solid #eee;
   color: #999;
   display: flex;
@@ -20,10 +21,8 @@
   cursor: default;
   flex: 1;
   overflow: hidden;
-  padding: 6px 4px 6px 8px;
+  padding: 6px 8px 6px 8px;
   text-overflow: ellipsis;
-
-  display: inline-flex;
 
   /* Weirdly, it won't shrink smaller than its content unless we give it an explicit width. */
   width: 1px;
@@ -42,29 +41,37 @@
   background-color: #f7f7f7;
 }
 
-#exampleList code {
+#exampleList code,
+#exampleList .startRule {
   font-family: Menlo, Monaco, monospace;
   font-size: 12px;
 }
 
-#exampleList .example .delete,
-#exampleList .example .sign {
-  padding: 0 4px 0 4px;
+#exampleList .example .sign,
+#exampleList .example .delete {
   cursor: default;
-  display: inline-block;
+  padding: 0 4px 0 4px;
 }
 
 #exampleList .example .delete {
-  padding: 4px;
-  color: #d44950;
+  color: #999;
+  font-size: 12px;
+  margin-right: 4px;
   visibility: hidden;
+}
+
+#exampleList .example:hover .delete {
+  visibility: visible;
+}
+
+#exampleList .example .delete:hover {
+  color: #666;
 }
 
 @media screen and (min-color-index:0) and(-webkit-min-device-pixel-ratio:0) {
   @media {
     /* Safari 6.1+ ONLY */
     #exampleList .example .sign {
-      padding-top: 6px;
       font-size: 12px;
     }
   }
@@ -72,15 +79,11 @@
 
 /* Firefox 1+ only */
 #exampleList .example .sign, x:-moz-any-link {
-  padding-top: 4px;
+  font-size: 16px;
 }
 
 #exampleList .example:hover {
   background-color: #f7f7f7;
-}
-
-#exampleList .example:hover .delete {
-  visibility: visible;
 }
 
 #exampleList code:empty::before {
@@ -170,20 +173,14 @@
   }
 }
 
-.selected span.startRule {
+.startRule {
+  color: hsl(0, 0%, 85%);
+  margin-right: 4px;
+}
+
+.selected .startRule {
   color: hsl(0, 0%, 75%);
 }
-
-span.startRule {
-  margin-left: 10px;
-  flex: 0.5;
-  color: hsl(0, 0%, 85%);
-}
-
-span.code {
-  flex: 1;
-}
-
 
 #neededExamples > ul {
   list-style-type: none;
@@ -201,31 +198,48 @@ option.needed {
   font-weight: bold;
 }
 
-#neededExamples select option {
-  text-align: center;
-}
-
-#neededExamples select {
-  text-align: center;
-  background: none;
-  border: none;
-  border-bottom: 1px solid hsl(0, 0%, 0%);
-}
-
 #neededExamples {
   padding: 7px;
 }
 
 #exampleBottom {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+}
+
+#exampleBottom .exampleText {
+  flex: 1;
 }
 
 #exampleBottom > .editorWrapper {
   flex: 1;
+  margin-right: 12px;
   position: relative;
 }
 
 #exampleBottom > #neededExamples {
   z-index: 10;
+}
+
+#exampleBottom .header {
+  padding: 0 5px 0 12px;
+}
+
+#exampleBottom .header label {
+  flex: 1;
+  margin-right: 4px;
+  text-align: right;
+}
+
+#exampleBottom .header-contents {
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: row;
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+#exampleBottom .CodeMirror-lines pre {
+  padding-left: 12px;
 }

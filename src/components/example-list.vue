@@ -10,28 +10,30 @@
       <ul id="exampleList">
         <li v-for="(ex, id) in exampleValues" :id="id" :key="id" :class="classesForExample(id)"
             @mousedown.prevent="handleMouseDown">
-          <code>
-            <span class="code">{{ ex.text }}</span>
-            <span class="startRule">{{ ex.startRule }}</span>
-          </code>
+          <code>{{ ex.text }}</code>
+          <div class="startRule">{{ ex.startRule }}</div>
           <div class="sign" @click.prevent="handleSignClick">
             <span v-if="ex.shouldMatch" title="Example should pass">&#x1F44D;</span>
             <span v-else title="Example should fail">&#x1F44E;</span>
           </div>
-          <div class="delete" @mousedown.prevent @click.prevent="handleDeleteClick">&#x2716;</div>
+          <div class="delete" @mousedown.prevent @click.prevent="handleDeleteClick"><span>&#x2715;</span></div>
         </li>
       </ul>
 
       <div id="exampleBottom" class="flex-fix" v-show="selectedId != null">
+        <div class="header">
+          <div class="header-contents">
+            <label>Start rule:</label>
+            <select id="startRuleDropdown" v-model="exampleStartRuleValue">
+              <option v-for="option in startRuleOptions" :key="option.value" :value="option.value"
+                      :class="{needed: false /* TODO */}">{{ option.text }}
+              </option>
+            </select>
+          </div>
+        </div>
         <div class="editorWrapper"></div>
         <div id="neededExamples">
           <ul class="exampleGeneratorUI hidden"></ul>
-          <!-- TODO: Move startRuleDropdown out of neededExamples -->
-          <select id="startRuleDropdown" v-model="exampleStartRuleValue">
-            <option v-for="option in startRuleOptions" :key="option.value" :value="option.value"
-                    :class="{needed: false /* TODO */}">{{ option.text }}
-            </option>
-          </select>
         </div>
       </div>
     </div>
