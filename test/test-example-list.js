@@ -51,6 +51,11 @@ function findEl(vm, query) {
   return vm.$el.querySelector(query);
 }
 
+function getDropdownOptionValues(dropdown) {
+  var options = dropdown.querySelectorAll('option');
+  return Array.prototype.map.call(options, function(opt) { return opt.value; });
+}
+
 // Tests
 // -----
 
@@ -62,7 +67,7 @@ test('adding and updating examples', function(t) {
 
   var id = vm.addExample();
   t.equal(vm.selectedId, id, 'adding selects the new example');
-  t.deepEqual(vm.getSelected(), {text: '', startRule: null, shouldMatch: true});
+  t.deepEqual(vm.getSelected(), {text: '', startRule: '', shouldMatch: true});
 
   vm.setExample(id, 'woooo', 'Start');
   t.deepEqual(vm.getSelected(), {text: 'woooo', startRule: 'Start', shouldMatch: true});
@@ -72,7 +77,7 @@ test('adding and updating examples', function(t) {
 
   var id2 = vm.addExample();
   t.equal(vm.selectedId, id2);
-  t.deepEqual(vm.getSelected(), {text: '', startRule: null, shouldMatch: true});
+  t.deepEqual(vm.getSelected(), {text: '', startRule: '', shouldMatch: true});
 
   t.end();
 });
@@ -114,7 +119,7 @@ test('deleting', function(t) {
           // localStorage should hold the id2 example.
           t.deepEqual(
               localStorageExamples,
-              [{text: "hi i'm id2", startRule: null, shouldMatch: true}]);
+              [{text: "hi i'm id2", startRule: '', shouldMatch: true}]);
 
           t.end();
         });
@@ -138,7 +143,7 @@ test('toggleShouldMatch', function(t) {
   Vue.nextTick(function() {
     t.deepEqual(
         localStorageExamples,
-        [{text: '', startRule: null, shouldMatch: false}],
+        [{text: '', startRule: '', shouldMatch: false}],
         'new value is saved to localStorage');
 
     vm.toggleShouldMatch(id);  // Toggle it back.
@@ -147,7 +152,7 @@ test('toggleShouldMatch', function(t) {
     Vue.nextTick(function() {
       t.deepEqual(
           localStorageExamples,
-          [{text: '', startRule: null, shouldMatch: true}],
+          [{text: '', startRule: '', shouldMatch: true}],
           'new value is saved to localStorage');
 
       t.end();
@@ -210,6 +215,60 @@ test('start rule text', function(t) {
 
       Vue.nextTick(function() {
         t.equal(findEl(vm, '.startRule').textContent, 'start');
+
+        t.end();
+      });
+    });
+  });
+});
+
+test('start rule dropdown', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  var id = vm.addExample();
+  t.equal(vm.selectedId, id);
+
+  Vue.nextTick(function() {
+    var dropdown = findEl(vm, '#startRuleDropdown');
+    t.equal(dropdown.value, '');
+    t.deepEqual(getDropdownOptionValues(dropdown), ['']);
+
+    simulateGrammarEdit('G { start = letter }', function() {
+      Vue.nextTick(function() {
+        dropdown = findEl(vm, '#startRuleDropdown');
+        t.equal(dropdown.value, '');
+        t.deepEqual(getDropdownOptionValues(dropdown), ['', 'start']);
+
+        // TODO: Test that changes to the dropdown are reflected in the example value.
+        // Not sure how to do that programatically, as `dropdown.value = ''` doesn't work.
+
+        t.end();
+      });
+    });
+  });
+});
+
+test('example editing', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  vm.addExample();
+  simulateGrammarEdit('G { start = letter* }', function() {
+    var li = findEl(vm, 'li');
+    t.ok(li.classList.contains('pass'));
+
+    ohmEditor.emit('change:inputEditor', 'asdf');
+    Vue.nextTick(function() {
+      t.equal(vm.getSelected().text, '', "example is not updated after 'change:inputEditor'");
+      t.notOk(
+          li.classList.contains('pass') || li.classList.contains('fail'),
+          'after editing, example is not passing or failing');
+
+      ohmEditor.emit('change:input', 'asdf');
+      Vue.nextTick(function() {
+        t.equal(vm.getSelected().text, 'asdf', "example is updated after 'change:input' event");
+        t.ok(li.classList.contains('pass'), 'test is shown as passing again');
 
         t.end();
       });

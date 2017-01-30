@@ -20,12 +20,13 @@
         </li>
       </ul>
 
-      <div id="exampleBottom" class="flex-fix" v-show="selectedId != null">
-        <div class="header">
+      <div id="exampleBottom" class="flex-fix">
+        <!-- Use a v-for just to bind `ex` to the currently-selected example. -->
+        <div v-for="ex in selectedExampleAsArray" key="header" class="header">
           <div class="header-contents">
             <label>Start rule:</label>
-            <select id="startRuleDropdown" v-model="exampleStartRuleValue">
-              <option v-for="option in startRuleOptions" :key="option.value" :value="option.value"
+            <select id="startRuleDropdown" v-model="ex.startRule">
+              <option v-for="option in startRuleOptionsForExample(ex)" :key="option.value" :value="option.value"
                       :class="{needed: false /* TODO */}">{{ option.text }}
               </option>
             </select>
@@ -74,13 +75,12 @@
         // Maps an example id to a string: either 'pass' or 'fail'.
         exampleStatus: Object.create(null),
 
-        // Two-way binding with the currently-selected option in #startRuleDropdown.
-        exampleStartRuleValue: ''
+        // Indicates that the user is editing an example, but the change hasn't been committed yet.
+        isInputPending: false
       };
     },
     computed: {
-      // An array of objects representing the options to show in #startRuleDropdown.
-      startRuleOptions: function() {
+      commonStartRuleOptions: function() {
         var options = [{text: '(default)', value: ''}];
         if (this.grammar) {
           Object.keys(this.grammar.rules).forEach(function(ruleName) {
@@ -88,6 +88,9 @@
           });
         }
         return options;
+      },
+      selectedExampleAsArray: function() {
+        return this.selectedId ? [this.exampleValues[this.selectedId]] : [];
       }
     },
     watch: {
@@ -96,16 +99,15 @@
         Object.keys(this.exampleValues).forEach(this.updateExampleStatus);
       },
       selectedId: function(id) {
-        var inputEditor = ohmEditor.ui.inputEditor;
+        // Update the inputEditor contents whenever the selected example changes.
         var example = this.getSelected();
-        if (example) {
-          // Update the inputEditor contents whenever the selected example changes.
-          inputEditor.setValue(example.text);
-          this.exampleStartRuleValue = example.startRule || '';
-          this.$nextTick(function() { inputEditor.focus(); });
-        } else {
-          inputEditor.setValue('');
-        }
+
+        this._isSelectionChanging = true;
+        ohmEditor.ui.inputEditor.setValue(example ? example.text : '');
+        this._isSelectionChanging = false;
+
+        this.$nextTick(function() { ohmEditor.ui.inputEditor.focus(); });
+
         ohmEditor.examples.emit('set:selected', id);
       },
       exampleValues: {
@@ -117,23 +119,28 @@
     },
     methods: {
       classesForExample: function(id) {
+        var pendingUpdate = this.indicatePendingInput(id);
         var classes = {
           example: true,
-          selected: this.selectedId === id
+          selected: this.selectedId === id,
+          pendingUpdate: pendingUpdate
         };
         // Add a class for the example status (either "pass" or "fail").
-        if (id in this.exampleStatus) {
+        if (id in this.exampleStatus && !pendingUpdate) {
           classes[this.exampleStatus[id]] = true;
         }
         return classes;
       },
-      handleSave: function(cm) {
-        if (this.selectedId) {
-          Object.assign(this.exampleValues[this.selectedId], {
-            startRule: this.exampleStartRuleValue,
-            text: cm.getValue()
-          });
+      // An array of objects representing the options to show in #startRuleDropdown.
+      startRuleOptionsForExample: function(ex) {
+        var options = this.commonStartRuleOptions;
+
+        // Ensure the example's start rule always appears in the dropdown, even if the
+        // rule no longer appears in the grammar.
+        if (!options.find(function(opt) { return opt.value === ex.startRule; })) {
+          options.unshift({text: ex.startRule, value: ex.startRule});
         }
+        return options;
       },
       handleAddClick: function(e) {
         this.addExample();
@@ -150,6 +157,9 @@
         var li = e.target.closest('li.example');
         this.selectedId = li.id;
       },
+      indicatePendingInput: function(id) {
+        return this.isInputPending && this.selectedId === id;
+      },
 
       // Add a new example to the list, and return its ID.
       // Every example added to the list must go through this function!
@@ -157,12 +167,12 @@
         var id = uniqueId();
         this.$set(this.exampleValues, id, {
           text: '',
-          startRule: null,
+          startRule: '',
           shouldMatch: true
         });
 
         this._watchExample(id, this.updateExampleStatus);
-        this.setSelected(id);
+        this.selectedId = id;
 
         ohmEditor.ui.inputEditor.focus();
         ohmEditor.examples.emit('add:example', id);
@@ -204,7 +214,7 @@
         var oldValue = Object.assign({}, example);
         var newValue = {
           text: text,
-          startRule: optStartRule || null,
+          startRule: optStartRule || '',
           shouldMatch: optShouldMatch == null ? true : optShouldMatch
         };
 
@@ -237,7 +247,7 @@
             examples = JSON.parse(value);
           } else {
             examples = domUtil.$$('#sampleExamples pre').map(function(elem) {
-              return {text: elem.textContent, startRule: null};
+              return {text: elem.textContent, startRule: '', shouldMatch: true};
             });
           }
         } else {
@@ -256,11 +266,8 @@
         });
         this.exampleValues = newExampleValues;
 
-        this.$nextTick(function() {
-          // Select the first example.
-          var firstEl = domUtil.$('#exampleList li:first-child');
-          this.selectedId = firstEl ? firstEl.id : null;
-        });
+        // Select the first example.
+        this.selectedId = Object.keys(newExampleValues)[0] || null;
       },
 
       // Save the current contents of all examples to localStorage.
@@ -293,12 +300,9 @@
       },
 
       _initializeInputEditor: function() {
-        ohmEditor.ui.inputEditor = CodeMirror(domUtil.$('#exampleContainer .editorWrapper'));
-        ohmEditor.ui.inputEditor.setOption('extraKeys', {
-          'Cmd-S': this.handleSave,
-          'Ctrl-S': this.handleSave
-        });
-        ohmEditor.emit('init:inputEditor', ohmEditor.ui.inputEditor);
+        var editor = ohmEditor.ui.inputEditor =
+            CodeMirror(domUtil.$('#exampleContainer .editorWrapper'));
+        ohmEditor.emit('init:inputEditor', editor);
       },
 
       // Watch for changes to the example with the given id. When any of its data changes,
@@ -323,6 +327,16 @@
       });
       ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
         self.grammar = grammar;
+      });
+      ohmEditor.addListener('change:inputEditor', function(source) {
+        // Don't indicate that input is pending if the user just changed the selected example.
+        if (!self._isSelectionChanging) {
+          self.isInputPending = true;
+        }
+      });
+      ohmEditor.addListener('change:input', function(source) {
+        self.isInputPending = false;
+        self.getSelected().text = source;
       });
     }
   };

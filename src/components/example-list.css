@@ -36,6 +36,10 @@
   border-left: 4px solid #58B958;
 }
 
+#exampleList .example.pendingUpdate code {
+  color: #bbb;
+}
+
 #exampleList .example.selected {
   color: #333;
   background-color: #f7f7f7;
