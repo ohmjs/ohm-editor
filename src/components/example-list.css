@@ -236,6 +236,13 @@ option.needed {
   flex: 1;
 }
 
+#exampleBottom .header .errorIcon {
+  cursor: help;
+  font-size: 13px;
+  margin: 0 4px;
+  position: relative;
+}
+
 #exampleBottom .header label {
   margin-right: 4px;
   text-align: right;

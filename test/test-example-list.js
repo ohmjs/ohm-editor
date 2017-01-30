@@ -171,19 +171,19 @@ test('pass/fail status', function(t) {
     t.equal(vm.exampleStatus[id], undefined, 'status is undefined without a grammar');
 
     simulateGrammarEdit('G { start = letter+ }', function() {
-      t.equal(vm.exampleStatus[id], 'pass');
+      t.equal(vm.exampleStatus[id].className, 'pass');
       vm.exampleValues[id].shouldMatch = false;
 
       Vue.nextTick(function() {
-        t.equal(vm.exampleStatus[id], 'fail', 'fails now that shouldMatch is false');
+        t.equal(vm.exampleStatus[id].className, 'fail', 'fails now that shouldMatch is false');
 
         simulateGrammarEdit('G { start = digit+ }', function() {
-          t.equal(vm.exampleStatus[id], 'pass', 'passes when example fails matching');
+          t.equal(vm.exampleStatus[id].className, 'pass', 'passes when example fails matching');
 
           var id2 = vm.addExample();
           vm.setExample(id2, '123');
           Vue.nextTick(function() {
-            t.equal(vm.exampleStatus[id2], 'pass');
+            t.equal(vm.exampleStatus[id2].className, 'pass');
 
             ohmEditor.emit('change:grammar', '');
             Vue.nextTick(function() {
@@ -249,6 +249,35 @@ test('start rule dropdown', function(t) {
   });
 });
 
+test('start rule errors', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  var id = vm.addExample();
+  vm.setExample(id, '', 'nein');
+
+  simulateGrammarEdit('G {}', function() {
+    t.equal(findEl(vm, '.header .errorIcon').title, 'Rule nein is not declared in grammar G');
+
+    simulateGrammarEdit('G { nein = }', function() {
+      t.notOk(findEl(vm, '.header .errorIcon'), 'error disappears when rule exists');
+
+      vm.setExample(id, '', 'nope');
+      Vue.nextTick(function() {
+        t.equal(findEl(vm, '.header .errorIcon').title, 'Rule nope is not declared in grammar G');
+
+        vm.setExample(id, '', '');
+        Vue.nextTick(function() {
+          t.notOk(findEl(vm, '.header .errorIcon'),
+              'error disappears when example uses default start rule');
+          t.end();
+        });
+      });
+    });
+
+  });
+});
+
 test('example editing', function(t) {
   var vm = new ExampleList();
   vm.$mount();
@@ -282,11 +311,11 @@ test('thumbs up button', function(t) {
 
   var id = vm.addExample();
   simulateGrammarEdit('G { start = any }', function() {
-    t.equal(vm.exampleStatus[id], 'fail', 'initially fails');
+    t.equal(vm.exampleStatus[id].className, 'fail', 'initially fails');
 
     findEl(vm, '.thumbsUpButton').click();  // Fake a button click.
     Vue.nextTick(function() {
-      t.equal(vm.exampleStatus[id], 'pass', 'passes after toggling');
+      t.equal(vm.exampleStatus[id].className, 'pass', 'passes after toggling');
 
       t.end();
     });

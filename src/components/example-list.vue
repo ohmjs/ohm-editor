@@ -26,6 +26,7 @@
                       :class="{needed: false /* TODO */}">{{ option.text }}
               </option>
             </select>
+            <div v-if="startRuleError" class="errorIcon" :title="startRuleError">⚠️</div>
             <div class="gap"></div>
             <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="toggleShouldMatch(id)" />
           </div>
@@ -97,6 +98,12 @@
           obj[this.selectedId] = this.getSelected();
         }
         return obj;
+      },
+      startRuleError: function() {
+        if (this.selectedId in this.exampleStatus) {
+          var err = this.exampleStatus[this.selectedId].err;
+          return err && err.message;
+        }
       }
     },
     watch: {
@@ -133,7 +140,7 @@
         };
         // Add a class for the example status (either "pass" or "fail").
         if (id in this.exampleStatus && !pendingUpdate) {
-          classes[this.exampleStatus[id]] = true;
+          classes[this.exampleStatus[id].className] = true;
         }
         return classes;
       },
@@ -296,9 +303,11 @@
           var status;
           try {
             var matched = this.grammar.match(example.text, example.startRule).succeeded();
-            status = matched === example.shouldMatch ? 'pass' : 'fail';
+            status = {
+              className: matched === example.shouldMatch ? 'pass' : 'fail'
+            };
           } catch (e) {
-            status = 'fail';
+            status = {className: 'fail', err: e};
           }
           this.$set(this.exampleStatus, id, status);
         } else {
