@@ -57,8 +57,7 @@
   background-color: #f7f7f7;
 }
 
-#exampleList code,
-#exampleList .startRule {
+#exampleList code {
   font-family: Menlo, Monaco, monospace;
   font-size: 12px;
 }
@@ -181,6 +180,8 @@
 
 .startRule {
   color: hsl(0, 0%, 85%);
+  font-family: inherit;
+  font-size: 12px;
   margin-right: 4px;
 }
 
