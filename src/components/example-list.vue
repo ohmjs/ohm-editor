@@ -3,9 +3,7 @@
 <template>
   <div id="exampleContainer">
     <div id="userExampleContainer">
-      <h2>Examples
-        <input id="addExampleButton" type="button" value="+" @click.prevent="handleAddClick"></input>
-      </h2>
+      <h2>Examples</h2>
 
       <ul id="exampleList">
         <li v-for="(ex, id) in exampleValues" :id="id" :key="id" :class="classesForExample(id)"
@@ -19,6 +17,7 @@
           <div class="delete" @mousedown.prevent @click.prevent="handleDeleteClick"><span>&#x2715;</span></div>
         </li>
       </ul>
+      <a id="addExampleLink" href="#" @click.prevent="handleAddClick">+ Add example</a>
 
       <div id="exampleBottom" class="flex-fix">
         <!-- Use a v-for just to bind `ex` to the currently-selected example. -->
@@ -32,7 +31,7 @@
             </select>
           </div>
         </div>
-        <div class="editorWrapper"></div>
+        <div v-show="selectedId" class="editorWrapper"></div>
         <div id="neededExamples">
           <ul class="exampleGeneratorUI hidden"></ul>
         </div>

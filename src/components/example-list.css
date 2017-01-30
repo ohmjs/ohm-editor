@@ -7,6 +7,18 @@
   overflow-x: auto;
 }
 
+#addExampleLink {
+  color: #999;
+  font-size: 12px;
+  margin: 6px 12px;
+  text-decoration: none;
+}
+
+#addExampleLink:hover {
+  color: #666;
+  text-decoration: underline;
+}
+
 #exampleList .example {
   align-items: center;
   border-bottom: 1px solid #eee;
@@ -162,21 +174,6 @@
   position: absolute;
 }
 
-#addExampleButton {
-  /*position: absolute;*/
-  right: 12px;
-  top: 12px;
-}
-
-/* Prevent things from looking terrible when zoomed in (looking at you, Chrome). */
-@media screen and (-webkit-min-device-pixel-ratio: 1.01) {
-  #addExampleButton {
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-  }
-}
-
 .startRule {
   color: hsl(0, 0%, 85%);
   margin-right: 4px;
@@ -207,6 +204,7 @@ option.needed {
 }
 
 #exampleBottom {
+  border-top: 1px solid #ddd;
   display: flex;
   flex-direction: column;
 }
