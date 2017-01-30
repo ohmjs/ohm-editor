@@ -10,10 +10,7 @@
             @mousedown.prevent="handleMouseDown">
           <code>{{ ex.text }}</code>
           <div class="startRule">{{ ex.startRule }}</div>
-          <div class="sign" @click.prevent="handleSignClick">
-            <span v-if="ex.shouldMatch" title="Example should pass">&#x1F44D;</span>
-            <span v-else title="Example should fail">&#x1F44E;</span>
-          </div>
+          <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="handleSignClick" />
           <div class="delete" @mousedown.prevent @click.prevent="handleDeleteClick"><span>&#x2715;</span></div>
         </li>
       </ul>
@@ -49,6 +46,7 @@
   var ohmEditor = require('../ohmEditor');
   var domUtil = require('../domUtil');
   var localStorage = require('global/window').localStorage;
+  var thumbsUpButton = require('./thumbs-up-button.vue');
 
   var idCounter = 0;
 
@@ -64,6 +62,9 @@
 
   module.exports = {
     name: 'example-list',
+    components: {
+      'thumbs-up-button': thumbsUpButton
+    },
     props: [],
     data: function() {
       return {

@@ -63,7 +63,7 @@
   font-size: 12px;
 }
 
-#exampleList .example .sign,
+#exampleList .example .thumbsUpButton,
 #exampleList .example .delete {
   cursor: default;
   padding: 0 4px 0 4px;
@@ -87,14 +87,14 @@
 @media screen and (min-color-index:0) and(-webkit-min-device-pixel-ratio:0) {
   @media {
     /* Safari 6.1+ ONLY */
-    #exampleList .example .sign {
+    #exampleList .example .thumbsUpButton {
       font-size: 12px;
     }
   }
 }
 
 /* Firefox 1+ only */
-#exampleList .example .sign, x:-moz-any-link {
+#exampleList .example .thumbsUpButton, x:-moz-any-link {
   font-size: 16px;
 }
 

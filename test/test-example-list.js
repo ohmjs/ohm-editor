@@ -275,3 +275,20 @@ test('example editing', function(t) {
     });
   });
 });
+
+test('thumbs up button', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  var id = vm.addExample();
+  simulateGrammarEdit('G { start = any }', function() {
+    t.equal(vm.exampleStatus[id], 'fail', 'initially fails');
+
+    findEl(vm, '.thumbsUpButton').click();  // Fake a button click.
+    Vue.nextTick(function() {
+      t.equal(vm.exampleStatus[id], 'pass', 'passes after toggling');
+
+      t.end();
+    });
+  });
+});
