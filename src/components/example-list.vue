@@ -151,10 +151,12 @@
 
         // Ensure the example's start rule always appears in the dropdown, even if the
         // rule no longer appears in the grammar.
-        if (!options.find(function(opt) { return opt.value === ex.startRule; })) {
-          options.unshift({text: ex.startRule, value: ex.startRule});
+        for (var i = 0; i < options.length; ++i) {
+          if (options[i].value === ex.startRule) {
+            return options;
+          }
         }
-        return options;
+        return [{text: ex.startRule, value: ex.startRule}].concat(options);
       },
       handleAddClick: function(e) {
         this.addExample();
