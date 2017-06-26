@@ -257,18 +257,18 @@ test('start rule errors', function(t) {
   vm.setExample(id, '', 'nein');
 
   simulateGrammarEdit('G {}', function() {
-    t.equal(findEl(vm, '.header .errorIcon').title, 'Rule nein is not declared in grammar G');
+    t.equal(findEl(vm, '.toolbar .errorIcon').title, 'Rule nein is not declared in grammar G');
 
     simulateGrammarEdit('G { nein = }', function() {
-      t.notOk(findEl(vm, '.header .errorIcon'), 'error disappears when rule exists');
+      t.notOk(findEl(vm, '.toolbar .errorIcon'), 'error disappears when rule exists');
 
       vm.setExample(id, '', 'nope');
       Vue.nextTick(function() {
-        t.equal(findEl(vm, '.header .errorIcon').title, 'Rule nope is not declared in grammar G');
+        t.equal(findEl(vm, '.toolbar .errorIcon').title, 'Rule nope is not declared in grammar G');
 
         vm.setExample(id, '', '');
         Vue.nextTick(function() {
-          t.notOk(findEl(vm, '.header .errorIcon'),
+          t.notOk(findEl(vm, '.toolbar .errorIcon'),
               'error disappears when example uses default start rule');
           t.end();
         });

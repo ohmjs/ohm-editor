@@ -206,51 +206,92 @@ option.needed {
 }
 
 #neededExamples {
-  padding: 7px;
+  display: none;
 }
 
-#exampleBottom {
-  border-top: 1px solid #ddd;
+#userExampleContainer .contents {
+  flex: 1;
+  position: relative;  /* For positioning #exampleEditor */
+}
+
+#editorOverlay {
+  background-color: rgba(0, 0, 0, 0.03);
   display: flex;
+  padding: 20px;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+#exampleEditor {
+  background-color: white;
+  border-radius: 3px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex: 1;
   flex-direction: column;
 }
 
-#exampleBottom .exampleText {
+#exampleEditor .header {
+  background-color: #fafafa;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  color: #666;
+  display: flex;
+  flex-direction: row;
+  padding: 8px 12px;
+}
+
+#exampleEditor .header .title {
+  flex: 1;
+  font-weight: 200;
+}
+
+#exampleEditor .exampleText {
   flex: 1;
 }
 
-#exampleBottom > .editorWrapper {
+#exampleEditor > .editorWrapper {
+  border-bottom: 1px solid #eee;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
   flex: 1;
-  margin-right: 12px;
+  margin: 0;
+  min-height: 60px;
   position: relative;
 }
 
-#exampleBottom > #neededExamples {
+#exampleEditor > #neededExamples {
   z-index: 10;
 }
 
-#exampleBottom .header {
+#exampleEditor .toolbar {
   padding: 0 12px 0 12px;
 }
 
-#exampleBottom .header .gap {
+#exampleEditor .toolbar .gap {
   flex: 1;
 }
 
-#exampleBottom .header .errorIcon {
+#exampleEditor .toolbar .errorIcon {
   cursor: help;
   font-size: 13px;
   margin: 0 4px;
   position: relative;
 }
 
-#exampleBottom .header label {
+#exampleEditor .toolbar label {
   margin-right: 4px;
   text-align: right;
 }
 
-#exampleBottom .header-contents {
+#exampleEditor .toolbar > .contents {
   align-items: center;
+  background-color: white;
   border-bottom: 1px solid #eee;
   display: flex;
   flex-direction: row;
@@ -258,12 +299,32 @@ option.needed {
   padding: 4px 0;
 }
 
-#exampleBottom .header-contents .thumbsUpButton {
+#exampleEditor .toolbar .thumbsUpButton {
   cursor: default;
   font-size: 16px;
-  margin: 0 12px 0 8px;
+  margin: 0 4px 0 8px;
 }
 
-#exampleBottom .CodeMirror-lines pre {
+#exampleEditor .CodeMirror-lines {
+  padding-bottom: 12px;  
+  padding-top: 12px;
+}
+
+#exampleEditor .CodeMirror-lines pre {
   padding-left: 12px;
+}
+
+#exampleEditor .CodeMirror-placeholder {
+  color: #999;
+}
+
+#exampleEditor.hideInputErrors .error {
+  display: none;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .25s
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0
 }
