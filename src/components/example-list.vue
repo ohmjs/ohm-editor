@@ -406,7 +406,10 @@
       });
       ohmEditor.addListener('change:input', function(source) {
         self.isInputPending = false;
-        self.getSelected().text = source;
+        var ex = self.getSelected();
+        if (ex) {
+          ex.text = source;
+        }
       });
     }
   };
