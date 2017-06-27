@@ -8,15 +8,15 @@
       <div class="contents">
         <ul id="exampleList">
           <li v-for="(ex, id) in exampleValues" :id="id" :key="id" :class="classesForExample(id)"
-              @mousedown.prevent="handleMouseDown"
+              @mousedown="handleMouseDown"
               @dblclick="handleDblClick">
             <code>{{ ex.text }}</code>
             <div class="startRule">{{ ex.startRule }}</div>
             <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="toggleShouldMatch(id)" />
-            <div class="delete" @mousedown.prevent @click.prevent="handleDeleteClick"><span>&#x2715;</span></div>
+            <div class="delete" @mousedown.stop @click="handleDeleteClick"><span>&#x2715;</span></div>
           </li>
         </ul>
-        <a id="addExampleLink" href="#" @click.prevent="handleAddClick">+ Add example</a>
+        <a id="addExampleLink" href="#" @click="handleAddClick">+ Add example</a>
         <example-editor ref="exampleEditor"
             :grammar="grammar"
             :example="selectedExampleOrEmpty"
@@ -120,6 +120,7 @@
       handleAddClick: function(e) {
         this.addExample();
         this.$refs.exampleEditor.startEditing('Add');
+        e.preventDefault();
       },
       handleSignClick: function(e) {
         var id = e.target.closest('li.example').id;
@@ -131,10 +132,12 @@
       handleDeleteClick: function(e) {
         var li = e.target.closest('li.example');
         this.deleteExample(li.id);
+        e.preventDefault();
       },
       handleMouseDown: function(e) {
         var li = e.target.closest('li.example');
         this.selectedId = li.id;
+        e.preventDefault();
       },
 
       // Emitted from the example editor when the user chooses a start rule.
@@ -170,7 +173,7 @@
         this.$delete(this.exampleValues, id);
 
         if (this.selectedId === id) {
-          this.setSelected(elToSelect ? elToSelect.id : null);
+          this.selectedId = elToSelect ? elToSelect.id : null;
         }
         ohmEditor.examples.emit('remove:example', id);
       },
