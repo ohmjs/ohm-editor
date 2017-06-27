@@ -8,7 +8,8 @@
       <div class="contents">
         <ul id="exampleList">
           <li v-for="(ex, id) in exampleValues" :id="id" :key="id" :class="classesForExample(id)"
-              @mousedown.prevent="handleMouseDown" @dblclick="startEditing()">
+              @mousedown.prevent="handleMouseDown"
+              @dblclick="handleDblClick">
             <code>{{ ex.text }}</code>
             <div class="startRule">{{ ex.startRule }}</div>
             <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="toggleShouldMatch(id)" />
@@ -16,52 +17,24 @@
           </li>
         </ul>
         <a id="addExampleLink" href="#" @click.prevent="handleAddClick">+ Add example</a>
-
-        <transition name="fade">
-          <div id="editorOverlay" v-show="editing">
-            <div id="exampleEditor" :class="hideInputErrors ? 'hideInputErrors' : ''">
-              <div class="header">
-                <div class="title">{{ editMode }} example</div>
-                <input type="button" value="Done" @click="stopEditing">
-              </div>
-
-              <!-- Use a v-for just to bind `ex` to the currently-selected example. -->
-              <div v-for="(ex, id) in selectedExampleAsObj" key="toolbar" class="toolbar">
-                <div class="contents">
-                  <label>Start rule:</label>
-                  <select id="startRuleDropdown" v-model="ex.startRule">
-                    <option v-for="option in startRuleOptionsForExample(id)" :key="option.value" :value="option.value"
-                            :class="{needed: false /* TODO */}">{{ option.text }}
-                    </option>
-                  </select>
-                  <div v-if="startRuleError" class="errorIcon" :title="startRuleError">⚠️</div>
-                  <div class="gap"></div>
-                  <thumbs-up-button :showThumbsUp="ex.shouldMatch" @click.native="toggleShouldMatch(id)" />
-                </div>
-              </div>
-              <div v-show="selectedId" class="editorWrapper"></div>
-              <div id="neededExamples">
-                <ul class="exampleGeneratorUI hidden"></ul>
-              </div>
-            </div>
-          </div>
-        </transition>
+        <example-editor ref="exampleEditor"
+            :grammar="grammar"
+            :example="selectedExampleOrEmpty"
+            :status="selectedExampleStatus"
+            @setStartRule="handleSetStartRule">
+        </example-editor>
       </div>
-
     </div>
     <div id="exampleSplitter" class="splitter vertical disabled"></div>
   </div>
 </template>
 
 <script>
-  /* global CodeMirror */
-
   'use strict';
 
   var ohmEditor = require('../ohmEditor');
   var domUtil = require('../domUtil');
   var localStorage = require('global/window').localStorage;
-  var thumbsUpButton = require('./thumbs-up-button.vue');
 
   var idCounter = 0;
 
@@ -78,7 +51,8 @@
   module.exports = {
     name: 'example-list',
     components: {
-      'thumbs-up-button': thumbsUpButton
+      'example-editor': require('./example-editor.vue'),
+      'thumbs-up-button': require('./thumbs-up-button.vue')
     },
     props: [],
     data: function() {
@@ -93,33 +67,16 @@
         exampleStatus: Object.create(null),
 
         // Indicates that the user is editing an example, but the change hasn't been committed yet.
-        isInputPending: false,
-
-        hideInputErrors: false
+        isInputPending: false
       };
     },
     computed: {
-      commonStartRuleOptions: function() {
-        var options = [{text: '(default)', value: ''}];
-        if (this.grammar) {
-          Object.keys(this.grammar.rules).forEach(function(ruleName) {
-            options.push({text: ruleName, value: ruleName});
-          });
-        }
-        return options;
+      selectedExampleStatus: function() {
+        return this.exampleStatus[this.selectedId];
       },
-      selectedExampleAsObj: function() {
-        var obj = {};
-        if (this.selectedId) {
-          obj[this.selectedId] = this.getSelected();
-        }
-        return obj;
-      },
-      startRuleError: function() {
-        if (this.selectedId in this.exampleStatus) {
-          var err = this.exampleStatus[this.selectedId].err;
-          return err && err.message;
-        }
+      selectedExampleOrEmpty: function() {
+        var ex = this.getSelected();
+        return ex || {text: '', startRule: '', shouldMatch: true};
       }
     },
     watch: {
@@ -160,42 +117,16 @@
         }
         return classes;
       },
-      // An array of objects representing the options to show in #startRuleDropdown.
-      startRuleOptionsForExample: function(id) {
-        var ex = this.exampleValues[id];
-        var options = this.commonStartRuleOptions;
-
-        // Ensure the example's start rule always appears in the dropdown, even if the
-        // rule no longer appears in the grammar.
-        for (var i = 0; i < options.length; ++i) {
-          if (options[i].value === ex.startRule) {
-            return options;
-          }
-        }
-        return [{text: ex.startRule, value: ex.startRule}].concat(options);
-      },
       handleAddClick: function(e) {
-        var cm = ohmEditor.ui.inputEditor;
         this.addExample();
-
-        // Set placeholder text that only appears before the user has typed anything.
-        // Normally, it would appear whenever the editor is empty.
-        cm.setOption('placeholder', 'Text to match');
-
-        // Also, hide errors in the input as long as the placeholder is visible.
-        this.hideInputErrors = true;
-
-        var self = this;
-        cm.on('change', function onChange() {
-          cm.setOption('placeholder', '');
-          self.hideInputErrors = false;
-          cm.off('change', onChange);
-        });
-        this.startEditing('Add');
+        this.$refs.exampleEditor.startEditing('Add');
       },
       handleSignClick: function(e) {
         var id = e.target.closest('li.example').id;
         this.toggleShouldMatch(id);
+      },
+      handleDblClick: function(e) {
+        this.$refs.exampleEditor.startEditing();
       },
       handleDeleteClick: function(e) {
         var li = e.target.closest('li.example');
@@ -205,6 +136,12 @@
         var li = e.target.closest('li.example');
         this.selectedId = li.id;
       },
+
+      // Emitted from the example editor when the user chooses a start rule.
+      handleSetStartRule: function(newVal) {
+        this.setStartRule(this.selectedId, newVal);
+      },
+
       indicatePendingInput: function(id) {
         return this.isInputPending && this.selectedId === id;
       },
@@ -285,20 +222,8 @@
         this.selectedId = id;
       },
 
-      startEditing: function(optMode) {
-        this.editing = true;
-        this.editMode = optMode || 'Edit';
-
-        // Focus the editor and set the cursor to the end.
-        this.$nextTick(function() {
-          var cm = ohmEditor.ui.inputEditor;
-          cm.focus();
-          cm.setCursor(cm.lineCount(), 0);
-          cm.refresh();
-        });
-      },
-      stopEditing: function() {
-        this.editing = false;
+      setStartRule: function(id, ruleName) {
+        this.exampleValues[id].startRule = ruleName;
       },
 
       // Restore the examples from localStorage or the given object.
@@ -364,17 +289,6 @@
         }
       },
 
-      _initializeInputEditor: function() {
-        var self = this;
-        var editorContainer = domUtil.$('#exampleContainer .editorWrapper');
-        var editor = ohmEditor.ui.inputEditor = CodeMirror(editorContainer, {
-          extraKeys: {
-            Esc: function(cm) { self.stopEditing(); }
-          }
-        });
-        ohmEditor.emit('init:inputEditor', editor);
-      },
-
       // Watch for changes to the example with the given id. When any of its data changes,
       // `callback` will be called with the example id as its only argument.
       _watchExample: function(id, callback) {
@@ -388,7 +302,6 @@
       }
     },
     mounted: function() {
-      this._initializeInputEditor();
       this.restoreExamples('examples');
 
       var self = this;
