@@ -13,7 +13,7 @@ ROOT=$(npm prefix)
 OHM_REV=$(git rev-parse --short master)
 
 PAGES_DIR="$1"
-if [ -z "$1"]; then
+if [ -z "$1" ]; then
   PAGES_DIR="$ROOT/../ohmlang.github.io"  # Default if $1 is empty
 fi
 
