@@ -32,10 +32,6 @@
       color: black;
       font-style: normal;
       border-radius: 3px;
-      padding: 2px 12px 1px 6px;
-      position: absolute;
-      top: 8px;
-      right: 0;
     }
     #grammars label {
       font-size: 0.75em;
@@ -61,8 +57,9 @@
     #saveIndicator:not(.edited) #edited {
       height: 0;
     }
+
     #saveGrammar {
-      width: 70px;
+      min-width: 64px;
     }
 
     #options {
@@ -143,10 +140,17 @@
     h2 {
       color: #e0a;
       font-size: 1em;
-      margin: 12px 12px 10px;
       -moz-user-select: none;
       -ms-user-select: none;
       -webkit-user-select: none;
+    }
+
+    .section-head {
+      padding: 0 10px;
+    }
+
+    .section-head h2 {
+      flex: 1;
     }
 
     /*
@@ -409,6 +413,36 @@
       cursor: pointer;
     }
 
+    .section-head [type=button] {
+      background-color: transparent;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      color: #888;
+    }
+
+    .section-head [type=button]:hover {
+      border-color: #666;
+      color: #444;
+    }
+
+    .section-head [type=button][disabled],
+    .section-head [type=button][disabled]:hover {
+      border-color: #ddd;
+      color: #ccc;
+    }
+
+    .section-head [type=button]:active {
+      color: #0096FF;
+      border-color: #0096FF;
+      outline-style: none;
+    }
+
+    .flex-row {
+      align-items: baseline;
+      display: flex;
+      flex-direction: row;
+    }
+
     /*
       Use media query hack to enable custom styling on WebKit/Blink only.
       Other browsers will ignore these rules.
@@ -444,18 +478,20 @@
 <body>
   <div id="topSection">
     <div id="grammarContainer">
-      <h2>Grammar</h2>
-      <div id="grammars" hidden>
-        <select id="grammarList" hidden><option value="">[local storage]</option></select>
-        <label id="grammarName" class="unnamed">no file loaded</label>
-        <input id="grammarFile" type="file" accept=".ohm" hidden>
-        <button id="loadGrammar">Load...</button>
-        <button id="saveGrammar">Save...</button>
-        <button id="saveGrammarAs">Save As...</button>
-        <label id="saveIndicator" hidden>
-          <div id="saved">Saved</div>
-          <div id="edited">Edited</div>
-        </label>
+      <div class="section-head flex-row">
+        <h2>Grammar</h2>
+        <div id="grammars" hidden>
+          <select id="grammarList" hidden><option value="">[local storage]</option></select>
+          <label id="grammarName" class="unnamed">no file loaded</label>
+          <input id="grammarFile" type="file" accept=".ohm" hidden>
+          <button id="loadGrammar">Load...</button>
+          <button id="saveGrammar">Save...</button>
+          <button id="saveGrammarAs">Save As...</button>
+          <label id="saveIndicator" hidden>
+            <div id="saved">Saved</div>
+            <div id="edited">Edited</div>
+          </label>
+        </div>
       </div>
       <div class="flex-fix"><div class="editorWrapper"></div></div>
     </div>

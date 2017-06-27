@@ -2,13 +2,13 @@
   <transition name="fade">
     <div id="editorOverlay" v-show="editing">
       <div id="exampleEditor" :class="classObj">
-        <div class="header">
+        <div class="header flex-row">
           <div class="title">{{ editMode }} example</div>
           <input type="button" value="Done" @click="stopEditing">
         </div>
 
         <div class="toolbar">
-          <div class="contents">
+          <div class="contents flex-row">
             <label>Start rule:</label>
             <select id="startRuleDropdown" v-model="startRule">
               <option v-for="option in startRuleOptions()" :key="option.value" :value="option.value"

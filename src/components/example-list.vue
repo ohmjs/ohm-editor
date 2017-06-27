@@ -3,7 +3,10 @@
 <template>
   <div id="exampleContainer">
     <div id="userExampleContainer">
-      <h2>Examples</h2>
+      <div class="section-head flex-row">
+        <h2>Examples</h2>
+        <input type="button" @click="handleAddClick" value="+ Add">
+      </div>
 
       <div class="contents">
         <ul id="exampleList">
@@ -16,7 +19,6 @@
             <div class="delete" @mousedown.stop @click="handleDeleteClick"><span>&#x2715;</span></div>
           </li>
         </ul>
-        <a id="addExampleLink" href="#" @click="handleAddClick">+ Add example</a>
         <example-editor ref="exampleEditor"
             :grammar="grammar"
             :example="selectedExampleOrEmpty"
@@ -112,6 +114,8 @@
           selected: this.selectedId === id,
           pendingUpdate: pendingUpdate
         };
+        classes['flex-row'] = true;
+
         // Add a class for the example status (either "pass" or "fail").
         if (id in this.exampleStatus && !pendingUpdate) {
           classes[this.exampleStatus[id].className] = true;
