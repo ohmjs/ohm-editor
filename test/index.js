@@ -3,4 +3,6 @@
 
 'use strict';
 
+require('../src/utils');  // For Object.assign polyfill
+
 require('./test-example-list');
