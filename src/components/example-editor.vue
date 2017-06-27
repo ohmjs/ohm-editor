@@ -21,9 +21,6 @@
           </div>
         </div>
         <div class="editorWrapper"></div>
-        <div id="neededExamples">
-          <ul class="exampleGeneratorUI hidden"></ul>
-        </div>
       </div>
     </div>
   </transition>

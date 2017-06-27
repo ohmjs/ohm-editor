@@ -22,6 +22,3 @@ Object.assign(ohmEditor.examples, {
   saveExamples: exampleList.saveExamples,
   restoreExamples: exampleList.restoreExamples
 });
-
-require('./exampleGenerationLinks');
-require('./exampleGenerationRequests');

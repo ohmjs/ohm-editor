@@ -21,7 +21,7 @@
     "ohm-editor": "cli.js"
   },
   "scripts": {
-    "build": "rm build/*.worker.js; NODE_ENV=\"'production'\" webpack -p",
+    "build": "NODE_ENV=\"'production'\" webpack -p",
     "build-visualizer": "bash bin/build-visualizer.sh",
     "build-electron": "cd build && electron-packager ../ OhmEditor --platform=darwin --arch=x64",
     "ci-test": "npm run lint && npm test -- --browsers PhantomJS && npm run build-electron",

@@ -161,11 +161,6 @@ checkboxes.forEach(function(cb) {
     // Respect the user's wishes if they automatically enable/disable "show failures".
     if (optionName === 'showFailures') {
       showFailuresImplicitly = false;
-    } else if (optionName === 'showExampleGenerator') {
-      // TODO: Move this code out of this file, and just listen for 'change:option'.
-      $$('.exampleGeneratorUI').forEach(function(el) {
-        el.classList.toggle('hidden', !cb.checked);
-      });
     }
     ohmEditor.options[optionName] = cb.checked;
     ohmEditor.emit('change:option', e.target.name);

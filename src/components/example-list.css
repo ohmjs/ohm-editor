@@ -107,74 +107,6 @@
   content: '\a0';  /* Insert &nbsp; to keep the correct height. */
 }
 
-/* Additions for example generation */
-
-#examplesNeededDrawer {
-  float: right;
-  cursor: pointer;
-  color: hsl(0, 0%, 30%);
-  font-weight: normal;
-}
-
-#examplesNeededDrawer .indicator {
-  transition: color 0.5s ease;
-}
-
-#examplesNeededDrawer .indicator.active {
-  color: hsl(219, 100%, 70%);
-}
-
-#exampleRequestContainer {
-  width: 0px;
-}
-
-.exampleGeneratorUI.hidden {
-  visibility: hidden;
-}
-
-#exampleRequestContainer.hidden {
-  flex-grow: 0 !important;
-}
-
-#exampleRequests {
-  border-top: 1px solid #ddd;
-}
-
-#exampleRequests ul {
-  list-style: none;
-  padding: 0px;
-}
-
-#exampleRequests ul textarea {
-  font-family: Menlo, Monaco, monospace;
-  font-size: 12px;
-  display: block;
-  border: none;
-  border-bottom: 1px solid hsl(0, 0%, 10%);
-  margin: 5px 10px 0px 10px;
-  text-align: left;
-  height: 20px;
-  width: 95%;
-}
-
-#exampleRequests ul textarea.invalid {
-  background-color: #FDE0E0 !important;
-}
-
-#exampleRequests ul textarea::-webkit-input-placeholder, /* Chrome/Opera/Safari */
-#exampleRequests ul textarea::-moz-placeholder, /* Firefox 19+ */
-#exampleRequests ul textarea:-ms-input-placeholder, /* IE 10+ */
-#exampleRequests ul textarea:-moz-placeholder { /* Firefox 18- */
-  margin-left: 15px;
-  text-align: left;
-}
-
-.requestContainer {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-}
-
 .startRule {
   color: hsl(0, 0%, 85%);
   font-family: inherit;
@@ -184,26 +116,6 @@
 
 .selected .startRule {
   color: hsl(0, 0%, 75%);
-}
-
-#neededExamples > ul {
-  list-style-type: none;
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 12px;
-  padding-left: 0px;
-}
-
-#neededExamples > ul > li {
-  text-align: center;
-}
-
-option.needed {
-  color: hsl(38, 86%, 55%);
-  font-weight: bold;
-}
-
-#neededExamples {
-  display: none;
 }
 
 #userExampleContainer > .contents {
@@ -261,10 +173,6 @@ option.needed {
   flex: 1;
   margin: 0;
   position: relative;
-}
-
-#exampleEditor > #neededExamples {
-  z-index: 10;
 }
 
 #exampleEditor .toolbar {
