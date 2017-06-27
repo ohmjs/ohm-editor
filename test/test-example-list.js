@@ -321,3 +321,19 @@ test('thumbs up button', function(t) {
     });
   });
 });
+
+test('editor - thumbs up button', function(t) {
+  var vm = new ExampleList();
+  vm.$mount();
+
+  var id = vm.addExample();
+  simulateGrammarEdit('G { start = any }', function() {
+    t.equal(vm.exampleStatus[id].className, 'fail', 'initially fails');
+    findEl(vm, '#exampleEditor .thumbsUpButton').click();  // Fake a button click.
+
+    Vue.nextTick(function() {
+      t.equal(vm.exampleStatus[id].className, 'pass', 'passes after toggling');
+      t.end();
+    });
+  });
+});

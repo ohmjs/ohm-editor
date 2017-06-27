@@ -17,7 +17,9 @@
             </select>
             <div v-if="startRuleError" class="errorIcon" :title="startRuleError">⚠️</div>
             <div class="gap"></div>
-            <thumbs-up-button :showThumbsUp="example.shouldMatch" @click.native="toggleShouldMatch(example.id)" />
+            <thumbs-up-button
+                :showThumbsUp="example.shouldMatch"
+                @click.native="$emit('thumbClick')" />
           </div>
         </div>
         <div class="editorWrapper"></div>

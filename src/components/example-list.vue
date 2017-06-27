@@ -21,7 +21,8 @@
             :grammar="grammar"
             :example="selectedExampleOrEmpty"
             :status="selectedExampleStatus"
-            @setStartRule="handleSetStartRule">
+            @setStartRule="handleSetStartRule"
+            @thumbClick="handleEditorThumbClick">
         </example-editor>
       </div>
     </div>
@@ -143,6 +144,9 @@
       // Emitted from the example editor when the user chooses a start rule.
       handleSetStartRule: function(newVal) {
         this.setStartRule(this.selectedId, newVal);
+      },
+      handleEditorThumbClick: function() {
+        this.toggleShouldMatch(this.selectedId);
       },
 
       indicatePendingInput: function(id) {
