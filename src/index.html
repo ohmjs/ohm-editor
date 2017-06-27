@@ -2,8 +2,6 @@
 <html>
 <head>
   <title>Ohm</title>
-  <link rel="stylesheet" href="style/semanticsButton.css">
-  <link rel="stylesheet" href="style/suggestionList.css">
   <link rel="stylesheet" href="style/parseTree.css">
   <link rel="stylesheet" href="third_party/codemirror-5.11/lib/codemirror.css">
   <style>
@@ -126,7 +124,6 @@
     #exampleRequestContainer,
     #userExampleContainer,
     #grammarContainer,
-    #semanticsContainer,
     #visualizerContainer {
       display: flex;
       flex-direction: column;
@@ -134,12 +131,7 @@
       overflow: hidden;
     }
 
-    #semanticsContainer[hidden] {
-      display: none;
-    }
-
     #grammarContainer,
-    #semanticsContainer,
     #visualizerContainer {
       position: relative;
     }
@@ -448,9 +440,6 @@
     }
   </style>
   <link rel="stylesheet" href="style/parseTree.css">
-  <link rel="stylesheet" href="style/semanticsResult.css">
-  <link rel="stylesheet" href="style/semanticsEditor.css">
-  <link rel="stylesheet" href="style/semanticsEditorWrapper.css">
 </head>
 <body>
   <div id="topSection">
@@ -477,14 +466,6 @@
   <div id="mainSplitter" class="splitter"></div>
 
   <div id="bottomSection">
-    <div id="semanticsContainer" hidden>
-      <h2>Semantics
-        <input id="addSemanticButton" type="button" value="+"></input>
-      </h2>
-      <div id="semantics">
-      </div>
-      <div class="flex-fix"><div class="editorWrapper"></div></div>
-    </div>
     <div id="bottomSplitter" class="splitter vertical"></div>
     <div id="visualizerContainer"></div>
   </div>
@@ -593,13 +574,5 @@ number  (a number)
   <script src="third_party/GitHub.bundle.min-2.3.0.js"></script>
 
   <script src="assets/visualizer-bundle.js"></script>
-
-  <!-- Scripts that have not yet been moved to CommonJS
-  <script src="semanticsHelper.js"></script>
-  <script src="semanticsEditorWrapper.js"></script>
-  <script src="semanticsEditor.js"></script>
-  <script src="semanticsResult.js"></script>
-  <script src="semanticsButton.js"></script>
-  -->
 </body>
 </html>
