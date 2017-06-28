@@ -414,27 +414,35 @@
       cursor: pointer;
     }
 
-    .section-head [type=button] {
+    button.outline-btn {
       background-color: transparent;
       border: 1px solid #aaa;
       border-radius: 3px;
       color: #888;
+      padding: 1px 6px 2px 6px;
     }
 
-    .section-head [type=button]:hover {
+    button.outline-btn:hover {
       border-color: #666;
       color: #444;
     }
 
-    .section-head [type=button][disabled],
-    .section-head [type=button][disabled]:hover {
+    button.outline-btn[disabled],
+    button.outline-btn[disabled]:hover {
       border-color: #ddd;
       color: #ccc;
     }
 
-    .section-head [type=button]:active {
-      color: #0096FF;
-      border-color: #0096FF;
+    button.outline-btn:active,
+    button.outline-btn:active:focus {
+      color: rgba(2, 117, 216, 0.8);
+      border-color: rgba(2, 117, 216, 0.8);
+      box-shadow: none;
+      outline-style: none;
+    }
+
+    button.outline-btn:focus {
+      box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);
       outline-style: none;
     }
 
@@ -485,9 +493,9 @@
           <select id="grammarList" hidden><option value="">[local storage]</option></select>
           <label id="grammarName" class="unnamed">no file loaded</label>
           <input id="grammarFile" type="file" accept=".ohm" hidden>
-          <button id="loadGrammar">Load...</button>
-          <button id="saveGrammar">Save...</button>
-          <button id="saveGrammarAs">Save As...</button>
+          <button class="outline-btn" id="loadGrammar">Load...</button>
+          <button class="outline-btn" id="saveGrammar">Save...</button>
+          <button class="outline-btn" id="saveGrammarAs">Save As...</button>
           <label id="saveIndicator" hidden>
             <div id="saved">Saved</div>
             <div id="edited">Edited</div>

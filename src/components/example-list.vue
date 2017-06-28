@@ -5,7 +5,7 @@
     <div id="userExampleContainer">
       <div class="section-head flex-row">
         <h2>Examples</h2>
-        <input type="button" @click="handleAddClick" value="+ Add">
+        <button class="outline-btn" @click="handleAddClick">+ Add</button>
       </div>
 
       <div class="contents">

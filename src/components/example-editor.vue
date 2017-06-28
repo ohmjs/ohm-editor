@@ -4,7 +4,7 @@
       <div id="exampleEditor" :class="classObj">
         <div class="header flex-row">
           <div class="title">{{ editMode }} example</div>
-          <input type="button" value="Done" @click="stopEditing">
+          <button class="outline-btn" @mousedown.prevent @click="stopEditing">Done</button>
         </div>
 
         <div class="toolbar">
