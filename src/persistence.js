@@ -61,7 +61,6 @@ function initServer(officialGrammars) {
 
   $('#grammars').hidden = false;
   $('#grammarName').hidden = true;
-  $('#saveIndicator').hidden = false;
   $('#loadGrammar').hidden = true;
 
   var saveButton = $('#saveGrammar');
@@ -284,7 +283,7 @@ function initServer(officialGrammars) {
         grammarList.value = gistId;
       }
 
-      $('#saveIndicator').classList.remove('edited');
+      saveButton.disabled = true;
     });
   }
 
@@ -345,7 +344,7 @@ function initServer(officialGrammars) {
     }
 
     ohmEditor.once('change:grammar', function(_) {
-      $('#saveIndicator').classList.remove('edited');
+      saveButton.disabled = true;
     });
     if (examples) {
       ohmEditor.once('parse:grammar', function(matchResult, grammar, err) {
@@ -436,7 +435,7 @@ function initServer(officialGrammars) {
     if (grammar === '') { // local storage
       ohmEditor.saveState(ohmEditor.ui.grammarEditor, 'grammar');
     } else {
-      $('#saveIndicator').classList.add('edited');
+      saveButton.disabled = false;
     }
   });
 

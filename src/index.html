@@ -45,22 +45,19 @@
       color: #999;
     }
 
-    #saveIndicator {
-      color: #999;
-      display: inline-block;
-      overflow: hidden;
-      vertical-align: middle;
-    }
-    #saveIndicator > * {
-      overflow: hidden;
-    }
-    #saveIndicator.edited #saved,
-    #saveIndicator:not(.edited) #edited {
-      height: 0;
-    }
-
     #saveGrammar {
       min-width: 64px;
+    }
+
+    /* Clever hack: when the button is disabled, make it a plain label that says 'Saved' */
+    #saveGrammar::after {
+      content: 'd';
+    }
+    #saveGrammar:not([disabled])::after {
+      color: transparent;
+    }
+    #saveGrammar[disabled] {
+      color: #888;
     }
 
     #options {
@@ -494,12 +491,8 @@
           <label id="grammarName" class="unnamed">no file loaded</label>
           <input id="grammarFile" type="file" accept=".ohm" hidden>
           <button class="outline-btn" id="loadGrammar">Load...</button>
-          <button class="outline-btn" id="saveGrammar">Save...</button>
+          <button class="outline-btn" id="saveGrammar">Save</button>
           <button class="outline-btn" id="saveGrammarAs">Save As...</button>
-          <label id="saveIndicator" hidden>
-            <div id="saved">Saved</div>
-            <div id="edited">Edited</div>
-          </label>
         </div>
       </div>
       <div class="flex-fix"><div class="editorWrapper"></div></div>
