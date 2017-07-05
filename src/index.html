@@ -581,41 +581,41 @@
   <div id="operationMenu" class="contextMenu" hidden><ul></ul></div>
   <div hidden>
     <pre id="sampleGrammar">Arithmetic {
-Exp
-  = AddExp
+  Exp
+    = AddExp
 
-AddExp
-  = AddExp "+" MulExp  -- plus
-  | AddExp "-" MulExp  -- minus
-  | MulExp
+  AddExp
+    = AddExp "+" MulExp  -- plus
+    | AddExp "-" MulExp  -- minus
+    | MulExp
 
-MulExp
-  = MulExp "*" ExpExp  -- times
-  | MulExp "/" ExpExp  -- divide
-  | ExpExp
+  MulExp
+    = MulExp "*" ExpExp  -- times
+    | MulExp "/" ExpExp  -- divide
+    | ExpExp
 
-ExpExp
-  = PriExp "^" ExpExp  -- power
-  | PriExp
+  ExpExp
+    = PriExp "^" ExpExp  -- power
+    | PriExp
 
-PriExp
-  = "(" Exp ")"  -- paren
-  | "+" PriExp   -- pos
-  | "-" PriExp   -- neg
-  | ident
-  | number
+  PriExp
+    = "(" Exp ")"  -- paren
+    | "+" PriExp   -- pos
+    | "-" PriExp   -- neg
+    | ident
+    | number
 
-ident  (an identifier)
-  = letter alnum*
+  ident  (an identifier)
+    = letter alnum*
 
-number  (a number)
-  = digit* "." digit+  -- fract
-  | digit+             -- whole
+  number  (a number)
+    = digit* "." digit+  -- fract
+    | digit+             -- whole
 }</pre>
     <pre id="sampleExamples">
       <pre>2 * (42 - 1) / 9</pre>
       <pre>1+2*3</pre>
-      <pre>I CAN HAS CHEEZBURGER?</pre>
+      <pre>oh no</pre>
       <pre> (  	123   ) </pre>
       <pre>(2+4)*7</pre>
     </pre>
