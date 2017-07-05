@@ -7,7 +7,7 @@ var ohmEditor = require('./ohmEditor');
 
 var ExampleList = Vue.extend(require('./components/example-list.vue'));
 
-var exampleList = new ExampleList({  // eslint-disable-line no-unused-vars
+var exampleList = new ExampleList({
   el: '#exampleContainer',
   propsData: {}
 });

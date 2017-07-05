@@ -445,20 +445,6 @@
       outline-style: none;
     }
 
-    #grammarControls .dropdown-toggle {
-      border-color: transparent;
-      font-size: 18px;
-      font-weight: 900;
-      margin-top: 1px;
-      padding: 0 4px;
-    }
-    #grammarControls .dropdown-toggle:hover {
-      background-color: #eee;
-    }
-    #grammarControls .dropdown-menu {
-      margin: 18px 6px 0 0;
-    }
-
     .flex-row {
       align-items: center;
       display: flex;
@@ -496,7 +482,6 @@
     }
   </style>
   <link rel="stylesheet" href="style/parseTree.css">
-  <link rel="stylesheet" href="third_party/css/bootstrap-3.3.7.css">
 </head>
 <body>
   <div id="topSection">
@@ -509,12 +494,7 @@
           <input id="grammarFile" type="file" accept=".ohm" hidden>
           <button class="outline-btn" id="loadGrammar">Load...</button>
           <button class="outline-btn" id="saveGrammar">Save</button>
-          <button class="outline-btn dropdown-toggle">&#x22ee;</button>
-          <div class="dropdown">
-            <ul class="dropdown-menu dropdown-menu-right" hidden>
-              <li><a href="#" id="saveGrammarAs">Save As...</a></li>
-            </ul>
-          </div>
+          <div id="grammarDropdown"><!-- See components/ellipsis-dropdown.vue --></div>
         </div>
       </div>
       <div class="flex-fix"><div class="editorWrapper"></div></div>
@@ -625,7 +605,6 @@
 
   <script src="third_party/es6.js"></script>
   <script src="third_party/d3.min.js"></script>
-  <script src="third_party/FileSaver.js"></script>
   <script src="third_party/codemirror-5.11/lib/codemirror.js"></script>
   <script src="third_party/codemirror-5.11/addon/display/placeholder.js"></script>
   <script src="third_party/codemirror-5.11/addon/search/search.js"></script>

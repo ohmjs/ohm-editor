@@ -1,17 +1,22 @@
 /* eslint-env browser */
-/* global saveAs, GitHub */
+/* global GitHub */
 
 'use strict';
 
+var FileSaver = require('./third_party/FileSaver');
+var Vue = require('vue');
 var ohmEditor = require('./ohmEditor');
 var domUtil = require('./domUtil');
+
+var EllipsisDropdown = Vue.extend(require('./components/ellipsis-dropdown.vue'));
 
 var $ = domUtil.$;
 var $$ = domUtil.$$;
 
+var handleSaveAs = FileSaver.saveAs;
+
 function initLocal() {
   $('#grammarControls').hidden = false;
-  $('#saveGrammarAs').hidden = true;
 
   var loadedGrammar = 'unnamed.ohm';
   var grammarName = $('#grammarName');
@@ -47,7 +52,7 @@ function initLocal() {
 
     // use application/octet-stream to force download (not text/ohm-js;charset=utf-8)
     var blob = new Blob([src], {type: 'application/octet-stream'});
-    saveAs(blob, loadedGrammar);
+    FileSaver.saveAs(blob, loadedGrammar);
   });
 
   // local storage
@@ -62,7 +67,6 @@ function initServer(officialGrammars) {
   $('#loadGrammar').hidden = true;
 
   var saveButton = $('#saveGrammar');
-  var saveAsButton = $('#saveGrammarAs');
 
   saveButton.textContent = 'Save';
   saveButton.disabled = true;
@@ -73,7 +77,7 @@ function initServer(officialGrammars) {
 
   function showPrompt(dialogId, optMessage) {
     $('#promptScreen').style.display = 'block';
-    Array.prototype.slice.apply($$('#promptScreen > *')).forEach(function(dialog) {
+    $$('#promptScreen > *').forEach(function(dialog) {
       dialog.hidden = true;
     });
     var messageField = $('#' + dialogId + 'Message');
@@ -86,11 +90,11 @@ function initServer(officialGrammars) {
   }
   function hidePrompt() {
     $('#promptScreen').style.display = 'none';
-    Array.prototype.slice.apply($$('#promptScreen > *')).forEach(function(dialog) {
+    $$('#promptScreen > *').forEach(function(dialog) {
       dialog.hidden = true;
     });
   }
-  Array.prototype.slice.apply($$('#promptScreen .close')).forEach(function(close) {
+  $$('#promptScreen .close').forEach(function(close) {
     close.addEventListener('click', hidePrompt);
   });
 
@@ -298,14 +302,6 @@ function initServer(officialGrammars) {
   }
   saveButton.addEventListener('click', save);
 
-  function saveAs() {
-    showPrompt('newGrammarBox', isLoggedIn() ?
-      null :
-      'Warning: You are not logged in and cannot update your grammar after saving!'
-    );
-  }
-  saveAsButton.addEventListener('click', saveAs);
-
   $('#newGrammarForm').addEventListener('submit', function(e) {
     hidePrompt();
 
@@ -323,6 +319,14 @@ function initServer(officialGrammars) {
   $('#newGrammarForm').addEventListener('reset', function(e) {
     hidePrompt();
   });
+
+  // Override "Save As" functionality
+  handleSaveAs = function() {
+    showPrompt('newGrammarBox', isLoggedIn() ?
+      null :
+      'Warning: You are not logged in and cannot update your grammar after saving!'
+    );
+  };
 
   // -------------------------------------------------------
   // GRAMMAR SELECTION
@@ -421,7 +425,7 @@ function initServer(officialGrammars) {
   ohmEditor.ui.grammarEditor.setOption('extraKeys', {
     'Cmd-S': function(cm) {
       if (saveButton.disabled) {
-        saveAs();
+        handleSaveAs();
       } else {
         save();
       }
@@ -446,24 +450,6 @@ function initServer(officialGrammars) {
 // Main
 // -------
 
-var dropdownMenu = $('#grammarControls .dropdown-menu');
-
-// Show the dropdown menu when the three dots button is clicked.
-$('#grammarControls .dropdown-toggle').addEventListener('click', function(e) {
-  var hidden = dropdownMenu.hidden = !dropdownMenu.hidden;
-  if (!hidden) {
-    domUtil.once(window, 'click', function(e) { dropdownMenu.hidden = true; });
-  }
-  e.stopPropagation();
-});
-
-// Hide the dropdown when Esc is clicked.
-window.addEventListener('keydown', function(e) {
-  if (e.keyCode === 27) {
-    dropdownMenu.hidden = true;
-  }
-});
-
 if (window.location.protocol !== 'file:') {
   // These grammars are secret gists under the GitHub user 'ohm-official'.
   var officialGrammars = [
@@ -474,6 +460,19 @@ if (window.location.protocol !== 'file:') {
 } else {
   initLocal();
 }
+
+// This must be done after calling initServer/initLocal, because those may
+// override the implementation of `handleSaveAs`.
+/* eslint-disable no-new */
+new EllipsisDropdown({
+  el: '#grammarDropdown',
+  propsData: {
+    items: {
+      'Save As...': handleSaveAs
+    }
+  }
+});
+/* eslint-enable no-new */
 
 // Exports
 // -------
