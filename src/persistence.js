@@ -465,8 +465,10 @@ window.addEventListener('keydown', function(e) {
 });
 
 if (window.location.protocol !== 'file:') {
+  // These grammars are secret gists under the GitHub user 'ohm-official'.
   var officialGrammars = [
-    '7f62adb8df879a5eb8288dbbddcc663f' // Arithmetic
+    '30325d346a6e803cc35344ca218d8636', // Arithmetic
+    '0a9a649c3c630fd0a470ba6cb75393fe'  // ES5
   ];
   initServer(officialGrammars);
 } else {
