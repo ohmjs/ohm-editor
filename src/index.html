@@ -29,12 +29,14 @@
       z-index: 9;
     }
 
-    #grammars {
-      color: black;
-      font-style: normal;
-      border-radius: 3px;
+    #grammarControls {
+      margin: 0 -4px;
     }
-    #grammars label {
+    #grammarControls > * {
+      margin: 0 4px;
+    }
+
+    #grammarControls label {
       font-size: 0.75em;
     }
     #grammarName {
@@ -49,12 +51,12 @@
       min-width: 64px;
     }
 
-    /* Clever hack: when the button is disabled, make it a plain label that says 'Saved' */
+    /* Clever hack: when the button is disabled, make it say 'Saved' */
     #saveGrammar::after {
       content: 'd';
     }
     #saveGrammar:not([disabled])::after {
-      color: transparent;
+      display: none;
     }
     #saveGrammar[disabled] {
       color: #888;
@@ -443,8 +445,22 @@
       outline-style: none;
     }
 
+    #grammarControls .dropdown-toggle {
+      border-color: transparent;
+      font-size: 18px;
+      font-weight: 900;
+      margin-top: 1px;
+      padding: 0 4px;
+    }
+    #grammarControls .dropdown-toggle:hover {
+      background-color: #eee;
+    }
+    #grammarControls .dropdown-menu {
+      margin: 18px 6px 0 0;
+    }
+
     .flex-row {
-      align-items: baseline;
+      align-items: center;
       display: flex;
       flex-direction: row;
     }
@@ -480,19 +496,25 @@
     }
   </style>
   <link rel="stylesheet" href="style/parseTree.css">
+  <link rel="stylesheet" href="third_party/css/bootstrap-3.3.7.css">
 </head>
 <body>
   <div id="topSection">
     <div id="grammarContainer">
       <div class="section-head flex-row">
         <h2>Grammar</h2>
-        <div id="grammars" hidden>
+        <div id="grammarControls" class="flex-row" hidden>
           <select id="grammarList" hidden><option value="">[local storage]</option></select>
           <label id="grammarName" class="unnamed">no file loaded</label>
           <input id="grammarFile" type="file" accept=".ohm" hidden>
           <button class="outline-btn" id="loadGrammar">Load...</button>
           <button class="outline-btn" id="saveGrammar">Save</button>
-          <button class="outline-btn" id="saveGrammarAs">Save As...</button>
+          <button class="outline-btn dropdown-toggle">&#x22ee;</button>
+          <div class="dropdown">
+            <ul class="dropdown-menu dropdown-menu-right" hidden>
+              <li><a href="#" id="saveGrammarAs">Save As...</a></li>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="flex-fix"><div class="editorWrapper"></div></div>

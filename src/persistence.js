@@ -6,10 +6,11 @@
 var ohmEditor = require('./ohmEditor');
 var domUtil = require('./domUtil');
 
-function initLocal() {
-  var $ = domUtil.$;
+var $ = domUtil.$;
+var $$ = domUtil.$$;
 
-  $('#grammars').hidden = false;
+function initLocal() {
+  $('#grammarControls').hidden = false;
   $('#saveGrammarAs').hidden = true;
 
   var loadedGrammar = 'unnamed.ohm';
@@ -56,10 +57,7 @@ function initLocal() {
 }
 
 function initServer(officialGrammars) {
-  var $ = domUtil.$;
-  var $$ = domUtil.$$;
-
-  $('#grammars').hidden = false;
+  $('#grammarControls').hidden = false;
   $('#grammarName').hidden = true;
   $('#loadGrammar').hidden = true;
 
@@ -447,6 +445,24 @@ function initServer(officialGrammars) {
 
 // Main
 // -------
+
+var dropdownMenu = $('#grammarControls .dropdown-menu');
+
+// Show the dropdown menu when the three dots button is clicked.
+$('#grammarControls .dropdown-toggle').addEventListener('click', function(e) {
+  var hidden = dropdownMenu.hidden = !dropdownMenu.hidden;
+  if (!hidden) {
+    domUtil.once(window, 'click', function(e) { dropdownMenu.hidden = true; });
+  }
+  e.stopPropagation();
+});
+
+// Hide the dropdown when Esc is clicked.
+window.addEventListener('keydown', function(e) {
+  if (e.keyCode === 27) {
+    dropdownMenu.hidden = true;
+  }
+});
 
 if (window.location.protocol !== 'file:') {
   var officialGrammars = [

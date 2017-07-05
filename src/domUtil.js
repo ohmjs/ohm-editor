@@ -62,6 +62,14 @@ module.exports = {
     }
   },
 
+  // Add an event handler to `el` that is removed right after it runs.
+  once: function(el, eventType, cb) {
+    el.addEventListener(eventType, function handler(e) {
+      cb(e);
+      el.removeEventListener(eventType, handler);
+    });
+  },
+
   toggleClasses: function(el, map) {
     for (var k in map) {
       if (map.hasOwnProperty(k)) {
