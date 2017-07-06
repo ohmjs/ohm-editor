@@ -71,6 +71,7 @@
           cb();
         }
         this.button.blur();
+        this.hide();  // Redundant, but blur() is flaky in tests.
       },
       hide: function() {
         this.hidden = true;
