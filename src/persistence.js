@@ -3,7 +3,6 @@
 
 'use strict';
 
-var FileSaver = require('./third_party/FileSaver');
 var Vue = require('vue');
 var ohmEditor = require('./ohmEditor');
 var domUtil = require('./domUtil');
@@ -13,196 +12,221 @@ var EllipsisDropdown = Vue.extend(require('./components/ellipsis-dropdown.vue'))
 var $ = domUtil.$;
 var $$ = domUtil.$$;
 
-var handleSaveAs = FileSaver.saveAs;
+// These grammars are secret gists under the GitHub user 'ohm-official'.
+var officialGrammars = [
+  '30325d346a6e803cc35344ca218d8636', // Arithmetic
+  '0a9a649c3c630fd0a470ba6cb75393fe'  // ES5
+];
 
-function initLocal() {
-  $('#grammarControls').hidden = false;
+var gitHub = new GitHub();
 
-  var loadedGrammar = 'unnamed.ohm';
-  var grammarName = $('#grammarName');
+// Prompt stuff
+// ------------
 
-  var loadButton = $('#loadGrammar');
-  var grammarFile = $('#grammarFile');
-  loadButton.addEventListener('click', function(e) {
-    grammarFile.click();
+function showPrompt(dialogId, optMessage) {
+  $('#promptScreen').style.display = 'block';
+  $$('#promptScreen > *').forEach(function(dialog) {
+    dialog.hidden = true;
   });
-  grammarFile.addEventListener('change', function(e) {
-    var file = e.target.files[0];
-    if (!file) {
-      return;
-    }
-    var reader = new FileReader();
-    var filename = file.name;
-    reader.onload = function(e) {
-      var src = e.target.result;
-      loadedGrammar = filename;
-      grammarName.textContent = filename;
-      grammarName.classList.remove('unnamed');
+  var messageField = $('#' + dialogId + 'Message');
+  if (messageField) {
+    messageField.textContent = optMessage || '';
+  }
+  var dialog = $('#' + dialogId);
+  dialog.hidden = false;
+  dialog.querySelector('input').focus();
+}
 
-      ohmEditor.ui.grammarEditor.setValue(src);
-    };
-    reader.readAsText(file);
-  }, false);
-
-  var saveButton = $('#saveGrammar');
-  saveButton.addEventListener('click', function(e) {
-    var src = ohmEditor.ui.grammarEditor.getValue();
-    // var url = 'data:application/stream;base64,' + btoa(src);
-    // window.location = url;
-
-    // use application/octet-stream to force download (not text/ohm-js;charset=utf-8)
-    var blob = new Blob([src], {type: 'application/octet-stream'});
-    FileSaver.saveAs(blob, loadedGrammar);
-  });
-
-  // local storage
-  ohmEditor.addListener('change:grammar', function(source) {
-    ohmEditor.saveState(ohmEditor.ui.grammarEditor, 'grammar');
+function hidePrompt() {
+  $('#promptScreen').style.display = 'none';
+  $$('#promptScreen > *').forEach(function(dialog) {
+    dialog.hidden = true;
   });
 }
 
-function initServer(officialGrammars) {
-  $('#grammarControls').hidden = false;
-  $('#grammarName').hidden = true;
-  $('#loadGrammar').hidden = true;
+// Gist loading/saving
+// -------------------
 
-  var saveButton = $('#saveGrammar');
+var grammarList = $('#grammarList');
+var saveButton = $('#saveGrammar');
 
+function loadFromGist(gistHash, cb) {
+  var gist = gitHub.getGist(gistHash);
+  gist.read(function(err, res, req) {
+    if (err) {
+      if (grammarList.selectedOptions[0].classList.contains('shared')) {
+        // delete option and select local storage
+        grammarList.selectedOptions[0].remove();
+        location.hash = '#';
+        return;
+      }
+    }
+
+    var grammarFilename = Object.getOwnPropertyNames(res.files).find(function(filename) {
+      return filename.slice(-4) === '.ohm';
+    });
+    var exampleFilename = Object.getOwnPropertyNames(res.files).find(function(filename) {
+      return filename.slice(-5) === '.json';
+    });
+
+    var grammarFile = res.files[grammarFilename];
+    var exampleFile = res.files[exampleFilename];
+    cb(res.description, grammarFile && grammarFile.content,
+      exampleFile && JSON.parse(exampleFile.content));
+  });
+}
+
+function addGrammarGroup(list, label, grammars, beforeElem) {
+  var group = list.querySelector('#myGrammars');
+  if (group) {
+    group.remove();
+  }
+  group = document.createElement('optgroup');
+  group.setAttribute('label', label);
+  list.add(group);
+
+  if (!(grammars instanceof Array)) {
+    grammars = [];
+  }
+
+  grammars.forEach(function(grammarHash) {
+    var option = list.querySelector('.shared[value="' + grammarHash + '"]');
+    if (!option) {
+      option = document.createElement('option');
+    }
+    option.value = grammarHash;
+    var gist = gitHub.getGist(grammarHash);
+    gist.read(function(err, res) {
+      if (err) {
+        console.warn('Could not load Gist ' + grammarHash); // eslint-disable-line no-console
+        return;
+      }
+      option.text = res.description;
+      if (beforeElem) {
+        group.insertBefore(option, beforeElem);
+      } else {
+        group.appendChild(option);
+      }
+    });
+  });
+
+  return group;
+}
+
+function loadUserGrammars(ghUser) {
+  ghUser.listGists(function(err, res) {
+    if (err) {
+      // login incorrect or other network problems
+      return;
+    }
+    var grammars = res
+      .filter(function(gist) {
+        var filenames = Object.getOwnPropertyNames(gist.files);
+        var hasJSON = filenames.find(function(filename) {
+          return filename.toLowerCase().slice(-5) === '.json';
+        });
+        var hasOhm = filenames.find(function(filename) {
+          return filename.toLowerCase().slice(-4) === '.ohm';
+        });
+        return hasJSON && hasOhm;
+      })
+      .sort(function(a, b) { return a.description < b.description; })
+      .map(function(gist) { return gist.id; });
+
+    localStorage.setItem('gitHubAuth', btoa(JSON.stringify(ghUser.__auth)));
+
+    var option = document.createElement('option');
+    option.value = '!logout';
+    option.text = '[Logout]';
+
+    var group = addGrammarGroup(grammarList, 'My Grammars', grammars, option);
+    group.id = 'myGrammars';
+
+    group.appendChild(option);
+  });
+}
+
+function isLoggedIn() {
+  return gitHub.__auth.username;
+}
+
+function saveToGist(description, grammarName, grammarText, examples, gistIdOrNull) {
+  var gist = gitHub.getGist(gistIdOrNull);
+  var gistData = {
+    description: description,
+    public: false,
+    files: {}
+  };
+  gistData.files[grammarName + '.ohm'] = {
+    content: grammarText,
+    type: 'text/ohm-js'
+  };
+  gistData.files[grammarName + '.json'] = {
+    content: JSON.stringify(
+      Object.keys(examples).map(function(key) {
+        return examples[key];
+      }), null, 2
+    ),
+    type: 'application/json'
+  };
+
+  gist[gistIdOrNull ? 'update' : 'create'](gistData, function(err, res) {
+    if (err) {
+      // could not save grammar, potential network problem
+      console.warn('Could not save Gist:', gistData); // eslint-disable-line no-console
+      return;
+    }
+
+    if (!gistIdOrNull) {
+      var gistId = res.id;
+      var option = document.createElement('option');
+      option.value = gistId;
+      option.text = description;
+      if (isLoggedIn()) {
+        var group = grammarList.querySelector('#myGrammars');
+        group.insertBefore(option, group.lastChild);
+        saveButton.disabled = false;
+      } else {
+        grammarList.insertBefore(option, grammarList.querySelector('optgroup'));
+      }
+      grammarList.value = gistId;
+    }
+
+    saveButton.disabled = true;
+  });
+}
+
+function save() {
+  var option = grammarList.options[grammarList.selectedIndex];
+  var grammarHash = option.value;
+
+  var description = option.label;
+  var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
+  var grammarText = ohmEditor.ui.grammarEditor.getValue();
+  var examples = ohmEditor.examples.getExamples();
+
+  saveToGist(description, grammarName, grammarText, examples, grammarHash);
+}
+
+function doSaveAs() {
+  showPrompt('newGrammarBox', isLoggedIn() ?
+    null :
+    'Warning: You are not logged in and cannot update your grammar after saving!'
+  );
+}
+
+// Main
+// ----
+
+(function init() {
   saveButton.textContent = 'Save';
   saveButton.disabled = true;
 
-  // -------------------------------------------------------
-  // PROMPT STUFF
-  // -------------------------------------------------------
-
-  function showPrompt(dialogId, optMessage) {
-    $('#promptScreen').style.display = 'block';
-    $$('#promptScreen > *').forEach(function(dialog) {
-      dialog.hidden = true;
-    });
-    var messageField = $('#' + dialogId + 'Message');
-    if (messageField) {
-      messageField.textContent = optMessage || '';
-    }
-    var dialog = $('#' + dialogId);
-    dialog.hidden = false;
-    dialog.querySelector('input').focus();
-  }
-  function hidePrompt() {
-    $('#promptScreen').style.display = 'none';
-    $$('#promptScreen > *').forEach(function(dialog) {
-      dialog.hidden = true;
-    });
-  }
   $$('#promptScreen .close').forEach(function(close) {
     close.addEventListener('click', hidePrompt);
   });
 
-  // -------------------------------------------------------
-  // GITHUB LOAD GRAMMARS (GISTS)
-  // -------------------------------------------------------
-
-  var grammarList = $('#grammarList');
   grammarList.hidden = false;
-
-  var gitHub = new GitHub();
-
-  function loadFromGist(gistHash, cb) {
-    var gist = gitHub.getGist(gistHash);
-    gist.read(function(err, res, req) {
-      if (err) {
-        if (grammarList.selectedOptions[0].classList.contains('shared')) {
-          // delete option and select local storage
-          grammarList.selectedOptions[0].remove();
-          location.hash = '#';
-          return;
-        }
-      }
-
-      var grammarFilename = Object.getOwnPropertyNames(res.files).find(function(filename) {
-        return filename.slice(-4) === '.ohm';
-      });
-      var exampleFilename = Object.getOwnPropertyNames(res.files).find(function(filename) {
-        return filename.slice(-5) === '.json';
-      });
-
-      var grammarFile = res.files[grammarFilename];
-      var exampleFile = res.files[exampleFilename];
-      cb(res.description, grammarFile && grammarFile.content,
-        exampleFile && JSON.parse(exampleFile.content));
-    });
-  }
-
-  function addGrammarGroup(list, label, grammars, beforeElem) {
-    var group = list.querySelector('#myGrammars');
-    if (group) {
-      group.remove();
-    }
-    group = document.createElement('optgroup');
-    group.setAttribute('label', label);
-    list.add(group);
-
-    if (!(grammars instanceof Array)) {
-      grammars = [];
-    }
-
-    grammars.forEach(function(grammarHash) {
-      var option = list.querySelector('.shared[value="' + grammarHash + '"]');
-      if (!option) {
-        option = document.createElement('option');
-      }
-      option.value = grammarHash;
-      var gist = gitHub.getGist(grammarHash);
-      gist.read(function(err, res) {
-        if (err) {
-          console.warn('Could not load Gist ' + grammarHash); // eslint-disable-line no-console
-          return;
-        }
-        option.text = res.description;
-        if (beforeElem) {
-          group.insertBefore(option, beforeElem);
-        } else {
-          group.appendChild(option);
-        }
-      });
-    });
-
-    return group;
-  }
-
-  function loadUserGrammars(ghUser) {
-    ghUser.listGists(function(err, res) {
-      if (err) {
-        // login incorrect or other network problems
-        return;
-      }
-      var grammars = res
-        .filter(function(gist) {
-          var filenames = Object.getOwnPropertyNames(gist.files);
-          var hasJSON = filenames.find(function(filename) {
-            return filename.toLowerCase().slice(-5) === '.json';
-          });
-          var hasOhm = filenames.find(function(filename) {
-            return filename.toLowerCase().slice(-4) === '.ohm';
-          });
-          return hasJSON && hasOhm;
-        })
-        .sort(function(a, b) { return a.description < b.description; })
-        .map(function(gist) { return gist.id; });
-
-      localStorage.setItem('gitHubAuth', btoa(JSON.stringify(ghUser.__auth)));
-
-      var option = document.createElement('option');
-      option.value = '!logout';
-      option.text = '[Logout]';
-
-      var group = addGrammarGroup(grammarList, 'My Grammars', grammars, option);
-      group.id = 'myGrammars';
-
-      group.appendChild(option);
-    });
-  }
-
   addGrammarGroup(grammarList, 'Official Ohm Grammars', officialGrammars);
 
   var gitHubAuth = localStorage.getItem('gitHubAuth');
@@ -235,71 +259,6 @@ function initServer(officialGrammars) {
     return false;
   });
 
-  // -------------------------------------------------------
-  // GITHUB ADD GRAMMARS (GISTS)
-  // -------------------------------------------------------
-
-  function isLoggedIn() {
-    return gitHub.__auth.username;
-  }
-
-  function saveToGist(description, grammarName, grammarText, examples, gistIdOrNull) {
-    var gist = gitHub.getGist(gistIdOrNull);
-    var gistData = {
-      description: description,
-      public: false,
-      files: {}
-    };
-    gistData.files[grammarName + '.ohm'] = {
-      content: grammarText,
-      type: 'text/ohm-js'
-    };
-    gistData.files[grammarName + '.json'] = {
-      content: JSON.stringify(
-        Object.keys(examples).map(function(key) {
-          return examples[key];
-        }), null, 2
-      ),
-      type: 'application/json'
-    };
-
-    gist[gistIdOrNull ? 'update' : 'create'](gistData, function(err, res) {
-      if (err) {
-        // could not save grammar, potential network problem
-        console.warn('Could not save Gist:', gistData); // eslint-disable-line no-console
-        return;
-      }
-
-      if (!gistIdOrNull) {
-        var gistId = res.id;
-        var option = document.createElement('option');
-        option.value = gistId;
-        option.text = description;
-        if (isLoggedIn()) {
-          var group = grammarList.querySelector('#myGrammars');
-          group.insertBefore(option, group.lastChild);
-          saveButton.disabled = false;
-        } else {
-          grammarList.insertBefore(option, grammarList.querySelector('optgroup'));
-        }
-        grammarList.value = gistId;
-      }
-
-      saveButton.disabled = true;
-    });
-  }
-
-  function save() {
-    var option = grammarList.options[grammarList.selectedIndex];
-    var grammarHash = option.value;
-
-    var description = option.label;
-    var grammarName = (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
-    var grammarText = ohmEditor.ui.grammarEditor.getValue();
-    var examples = ohmEditor.examples.getExamples();
-
-    saveToGist(description, grammarName, grammarText, examples, grammarHash);
-  }
   saveButton.addEventListener('click', save);
 
   $('#newGrammarForm').addEventListener('submit', function(e) {
@@ -320,17 +279,8 @@ function initServer(officialGrammars) {
     hidePrompt();
   });
 
-  // Override "Save As" functionality
-  handleSaveAs = function() {
-    showPrompt('newGrammarBox', isLoggedIn() ?
-      null :
-      'Warning: You are not logged in and cannot update your grammar after saving!'
-    );
-  };
-
-  // -------------------------------------------------------
-  // GRAMMAR SELECTION
-  // -------------------------------------------------------
+  // Grammar selection
+  // -----------------
 
   var prevSelection;
   grammarList.addEventListener('click', function(e) {
@@ -425,7 +375,7 @@ function initServer(officialGrammars) {
   ohmEditor.ui.grammarEditor.setOption('extraKeys', {
     'Cmd-S': function(cm) {
       if (saveButton.disabled) {
-        handleSaveAs();
+        doSaveAs();
       } else {
         save();
       }
@@ -445,39 +395,15 @@ function initServer(officialGrammars) {
   if (location.hash !== '') {
     loadFromHash();
   }
-}
+})();
 
-// Main
-// -------
-
-if (window.location.protocol !== 'file:') {
-  // These grammars are secret gists under the GitHub user 'ohm-official'.
-  var officialGrammars = [
-    '30325d346a6e803cc35344ca218d8636', // Arithmetic
-    '0a9a649c3c630fd0a470ba6cb75393fe'  // ES5
-  ];
-  initServer(officialGrammars);
-} else {
-  initLocal();
-}
-
-// This must be done after calling initServer/initLocal, because those may
-// override the implementation of `handleSaveAs`.
 /* eslint-disable no-new */
 new EllipsisDropdown({
   el: '#grammarDropdown',
   propsData: {
     items: {
-      'Save As...': handleSaveAs
+      'Save As...': doSaveAs
     }
   }
 });
 /* eslint-enable no-new */
-
-// Exports
-// -------
-
-module.exports = {
-  local: initLocal,
-  server: initServer
-};
