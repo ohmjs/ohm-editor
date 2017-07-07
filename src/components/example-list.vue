@@ -20,7 +20,7 @@
           </li>
         </ul>
         <example-editor ref="exampleEditor"
-            :grammar="grammar"
+            :grammar="grammar()"
             :example="selectedExampleOrEmpty"
             :status="selectedExampleStatus"
             @setStartRule="handleSetStartRule"
@@ -60,7 +60,6 @@
     props: [],
     data: function() {
       return {
-        grammar: null,
         selectedId: null,
         editing: false,
         editMode: '',
@@ -83,10 +82,6 @@
       }
     },
     watch: {
-      grammar: function() {
-        // Re-check all the examples.
-        Object.keys(this.exampleValues).forEach(this.updateExampleStatus);
-      },
       selectedId: function(id) {
         // Update the inputEditor contents whenever the selected example changes.
         var example = this.getSelected();
@@ -107,6 +102,17 @@
       }
     },
     methods: {
+      grammar: function() {
+        return this._grammar;
+      },
+      setGrammar: function(newVal) {
+        this._grammar = newVal;
+
+        // Re-check all the examples.
+        Object.keys(this.exampleValues).forEach(this.updateExampleStatus);
+
+        this.$forceUpdate();
+      },
       classesForExample: function(id) {
         var pendingUpdate = this.indicatePendingInput(id);
         var classes = {
@@ -283,11 +289,11 @@
           this.$delete(this.exampleStatus, id);
           return;
         }
-        if (this.grammar) {
+        if (this._grammar) {
           var example = this.getExample(id);
           var status;
           try {
-            var matched = this.grammar.match(example.text, example.startRule).succeeded();
+            var matched = this._grammar.match(example.text, example.startRule).succeeded();
             status = {
               className: matched === example.shouldMatch ? 'pass' : 'fail'
             };
@@ -312,15 +318,19 @@
         }, opts);
       }
     },
+    created: function() {
+      // This is not a data property because we don't want Vue to observe its internals.
+      this._grammar = null;
+    },
     mounted: function() {
       this.restoreExamples('examples');
 
       var self = this;
       ohmEditor.addListener('change:grammar', function(source) {
-        self.grammar = null;
+        self.setGrammar(null);
       });
       ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
-        self.grammar = grammar;
+        self.setGrammar(grammar);
       });
       ohmEditor.addListener('change:inputEditor', function(source) {
         // Don't indicate that input is pending if the user just changed the selected example.
