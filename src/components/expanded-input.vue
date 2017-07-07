@@ -48,10 +48,15 @@
         var el = this.canvasEl;
         var sizer = this.$el.querySelector('#sizer');
         var pixelRatio = this.getPixelRatio();
+
         el.width = sizer.offsetWidth * pixelRatio;
         el.height = sizer.offsetHeight * pixelRatio;
         el.style.width = sizer.offsetWidth + 'px';
         el.style.height = sizer.offsetHeight + 'px';
+
+        // Fill with white to ensure good antialiasing on the text.
+        this.inputCtx.fillStyle = 'white';
+        this.inputCtx.fillRect(0, 0, el.width, el.height);
       },
       update: function(optAnimatingEl, isCollapsing, t) {
         this.updateCanvasSize();
