@@ -168,6 +168,8 @@ LastLineWidget.prototype.update = function(cm, matchResult, grammar) {
   }
 };
 
+var grammarEditor = ohmEditor.ui.grammarEditor;
+
 // Singletons associated with the current grammar (ok since there's only one grammar editor).
 var widget;
 var grammarState = {
@@ -176,10 +178,12 @@ var grammarState = {
 };
 
 function updateExternalRules() {
-  var grammarEditor = ohmEditor.ui.grammarEditor;
-  widget = widget || new LastLineWidget(grammarEditor);
   widget.update(grammarEditor, grammarState.matchResult, grammarState.grammar);
 }
+
+grammarEditor.on('swapDoc', function(cm) {
+  widget = new LastLineWidget(cm);
+});
 
 ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
   grammarState.matchResult = matchResult;
