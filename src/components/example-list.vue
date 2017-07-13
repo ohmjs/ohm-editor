@@ -28,7 +28,6 @@
         </example-editor>
       </div>
     </div>
-    <div id="exampleSplitter" class="splitter vertical disabled"></div>
   </div>
 </template>
 
