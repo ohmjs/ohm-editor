@@ -13,7 +13,7 @@
       background-color: white;
       display: flex;
       flex-direction: column;
-      font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Helvetica", "Arial", sans-serif;;
       margin: 0;
       overflow: hidden;
       padding: 0;
@@ -63,25 +63,36 @@
       color: #888;
     }
 
-    #options {
+    #optionPanel {
+      align-items: center;
       background-color: white;
       border-radius: 3px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-      font-size: 14px;
+      color: #444;
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+      bottom: 15px;
       padding: 8px 12px 10px 10px;
       position: fixed;
-      bottom: 25px;
       right: 15px;
     }
     #options input[type=checkbox] {
       position: relative;
-      margin: 0 6px 0 0;
-      top: -1px;
+      margin: 0 4px 0 0;
     }
     #options ul {
       list-style: none;
       margin: 0.3em 0 0 0;
       padding: 0;
+    }
+    #options li {
+      margin-top: 4px;
+    }
+    #options hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 8px 0 2px 0;
     }
 
     #measuringDiv {
@@ -341,15 +352,6 @@
       display: block;
     }
 
-    #timeline {
-      display: flex;
-      height: 20px;
-      margin: 5px 10px;
-    }
-    #timeSlider {
-      flex: 1;
-    }
-
     #promptScreen {
       display: none;
       position: fixed;
@@ -414,7 +416,7 @@
       cursor: pointer;
     }
 
-    button.outline-btn {
+    .outline-btn {
       background-color: transparent;
       border: 1px solid #aaa;
       border-radius: 3px;
@@ -422,26 +424,26 @@
       padding: 1px 6px 2px 6px;
     }
 
-    button.outline-btn:hover {
+    .outline-btn:hover {
       border-color: #666;
       color: #444;
     }
 
-    button.outline-btn[disabled],
-    button.outline-btn[disabled]:hover {
+    .outline-btn[disabled],
+    .outline-btn[disabled]:hover {
       border-color: #ddd;
       color: #ccc;
     }
 
-    button.outline-btn:active,
-    button.outline-btn:active:focus {
+    .outline-btn:active,
+    .outline-btn:active:focus {
       color: rgba(2, 117, 216, 0.8);
       border-color: rgba(2, 117, 216, 0.8);
       box-shadow: none;
       outline-style: none;
     }
 
-    button.outline-btn:focus {
+    .outline-btn:focus {
       box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);
       outline-style: none;
     }
@@ -450,36 +452,6 @@
       align-items: center;
       display: flex;
       flex-direction: row;
-    }
-
-    /*
-      Use media query hack to enable custom styling on WebKit/Blink only.
-      Other browsers will ignore these rules.
-     */
-    @media screen and (-webkit-min-device-pixel-ratio: 0) {
-      #timeSlider {
-        -webkit-appearance: none;
-        background-color: #ccc;
-        height: 1px;
-        position: relative;
-        top: 50%;
-      }
-      #timeSlider::-webkit-slider-thumb {
-         -webkit-appearance: none;
-        background-color: #aaa;
-        border-radius: 5px;
-        height: 10px;
-        position: relative;
-        top: -1px;
-        width: 10px;
-      }
-      #timeSlider:focus::-webkit-slider-thumb {
-        background-color: rgb(53, 151, 255);
-        box-shadow: 0 0 0 4px rgba(53, 151, 255, 0.4);
-      }
-      #timeSlider:focus {
-        outline: none;
-      }
     }
   </style>
   <link rel="stylesheet" href="style/parseTree.css">
@@ -506,15 +478,18 @@
   <div id="bottomSection">
     <div id="visualizerContainer"></div>
   </div>
-  <div id="timeline"><input id="timeSlider" type="range" step="1"></div>
 
   <div id="dragOverlay"></div>
 
-  <div id="options">
-    <ul>
-      <li><input type="checkbox" name="showFailures"><label>Explain parse</label></li>
-      <li><input type="checkbox" name="showSpaces"><label>Show spaces</label></li>
-    </ul>
+  <div id="optionPanel">
+    <div id="options">
+      <ul>
+        <li><input type="checkbox" name="showFailures"><label>Explain parse</label></li>
+        <li><input type="checkbox" name="showSpaces"><label>Show spaces</label></li>
+      </ul>
+      <hr>
+    </div>
+    <div id="stepControls"><!-- See components/step-controls.vue --></div>
   </div>
 
   <div id="promptScreen">

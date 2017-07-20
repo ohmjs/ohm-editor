@@ -6,7 +6,8 @@ var webpack = require('webpack');
 module.exports = {
   module: {
     loaders: [
-      {test: /\.vue$/, loader: 'vue'}
+      {test: /\.vue$/, loader: 'vue'},
+      {test: /\.(?:jpg|gif|png)$/, loader: 'file'}
     ]
   },
   entry: {

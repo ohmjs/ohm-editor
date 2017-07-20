@@ -16,11 +16,18 @@ document.addEventListener('keydown', function(e) {
     hideContextMenus();
   }
 });
+
 function hideContextMenus() {
   var menus = document.querySelectorAll('.contextMenu');
   Array.prototype.forEach.call(menus, function(menu) {
     menu.hidden = true;
   });
+}
+
+function assert(cond, msg) {
+  if (!cond) {
+    throw new Error(msg);
+  }
 }
 
 // Exports
@@ -31,9 +38,12 @@ module.exports = {
 
   $$: function(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); },
 
-  clearDOMNode: function(domNode) {
-    while (domNode.firstChild) {
-      domNode.removeChild(domNode.firstChild);
+  clearAll: function(classSelector) {
+    assert(classSelector[0] === '.', "Expected a selector beginning with '.'");
+    var className = classSelector.slice(1);
+    var nodes = document.querySelectorAll(classSelector);
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].classList.remove(className);
     }
   },
 

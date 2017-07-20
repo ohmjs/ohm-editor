@@ -18,6 +18,7 @@
   /* global window */
   'use strict';
 
+  var Vue = require('vue');
   var cmUtil = require('../cmUtil');
   var domUtil = require('../domUtil');
   var isLeaf = require('../traceUtil').isLeaf;
@@ -31,6 +32,8 @@
   var inputMark;
   var grammarMark;
   var defMark;
+
+  var StepControls = Vue.extend(require('./step-controls.vue'));
 
   // Helpers
   // -------
@@ -81,6 +84,14 @@
           return {node: this.previewedZoomTrace, class: 'zoomBorder'};
         }
       }
+    },
+    watch: {
+      currentRootTrace: function() {
+        this._stepControls.reset();
+      }
+    },
+    created: function() {
+      this._stepControls = new StepControls({el: '#stepControls'});
     },
     mounted: function() {
       window.addEventListener('resize', this.$refs.expandedInput.update);

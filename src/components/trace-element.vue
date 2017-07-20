@@ -1,14 +1,14 @@
 <template>
-  <div class="pexpr" :class="classObj" id="id">
+  <div class="pexpr" :class="classObj" :id="id">
     <div v-if="labeled" class="self">
       <trace-label :traceNode="traceNode" :minWidth="minWidth"
                    @hover="onHover" @unhover="onUnhover" @click="onClick"
                    @showContextMenu="onShowContextMenu" />
     </div>
-    <div v-if="!isLeaf" ref="children"
+    <div v-if="!isLeaf"
          class="children" :class="{vbox: vbox}"
          :hidden="collapsed">
-      <trace-element v-for="child in childrenToRender"
+      <trace-element v-for="child in childrenToRender" :ref="child.id"
                      :id="child.id" :traceNode="child.traceNode" :context="child.context"
                      :currentLR="child.currentLR" :measureInputText="measureInputText"
                      :isInVBox="child.isInVBox" :eventHandlers="eventHandlers">
@@ -138,7 +138,7 @@
       measureInputText: {type: Function},
       isInVBox: {type: Boolean},
 
-      // from parent element
+      // Properties pertaining to the parent trace element
       context: {type: Object},
 
       eventHandlers: {type: Object},
@@ -156,9 +156,6 @@
                hasVisibleLeftRecursion(this.traceNode) ||
                (isAlt(this.traceNode.expr) && this.context && this.context.vbox);
       },
-      isWhitespace: function() {
-        return this.traceNode.ruleName === 'spaces';
-      },
       isLeaf: function() {
         var leaf = isLeaf(ohmEditor.grammar, this.traceNode);
         if (this.traceNode.isMemoized) {
@@ -169,6 +166,9 @@
           }
         }
         return leaf;
+      },
+      isWhitespace: function() {
+        return this.traceNode.ruleName === 'spaces';
       },
       initiallyCollapsed: function() {
         if (!this.labeled || this.isLeaf) {
@@ -233,6 +233,7 @@
           var lrObj = cloneObject(self.currentLR);
           var traceElement = {
             traceNode: node,
+            id: getFreshNodeId(),
             context: {
               syntactic: self.labeled ? isSyntactic(node.expr) :
                                         self.context && self.context.syntactic,
@@ -308,7 +309,7 @@
         var source = this.traceNode.source;
         var pexpr = this.traceNode.expr;
 
-        // TODO: Can `source` ever be undefine/null here?
+        // TODO: Can `source` ever be undefined/null here?
         if (source) {
           // inputMark = cmUtil.markInterval(inputEditor, source, 'highlight', false);
           inputEditor.getWrapperElement().classList.add('highlighting');
