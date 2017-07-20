@@ -5,5 +5,6 @@
 
 require('../src/utils');  // For Object.assign polyfill
 
+require('./test-TraceElementWalker');
 require('./test-ellipsis-dropdown');
 require('./test-example-list');
