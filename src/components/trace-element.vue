@@ -1,5 +1,5 @@
 <template>
-  <div class="pexpr" :class="classObj" :id="id">
+  <div class="pexpr" :class="classObj" :id="id" :hidden="hiddenForStepping">
     <div v-if="labeled" class="self">
       <trace-label :traceNode="traceNode" :minWidth="minWidth"
                    @hover="onHover" @unhover="onUnhover" @click="onClick"
@@ -204,6 +204,8 @@
         obj.failed = !this.traceNode.succeeded;
         obj.labeled = this.labeled;
         obj.leaf = this.isLeaf;
+        obj.currentParseStep = this.isCurrentParseStep;
+        obj.undecided = this.isUndecided;
         return obj;
       },
       // The children to actually be rendered in the DOM. By using a separate property, we can
@@ -267,7 +269,10 @@
     data: function() {
       return {
         collapsed: false,
-        hasUserToggledCollapsedState: false
+        hasUserToggledCollapsedState: false,
+        hiddenForStepping: false,
+        isCurrentParseStep: false,
+        isUndecided: false
       };
     },
     beforeMount: function() {

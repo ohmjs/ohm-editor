@@ -1,8 +1,15 @@
-/* global NodeFilter */
+/* global Node, NodeFilter */
 
 'use strict';
 
 var domUtil = require('./domUtil');
+
+// Helpers
+// -------
+
+function followsInDocument(a, b) {
+  return b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING;
+}
 
 // TraceElementWalker
 // ------------------
@@ -22,6 +29,7 @@ function TraceElementWalker(root) {
     }
   });
   this._isAtEnd = false;
+  this._furthest = this._root;
   this.currentNode = null;
   this.exitingCurrentNode = false;
 }
@@ -56,6 +64,8 @@ TraceElementWalker.prototype.nextNode = function() {
 
   if (!this.currentNode) {
     this._isAtEnd = true;
+  } else if (followsInDocument(this.currentNode, this._furthest)) {
+    this._furthest = this.currentNode;
   }
 
   return this.currentNode;
@@ -101,12 +111,20 @@ TraceElementWalker.prototype.previousNode = function() {
 };
 
 TraceElementWalker.prototype.forEachAncestor = function(cb) {
-  if (this.currentNode) {
-    var node = this.currentNode;
-    while ((node = domUtil.closestElementMatching('.pexpr.labeled', node.parentNode)) != null) {
-      cb(node);
-    }
+  var node = this.currentNode;
+  while (node &&
+      (node = domUtil.closestElementMatching('.pexpr.labeled', node.parentNode)) != null) {
+    cb(node);
   }
+};
+
+TraceElementWalker.prototype.forEachPastFurthest = function(cb) {
+  var oldCurrent = this._walker.currentNode;
+  this._walker.currentNode = this._furthest;
+  while (this._walker.nextNode()) {
+    cb(this._walker.currentNode);
+  }
+  this._walker.currentNode = oldCurrent;
 };
 
 module.exports = TraceElementWalker;
