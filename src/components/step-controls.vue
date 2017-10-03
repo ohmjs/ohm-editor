@@ -167,7 +167,7 @@
         // NOTE: It doesn't matter which way we're going! If it's in this._expandedForStepping,
         // and `node` is the current parse step, then by definition we've left the subtree.
         if (this._expandedForStepping[node.id]) {
-          node.setCollapsed(true);
+          node.setCollapsed(true, 0);
           delete this._expandedForStepping[node.id];
         }
       },
