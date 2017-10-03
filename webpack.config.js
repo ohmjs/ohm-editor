@@ -36,5 +36,8 @@ module.exports = {
     inline: true,
     port: 8080,
     publicPath: '/assets/'
+  },
+  vue: {
+    esModule: false
   }
 };
