@@ -29,6 +29,9 @@
         };
       }
     },
+    provide: {
+      inSyntacticContext: false
+    },
     methods: {
       // To make it easier to navigate around the parse tree, handle mousewheel events
       // and translate vertical overscroll into horizontal movement. I.e., when scrolled all

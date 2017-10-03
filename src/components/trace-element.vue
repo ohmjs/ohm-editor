@@ -190,7 +190,7 @@
         }
 
         // Collapse the non-syntactic nodes that are in syntactic contexts.
-        return this.context.syntactic && !isSyntactic(this.traceNode.expr);
+        return this.inSyntacticContext && !isSyntactic(this.traceNode.expr);
       },
       classObj: function() {
         var obj = {
@@ -237,8 +237,6 @@
             traceNode: node,
             id: getFreshNodeId(),
             context: {
-              syntactic: self.labeled ? isSyntactic(node.expr) :
-                                        self.context && self.context.syntactic,
               vbox: self.vbox
             },
             isInVBox: self.vbox,
@@ -273,6 +271,14 @@
         hiddenForStepping: false,
         isCurrentParseStep: false,
         isUndecided: false
+      };
+    },
+    inject: ['inSyntacticContext'],
+    provide: function() {
+      return {
+        inSyntacticContext: this.labeled
+            ? isSyntactic(this.traceNode.expr)
+            : this.inSyntacticContext
       };
     },
     beforeMount: function() {
