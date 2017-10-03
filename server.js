@@ -35,7 +35,7 @@ function Server() {
   var server = new WebpackDevServer(compiler, config.devServer);
 
   this._webpackDevServer = server;
-  this.indexURL = 'http://0.0.0.0:' + config.devServer.port + '/webpack-dev-server/';
+  this.indexURL = 'http://localhost:' + config.devServer.port + '/webpack-dev-server/';
 
   server.app.get('/assets/ohm.min.js', function(req, res) {
     res.sendFile(OHM_BUNDLE_PATH);
