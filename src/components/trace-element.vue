@@ -190,7 +190,7 @@
         }
 
         // Collapse the non-syntactic nodes that are in syntactic contexts.
-        return this.context.syntactic && !isSyntactic(this.traceNode);
+        return this.context.syntactic && !isSyntactic(this.traceNode.expr);
       },
       classObj: function() {
         var obj = {
