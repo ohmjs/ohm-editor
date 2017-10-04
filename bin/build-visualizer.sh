@@ -24,6 +24,7 @@ echo "Ohm editor version: $(git rev-parse HEAD)" > visualizer/build-info.txt
 
 # Copy the appropriate files into the $BUILD_DIR/visualizer.
 cp visualizer-bundle.js visualizer/assets
+cp *.png visualizer/assets
 cp -r ../src/index.html ../src/style ../src/third_party visualizer
 
 # Sync $BUILD_DIR/visualizer with the user-specified destination dir.

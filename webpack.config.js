@@ -3,6 +3,8 @@
 var path = require('path');
 var webpack = require('webpack');
 
+/* eslint-disable quote-props */
+
 module.exports = {
   module: {
     loaders: [
@@ -39,5 +41,8 @@ module.exports = {
   },
   vue: {
     esModule: false
+  },
+  'file-loader': {
+    useRelativePath: true
   }
 };
