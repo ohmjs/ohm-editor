@@ -20,6 +20,7 @@
   "plugins": [
     "camelcase-ohm",
     "html",
+    "node",
     "no-extension-in-require",
     "tape"
   ],
@@ -51,7 +52,10 @@
     // Don't require `new` when calling functions whose name starts with a capital letter.
     new-cap: ["error", {capIsNew: false}],
 
-    no-console: 2,
+    // Prevent use of ES6 features that don't work our minimum supported Node version,
+    // which is determined by the "engines" field of package.json.
+    node/no-unsupported-features: "error",
+
     no-constant-condition: 0,  // Allow things like `while(true)`.
     no-else-return: 0,  // Allow `else` after a return statement.
     no-eq-null: 0,
