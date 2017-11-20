@@ -17,7 +17,7 @@ function findEl(vm, query) {
 // Tests
 // -----
 
-test('showing and hiding the dropdown', function(t) {
+test('showing and hiding the dropdown', t => {
   const counts = {Foo: 0, Bar: 0};
   const vm = new EllipsisDropdown({
     propsData: {
@@ -35,14 +35,14 @@ test('showing and hiding the dropdown', function(t) {
   button.click();
 
   t.equal(vm.hidden, false, 'hidden is false after clicking button');
-  Vue.nextTick(function() {
+  Vue.nextTick(() => {
     const links = ArrayProto.slice.call(vm.$el.querySelectorAll('li > a'));
 
-    const labels = links.map(function(el) { return el.textContent; });
+    const labels = links.map(el => el.textContent);
     t.deepEqual(labels, ['Foo', 'Bar'], 'labels are correct');
 
     links[0].click();
-    Vue.nextTick(function() {
+    Vue.nextTick(() => {
       t.equal(counts.Foo, 1, 'Foo callback ran');
       t.equal(counts.Bar, 0);
       t.equal(vm.hidden, true, 'click caused menu to hide');
