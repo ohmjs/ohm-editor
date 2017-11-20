@@ -2,12 +2,12 @@
 
 'use strict';
 
-var TraceElementWalker = require('../src/TraceElementWalker');
-var test = require('tape');
+const TraceElementWalker = require('../src/TraceElementWalker');
+const test = require('tape');
 
 function createTestDiv() {
-  var doc = document;
-  var div = doc.body.appendChild(doc.createElement('div'));
+  const doc = document;
+  const div = doc.body.appendChild(doc.createElement('div'));
   div.innerHTML = [
     '<p>',
     '  <div id="node0" class="pexpr labeled" hidden>',
@@ -25,9 +25,9 @@ function createTestDiv() {
   return div;
 }
 
-test('nextNode', function(t) {
-  var div = createTestDiv();
-  var walker = new TraceElementWalker(div);
+test('nextNode', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div);
 
   // Ensure that it does an in-order traversal of the tree, ignoring any nodes
   // that don't have the 'pexpr' and 'labeled' classes (but not their children).
@@ -59,9 +59,9 @@ test('nextNode', function(t) {
   t.end();
 });
 
-test('previousNode', function(t) {
-  var div = createTestDiv();
-  var walker = new TraceElementWalker(div);
+test('previousNode', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div);
 
   while (walker.nextNode().id !== 'node4'); // Go to last node
   t.equal(walker.currentNode, div.querySelector('#node4'));
@@ -89,9 +89,9 @@ test('previousNode', function(t) {
   t.end();
 });
 
-test('mixing nextNode and previousNode', function(t) {
-  var div = createTestDiv();
-  var walker = new TraceElementWalker(div);
+test('mixing nextNode and previousNode', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div);
 
   walker.nextNode();
   t.equal(walker.previousNode(), null);
@@ -124,9 +124,9 @@ test('mixing nextNode and previousNode', function(t) {
   t.end();
 });
 
-test('going backwards from end', function(t) {
-  var div = createTestDiv();
-  var walker = new TraceElementWalker(div);
+test('going backwards from end', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div);
 
   while (walker.nextNode());
   t.equal(walker.previousNode(), div.querySelector('#node4'));

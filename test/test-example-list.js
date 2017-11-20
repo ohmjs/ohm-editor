@@ -1,9 +1,9 @@
 'use strict';
 
-var Vue = require('vue');
-var assert = require('assert');
-var ohm = require('ohm-js');
-var test = require('tape');
+const Vue = require('vue');
+const assert = require('assert');
+const ohm = require('ohm-js');
+const test = require('tape');
 
 // Dependencies w/ mocks
 // ---------------------
@@ -17,12 +17,12 @@ global.CodeMirror = function() {
   };
 };
 
-var ohmEditor = require('../src/ohmEditor');  // Requires CodeMirror()
+const ohmEditor = require('../src/ohmEditor');  // Requires CodeMirror()
 
-var localStorageExamples;
+let localStorageExamples;
 
-var exampleListInjector = require('!!vue?inject!../src/components/example-list.vue');
-var ExampleList = Vue.extend(exampleListInjector({
+const exampleListInjector = require('!!vue?inject!../src/components/example-list.vue');
+const ExampleList = Vue.extend(exampleListInjector({
   'global/window': {
     localStorage: {
       getItem: function() {
@@ -52,7 +52,7 @@ function findEl(vm, query) {
 }
 
 function getDropdownOptionValues(dropdown) {
-  var options = dropdown.querySelectorAll('option');
+  const options = dropdown.querySelectorAll('option');
   return Array.prototype.map.call(options, function(opt) { return opt.value; });
 }
 
@@ -60,12 +60,12 @@ function getDropdownOptionValues(dropdown) {
 // -----
 
 test('adding and updating examples', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
   t.equal(vm.getSelected(), undefined);
 
-  var id = vm.addExample();
+  const id = vm.addExample();
   t.equal(vm.selectedId, id, 'adding selects the new example');
   t.deepEqual(vm.getSelected(), {text: '', startRule: '', shouldMatch: true});
 
@@ -75,7 +75,7 @@ test('adding and updating examples', function(t) {
   vm.setExample(id, 'woooo', 'Start', false);
   t.deepEqual(vm.getSelected(), {text: 'woooo', startRule: 'Start', shouldMatch: false});
 
-  var id2 = vm.addExample();
+  const id2 = vm.addExample();
   t.equal(vm.selectedId, id2);
   t.deepEqual(vm.getSelected(), {text: '', startRule: '', shouldMatch: true});
 
@@ -83,13 +83,13 @@ test('adding and updating examples', function(t) {
 });
 
 test('deleting', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
   localStorageExamples = [];
 
   // First, try adding a single example then deleting it.
-  var id = vm.addExample();
+  const id = vm.addExample();
   vm.setExample(id, 'first');
 
   Vue.nextTick(function() {
@@ -98,8 +98,8 @@ test('deleting', function(t) {
     t.equal(vm.getSelected(), undefined);
 
     // Now, add two examples.
-    var id1 = vm.addExample();
-    var id2 = vm.addExample();
+    const id1 = vm.addExample();
+    let id2 = vm.addExample();
 
     vm.setExample(id1, "hi i'm id1");
     t.equal(vm.selectedId, id2, 'the second example is selected');
@@ -129,15 +129,15 @@ test('deleting', function(t) {
 });
 
 test('toggleShouldMatch', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
   localStorageExamples = [];
 
-  var id = vm.addExample();
+  const id = vm.addExample();
   vm.toggleShouldMatch(id);
 
-  var example = vm.getSelected();
+  const example = vm.getSelected();
   t.equal(example.shouldMatch, false);
 
   Vue.nextTick(function() {
@@ -161,10 +161,10 @@ test('toggleShouldMatch', function(t) {
 });
 
 test('pass/fail status', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
-  var id = vm.addExample();
+  const id = vm.addExample();
   vm.setExample(id, 'abcdefg');
 
   Vue.nextTick(function() {
@@ -180,14 +180,14 @@ test('pass/fail status', function(t) {
         simulateGrammarEdit('G { start = digit+ }', function() {
           t.equal(vm.exampleStatus[id].className, 'pass', 'passes when example fails matching');
 
-          var id2 = vm.addExample();
+          const id2 = vm.addExample();
           vm.setExample(id2, '123');
           Vue.nextTick(function() {
             t.equal(vm.exampleStatus[id2].className, 'pass');
 
             ohmEditor.emit('change:grammar', '');
             Vue.nextTick(function() {
-              for (var k in vm.exampleStatus) {
+              for (const k in vm.exampleStatus) {
                 t.equal(vm.exampleStatus[k], undefined);
               }
               t.end();
@@ -200,10 +200,10 @@ test('pass/fail status', function(t) {
 });
 
 test('start rule text', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
-  var id = vm.addExample();
+  const id = vm.addExample();
 
   simulateGrammarEdit('G { start = letter }', function() {
     t.equal(findEl(vm, '.startRule').textContent, '');
@@ -223,14 +223,14 @@ test('start rule text', function(t) {
 });
 
 test('start rule dropdown', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
-  var id = vm.addExample();
+  const id = vm.addExample();
   t.equal(vm.selectedId, id);
 
   Vue.nextTick(function() {
-    var dropdown = findEl(vm, '#startRuleDropdown');
+    let dropdown = findEl(vm, '#startRuleDropdown');
     t.equal(dropdown.value, '');
     t.deepEqual(getDropdownOptionValues(dropdown), ['']);
 
@@ -250,10 +250,10 @@ test('start rule dropdown', function(t) {
 });
 
 test('start rule errors', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
-  var id = vm.addExample();
+  const id = vm.addExample();
   vm.setExample(id, '', 'nein');
 
   simulateGrammarEdit('G {}', function() {
@@ -279,12 +279,12 @@ test('start rule errors', function(t) {
 });
 
 test('example editing', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
   vm.addExample();
   simulateGrammarEdit('G { start = letter* }', function() {
-    var li = findEl(vm, 'li');
+    const li = findEl(vm, 'li');
     t.ok(li.classList.contains('pass'));
 
     ohmEditor.emit('change:inputEditor', 'asdf');
@@ -306,10 +306,10 @@ test('example editing', function(t) {
 });
 
 test('thumbs up button', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
-  var id = vm.addExample();
+  const id = vm.addExample();
   simulateGrammarEdit('G { start = any }', function() {
     t.equal(vm.exampleStatus[id].className, 'fail', 'initially fails');
 
@@ -323,10 +323,10 @@ test('thumbs up button', function(t) {
 });
 
 test('editor - thumbs up button', function(t) {
-  var vm = new ExampleList();
+  const vm = new ExampleList();
   vm.$mount();
 
-  var id = vm.addExample();
+  const id = vm.addExample();
   simulateGrammarEdit('G { start = any }', function() {
     t.equal(vm.exampleStatus[id].className, 'fail', 'initially fails');
     findEl(vm, '#exampleEditor .thumbsUpButton').click();  // Fake a button click.
