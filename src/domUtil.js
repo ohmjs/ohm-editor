@@ -89,7 +89,7 @@ module.exports = {
   },
 
   // Permanently add a menu item to the context menu.
-  // `menuId` is the value use as the `id` attribute of the context menu.
+  // `menuId` is the value use as the 'id' attribute of the context menu.
   // `id` is the value to use as the 'id' attribute of the DOM node.
   // `label` is the text label of the item.
   // `onClick` is a function to use as the onclick handler for the item.
