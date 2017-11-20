@@ -173,6 +173,8 @@
       },
       goToStart: function() {
         this._treeWalker = this._initializeWalker(START);
+        this.canGoBack = false;
+        this.canGoForward = !this._treeWalker._isAtEnd;
       },
       stepBack: function() {
         if (!this.canGoBack) {
