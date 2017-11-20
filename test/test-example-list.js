@@ -25,10 +25,10 @@ const exampleListInjector = require('!!vue?inject!../src/components/example-list
 const ExampleList = Vue.extend(exampleListInjector({
   'global/window': {
     localStorage: {
-      getItem: function() {
+      getItem() {
         return '[]';
       },
-      setItem: function(name, value) {
+      setItem(name, value) {
         assert.equal(name, 'examples');
         localStorageExamples = JSON.parse(value);
       }

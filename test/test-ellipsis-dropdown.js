@@ -22,7 +22,7 @@ test('showing and hiding the dropdown', t => {
   const vm = new EllipsisDropdown({
     propsData: {
       items: {
-        Foo: function() { counts.Foo++; },
+        Foo() { counts.Foo++; },
         Bar: null
       }
     }
