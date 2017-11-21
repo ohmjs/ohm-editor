@@ -1,5 +1,5 @@
 <template>
-  <div class="pexpr" :class="classObj" :id="id" :hidden="hiddenForStepping">
+  <div class="pexpr" :class="classObj" :id="id" :hidden="isHiddenForStepping">
     <div v-if="labeled" class="self">
       <trace-label :traceNode="traceNode" :minWidth="minWidth"
                    @hover="onHover" @unhover="onUnhover" @click="onClick"
@@ -8,30 +8,35 @@
     <div v-if="!isLeaf"
          class="children" :class="{vbox: vbox}"
          :hidden="collapsed">
-      <trace-element v-for="child in childrenToRender" :ref="child.id"
+      <trace-element v-for="child in childrenToRender" :ref="child.id" :key="child.id"
                      :id="child.id" :traceNode="child.traceNode" :context="child.context"
                      :currentLR="child.currentLR" :measureInputText="measureInputText"
-                     :isInVBox="child.isInVBox" :eventHandlers="eventHandlers">
-      </trace-element>
+                     :isInVBox="child.isInVBox" :eventHandlers="eventHandlers"
+                     :isPossiblyInvolvedInStepping="areChildrenPossiblyInvolvedInStepping" />
     </div>
   </div>
 </template>
 
 <script>
-  /* global d3, ohm */
+  /* global Node, d3, ohm */
   'use strict';
 
   var $ = require('../domUtil').$;
   var cmUtil = require('../cmUtil');
   var isLeaf = require('../traceUtil').isLeaf;
   var ohmEditor = require('../ohmEditor');
-
   var traceLabel = require('./trace-label.vue');
 
-  var nextNodeId = 0;
+  var nextNodeId = 1;  // Node 0 is always the root.
 
   // Helpers
   // -------
+
+  function byId(id) {
+    if (id !== '') {
+      return $('#' + id);
+    }
+  }
 
   function getFreshNodeId() {
     return 'node-' + nextNodeId++;
@@ -134,9 +139,11 @@
       'trace-label': traceLabel
     },
     props: {
+      id: {type: String, required: true},
       traceNode: {type: Object, required: true},
       measureInputText: {type: Function},
       isInVBox: {type: Boolean},
+      isPossiblyInvolvedInStepping: {type: Boolean, default: true},
 
       // Properties pertaining to the parent trace element
       context: {type: Object},
@@ -145,9 +152,6 @@
       currentLR: {type: Object}
     },
     computed: {
-      id: function() {
-        return getFreshNodeId();
-      },
       labeled: function() {
         return shouldNodeBeLabeled(this.traceNode);
       },
@@ -234,8 +238,8 @@
 
           var lrObj = cloneObject(self.currentLR);
           var traceElement = {
-            traceNode: node,
             id: getFreshNodeId(),
+            traceNode: node,
             context: {
               vbox: self.vbox
             },
@@ -262,24 +266,78 @@
       },
       minWidth: function() {
         return this.measureInputText(this.traceNode.source.contents) + 'px';
+      },
+      isCurrentParseStep: function() {
+        return this.isPossiblyInvolvedInStepping &&
+            this.id === this.injectedStepState.currentParseStep;
+      },
+      isInvolvedInStepping: function() {
+        if (this.traceNode.isRootNode || this.isCurrentParseStep) {
+          return true;
+        }
+        if (this.isMounted && this.isPossiblyInvolvedInStepping) {
+          // A node is "involved" if it contains the current parse step.
+          var currEl = byId(this.injectedStepState.currentParseStep);
+          if (currEl && this.containsElement(currEl)) {
+            return true;
+          }
+        }
+        return false;
+      },
+      areChildrenPossiblyInvolvedInStepping: function() {
+        if (this.isPossiblyInvolvedInStepping) {
+          // If a node is involved in stepping, then its children are possibly involved.
+          // This prevents re-rendering every single element whenever the step state changes.
+          return this.labeled ? this.isInvolvedInStepping : true;
+        }
+        return false;
+      },
+      isUndecided: function() {
+        if (this.isPossiblyInvolvedInStepping) {
+          // All ancestors of the current parse step are undecided -- i.e., any involved nodes
+          // except the current parse step. The current parse step is only undecided if it's a
+          // non-leaf and we just entered it (i.e., we will visit its children next).
+          if (this.isCurrentParseStep) {
+            return !(this.isLeaf || this.injectedStepState.exiting);
+          }
+          return this.isInvolvedInStepping;
+        }
+        return false;
+      },
+      isHiddenForStepping: function() {
+        if (this.isMounted &&
+            (this.isPossiblyInvolvedInStepping || this.injectedStepState.jumpCount >= 0)) {
+
+          if (this.isCurrentParseStep || this.injectedStepState.isAtEnd) {
+            return false;
+          }
+
+          var currEl = byId(this.injectedStepState.currentParseStep);
+          if (currEl) {
+            if (this.precedesElement(currEl) ||
+                this.containedByElement(currEl) && this.injectedStepState.exiting) {
+              return false;
+            }
+          }
+          return true;
+        }
       }
     },
     data: function() {
       return {
         collapsed: false,
         hasUserToggledCollapsedState: false,
-        hiddenForStepping: false,
-        isCurrentParseStep: false,
-        isUndecided: false
+        isMounted: false
       };
     },
-    inject: ['inSyntacticContext'],
+    inject: [
+      'inSyntacticContext',
+      'injectedStepState'
+    ],
     provide: function() {
-      return {
-        inSyntacticContext: this.labeled
-            ? isSyntactic(this.traceNode.expr)
-            : this.inSyntacticContext
-      };
+      if (this.labeled) {
+        return {inSyntacticContext: isSyntactic(this.traceNode.expr)};
+      }
     },
     beforeMount: function() {
       this.initializeCollapsedState();
@@ -299,6 +357,7 @@
           ohmEditor.parseTree.emit('exit:traceElement', el, el._traceNode);
         });
       }
+      this.isMounted = true;
     },
     beforeUpdate: function() {
       if (this.traceNode !== this.$el._traceNode) {
@@ -445,6 +504,15 @@
         };
         measuringDiv.removeChild(clone);
         return result;
+      },
+      containsElement: function(el) {
+        return el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_CONTAINS;
+      },
+      containedByElement: function(el) {
+        return this.$el.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_CONTAINS;
+      },
+      precedesElement: function(el) {
+        return el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_PRECEDING;
       }
     }
   };

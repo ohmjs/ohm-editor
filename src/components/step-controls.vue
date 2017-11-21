@@ -53,9 +53,11 @@
   'use strict';
 
   var TraceElementWalker = require('../TraceElementWalker');
-  var domUtil = require('../domUtil');
-
-  var START = {};
+  
+  var Position = {
+    START: {},
+    END: {}
+  };
 
   function getVM(el) {
     return el && el.__vue__;
@@ -68,18 +70,27 @@
     name: 'step-controls',
     data: function() {
       return {
+        rootEl: null,
         canGoToStart: true,
         canGoBack: true,
         canGoForward: false,
-        canGoToEnd: false
+        canGoToEnd: false,
+
+        // NOTE: This object is exposed to the entire parse tree as 'injectedStepState'.
+        stepState: {
+          currentParseStep: '',
+          isAtEnd: false,
+          exiting: false,
+
+          // Incremented each time the current parse step moves more than a single step.
+          jumpCount: 0
+        }
       };
     },
-    created: function() {
-      this.reset();
-    },
     methods: {
-      reset: function() {
-        this._treeWalker = null;
+      reset: function(rootEl) {
+        this.rootEl = rootEl;
+        this._initializeWalker(Position.END);
         this._expandedForStepping = {};
       },
       handleKeyDown: function(e) {
@@ -92,65 +103,27 @@
         }
         e.preventDefault();
       },
-      _initializeWalker: function(initialNode, optAtExit) {
-        var exiting = !!optAtExit;
-        var walker = new TraceElementWalker(domUtil.$('#visualizerBody'));
-        if (initialNode !== START) {
-          // Walk until the requested node is reached.
-          while (walker.nextNode() != null) {
-            if (walker.currentNode === initialNode && walker.exitingCurrentNode === exiting) {
-              break;
-            }
-            // As we step over nodes, mark them as decided and not hidden.
-            var vm = getVM(walker.currentNode);
-            vm.hiddenForStepping = false;
-            vm.isUndecided = false;
-          }
-        }
-        // Any nodes that have not yet been seen on the walk must be hidden.
-        walker.forEachPastFurthest(function(node) {
-          getVM(node).hiddenForStepping = true;
+      _initializeWalker: function(initialPos) {
+        this._treeWalker = new TraceElementWalker(this.rootEl, {
+          startAtEnd: initialPos === Position.END
         });
-        return walker;
+        this._updateStepState(true);
       },
       _doStep: function(forward) {
         var curr = getVM(this._treeWalker.currentNode);
         if (curr) {
           // If necessary, expand the node before stepping into it.
           this._maybeExpand(curr, this._treeWalker, forward);
-
-          curr.isCurrentParseStep = false;
-
-          // When going backwards, hide the node if we're not moving to its subtree.
-          if (!forward) {
-            curr.hiddenForStepping = !this._treeWalker.exitingCurrentNode;
-          }
         }
 
         // Use $nextTick to ensure the DOM reflects the effect of _maybeExpand().
         this.$nextTick(function() {
-          var next = getVM(
-              forward ? this._treeWalker.nextNode() : this._treeWalker.previousNode());
-          if (next) {
-            // When we step into a node, unhide it and mark it decided -- except interior
-            // nodes, which are only decided when exiting the node (visiting on the way out).
-            next.hiddenForStepping = false;
-            next.isCurrentParseStep = true;
-            next.isUndecided = !(next.isLeaf || this._treeWalker.exitingCurrentNode);
-
-            // Each ancestor of the current parse node must be undecided.
-            this._treeWalker.forEachAncestor(function(node) {
-              getVM(node).isUndecided = true;
-            });
-
-            // When returning to a node that was expanded for stepping, re-collapse it.
-            this._maybeRecollapse(next);
+          if (forward) {
+            this._treeWalker.nextNode();
+          } else {
+            this._treeWalker.previousNode();
           }
-          this.canGoBack = next || this._treeWalker._isAtEnd;
-          this.canGoToStart = this.canGoBack;
-
-          this.canGoForward = !this._treeWalker._isAtEnd;
-          this.canGoToEnd = this.canGoForward;
+          this._updateStepState();
         });
       },
       _maybeExpand: function(node, walker, forward) {
@@ -171,29 +144,43 @@
           delete this._expandedForStepping[node.id];
         }
       },
+      // Updates `this.stepState` based on the current state of the treewalker. Should be
+      // called whenever the treewalker's currentNode changes.
+      // If `optDidJump` is true, the current parse step moved by more than a single step.
+      _updateStepState: function(optDidJump) {
+        var curr = getVM(this._treeWalker.currentNode);
+        if (curr && curr.id !== this.stepState.currentParseStep) {
+          // When returning to a node that was expanded for stepping, re-collapse it.
+          this._maybeRecollapse(curr);
+        }
+        var isAtEnd = this._treeWalker.isAtEnd;
+        this.stepState.currentParseStep = curr ? curr.id : '';
+        this.stepState.isAtEnd = isAtEnd;
+        this.stepState.exiting = this._treeWalker.exitingCurrentNode;
+        if (optDidJump) {
+          this.stepState.jumpCount++;
+        }
+
+        this.canGoToEnd = this.canGoForward = !isAtEnd;
+        this.canGoToStart = this.canGoBack = curr || isAtEnd;
+      },
       goToStart: function() {
-        this._treeWalker = this._initializeWalker(START);
-        this.canGoBack = false;
-        this.canGoForward = !this._treeWalker._isAtEnd;
+        this._initializeWalker(Position.START);
       },
       stepBack: function() {
-        if (!this.canGoBack) {
-          return;
+        if (this.canGoBack) {
+          this._doStep(false);
         }
-        // By default, it's as if we're at the end, but initialize the walker lazily.
-        if (this._treeWalker === null) {
-          this.goToEnd();
-        }
-        this._doStep(false);
       },
       stepForward: function() {
-        if (!this.canGoForward) {
-          return;
+        if (this.canGoForward) {
+          this._doStep(true);
         }
-        this._doStep(true);
       },
       goToEnd: function() {
-        this._treeWalker = this._initializeWalker(null);
+        this._initializeWalker(Position.END);
+      },
+      stepInto: function(node) {
       }
     }
   };

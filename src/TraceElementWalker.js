@@ -1,25 +1,15 @@
-/* global Node, NodeFilter */
+/* global NodeFilter */
 
 'use strict';
-
-var domUtil = require('./domUtil');
-
-// Helpers
-// -------
-
-function followsInDocument(a, b) {
-  return b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING;
-}
-
-// TraceElementWalker
-// ------------------
 
 // Similar to a DOM TreeWalker (https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker),
 // but specialized for walking our parse trees. It visits only labeled PExpr nodes, and it
 // it visits interior nodes (i.e., `.pexpr.labeled:not(.leaf)` nodes) on the way in AND on
 // the way out -- even if they have no actual children. Whereas, the regular TreeWalker just
 // does a standard pre-order traversal.
-function TraceElementWalker(root) {
+function TraceElementWalker(root, optConfig) {
+  var config = optConfig || {};
+
   this._root = root;
   this._walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
     acceptNode: function(node) {
@@ -28,10 +18,17 @@ function TraceElementWalker(root) {
           : NodeFilter.FILTER_SKIP;
     }
   });
-  this._isAtEnd = false;
-  this._furthest = this._root;
+  this.isAtEnd = !!config.startAtEnd;
   this.currentNode = null;
   this.exitingCurrentNode = false;
+
+  // "End" means the next position past the last node. After intializing, a call to
+  // previousNode() will move the walker back to the last node.
+  if (config.startAtEnd) {
+    // Find last sibling of first node.
+    this._walker.nextNode();
+    while (this._walker.nextSibling() != null);
+  }
 }
 
 TraceElementWalker.prototype._isInInitialState = function() {
@@ -63,9 +60,7 @@ TraceElementWalker.prototype.nextNode = function() {
   }
 
   if (!this.currentNode) {
-    this._isAtEnd = true;
-  } else if (followsInDocument(this.currentNode, this._furthest)) {
-    this._furthest = this.currentNode;
+    this.isAtEnd = true;
   }
 
   return this.currentNode;
@@ -91,8 +86,8 @@ TraceElementWalker.prototype.previousNode = function() {
   }
 
   // Case 2: Going back to an interior or leaf node.
-  if (this._isAtEnd) {
-    this._isAtEnd = false;
+  if (this.isAtEnd) {
+    this.isAtEnd = false;
     this.currentNode = this._walker.currentNode;
     this.exitingCurrentNode = this._isOnInteriorNode();
   } else if ((this.currentNode = this._walker.previousSibling()) != null) {
@@ -108,23 +103,6 @@ TraceElementWalker.prototype.previousNode = function() {
   }
 
   return this.currentNode;
-};
-
-TraceElementWalker.prototype.forEachAncestor = function(cb) {
-  var node = this.currentNode;
-  while (node &&
-      (node = domUtil.closestElementMatching('.pexpr.labeled', node.parentNode)) != null) {
-    cb(node);
-  }
-};
-
-TraceElementWalker.prototype.forEachPastFurthest = function(cb) {
-  var oldCurrent = this._walker.currentNode;
-  this._walker.currentNode = this._furthest;
-  while (this._walker.nextNode()) {
-    cb(this._walker.currentNode);
-  }
-  this._walker.currentNode = oldCurrent;
 };
 
 module.exports = TraceElementWalker;

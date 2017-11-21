@@ -17,8 +17,10 @@ parseTree.vue = new Vue({
     'parse-tree': require('./components/parse-tree.vue')
   },
   template:
-    '<div id="visualizerContainer"><parse-tree :rootTrace="trace" />' +
-    '<div v-show="parsing" class="overlay"></div>',
+    '<div id="visualizerContainer">' +
+    '  <parse-tree :rootTrace="trace" />' +
+    '  <div v-show="parsing" class="overlay"></div>' +
+    '</div>',
   methods: {
     onEdit: function(cm) {
       this.parsing = true;
@@ -37,12 +39,6 @@ parseTree.vue = new Vue({
   }
 });
 
-/*
-parseTree.refresh = function() {
-  clearMarks();
-  refreshParseTree(rootTrace);
-};
-*/
 parseTree.setTraceElementCollapsed = function(el, collapsed, optDuration) {
   el.__vue__.setCollapsed(collapsed, optDuration);
 };

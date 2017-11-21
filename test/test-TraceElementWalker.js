@@ -124,6 +124,31 @@ test('mixing nextNode and previousNode', t => {
   t.end();
 });
 
+test('startAtEnd option', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div, {startAtEnd: true});
+
+  t.equal(walker.previousNode().id, 'node4');
+  t.equal(walker.exitingCurrentNode, false);
+
+  t.equal(walker.nextNode(), null);
+  t.equal(walker.previousNode().id, 'node4');
+  t.equal(walker.exitingCurrentNode, false);
+
+  div.querySelector('#node4').remove();
+
+  const walker2 = new TraceElementWalker(div, {startAtEnd: true});
+  t.equal(walker2.previousNode().id, 'node0');
+  t.equal(walker2.exitingCurrentNode, true);
+  t.equal(walker2.nextNode(), null);
+  t.equal(walker2.previousNode().id, 'node0');
+  t.equal(walker2.exitingCurrentNode, true);
+
+  div.remove();
+
+  t.end();
+});
+
 test('going backwards from end', t => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);

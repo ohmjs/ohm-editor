@@ -4,6 +4,8 @@
   var ohmEditor = require('../ohmEditor');
   var traceElement = require('./trace-element.vue');
 
+  var EMPTY_LR_INFO = {};
+
   // Exports
   // -------
 
@@ -72,9 +74,10 @@
       }
       var rootTraceElement = createElement(traceElement, {
         props: {
+          id: 'node-0',
           traceNode: this.trace,
           isInVBox: false,
-          currentLR: {},
+          currentLR: EMPTY_LR_INFO,
           measureInputText: this.measureInputText,
           eventHandlers: this.pexprEventHandlers
         }

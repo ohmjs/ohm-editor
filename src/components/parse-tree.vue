@@ -85,13 +85,13 @@
         }
       }
     },
-    watch: {
-      currentRootTrace: function() {
-        this._stepControls.reset();
-      }
-    },
-    created: function() {
+    provide: function() {
+      // Create the step controls here so that we can inject its state into the tree.
       this._stepControls = new StepControls({el: '#stepControls'});
+      return {
+        injectedStepState: this._stepControls.stepState,
+        isPossiblyInvolvedInStepping: true
+      };
     },
     mounted: function() {
       window.addEventListener('resize', this.$refs.expandedInput.update);
@@ -107,6 +107,10 @@
         }
       });
       ohmEditor.addListener('unpeek:ruleDefinition', clearMarks);
+      this.$nextTick(this.resetStepControls);
+    },
+    updated: function() {
+      this.$nextTick(this.resetStepControls);
     },
     methods: {
       zoom: function(traceNode) {
@@ -134,6 +138,9 @@
 
         var self = this;
         domUtil.addMenuItem('parseTreeMenu', 'getInfoItem', 'Get Info', false);
+        domUtil.addMenuItem('parseTreeMenu', 'stepInItem', 'Step Into', true, function() {
+          self._stepControls.stepInto(data.el);
+        });
         domUtil.addMenuItem('parseTreeMenu', 'zoomItem', 'Zoom to Node', zoomEnabled, function() {
           self.zoom(data.traceNode);
         });
@@ -144,6 +151,9 @@
       },
       measureInputText: function(text) {
         return this.$refs.expandedInput.measureText(text);
+      },
+      resetStepControls: function() {
+        this._stepControls.reset(domUtil.$('#visualizerBody'));
       }
     }
   };
