@@ -105,4 +105,17 @@ TraceElementWalker.prototype.previousNode = function() {
   return this.currentNode;
 };
 
+// Make `node` the walker's current node, as if we are just stepping into it.
+TraceElementWalker.prototype.stepInto = function(node) {
+  this.currentNode = this._walker.currentNode = node;
+  this.exitingCurrentNode = false;
+  this.isAtEnd = false;
+};
+
+// Make `node` the walker's current node, as if we are just stepping out of it.
+TraceElementWalker.prototype.stepOut = function(node) {
+  this.stepInto(node);
+  this.exitingCurrentNode = this._isOnInteriorNode();
+};
+
 module.exports = TraceElementWalker;

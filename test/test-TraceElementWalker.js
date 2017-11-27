@@ -165,3 +165,71 @@ test('going backwards from end', t => {
 
   t.end();
 });
+
+test('step into', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div);
+
+  const $ = sel => div.querySelector(sel);
+
+  walker.stepInto($('#node0'));
+  t.equal(walker.previousNode(), null);
+
+  walker.stepInto($('#node0'));
+  t.equal(walker.currentNode.id, 'node0');
+  t.equal(walker.exitingCurrentNode, false);
+
+  t.equal(walker.nextNode().id, 'node1');
+  t.equal(walker.exitingCurrentNode, false);
+
+  t.equal(walker.nextNode().id, 'node2');
+  t.equal(walker.exitingCurrentNode, false);
+  t.equal(walker.nextNode().id, 'node2');
+  t.equal(walker.exitingCurrentNode, true);
+
+  walker.stepInto($('#node1'));
+  t.equal(walker.exitingCurrentNode, false);
+  t.equal(walker.nextNode().id, 'node2');
+
+  div.remove();
+
+  t.end();
+});
+
+test('step into from end', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div, {startAtEnd: true});
+
+  const $ = sel => div.querySelector(sel);
+
+  walker.stepInto($('#node0'));
+  t.equal(walker.isAtEnd, false);
+
+  div.remove();
+
+  t.end();
+});
+
+test('step out', t => {
+  const div = createTestDiv();
+  const walker = new TraceElementWalker(div);
+
+  const $ = sel => div.querySelector(sel);
+
+  walker.stepOut($('#node0'));
+  t.equal(walker.currentNode, $('#node0'));
+  t.equal(walker.previousNode(), $('#node2'));
+
+  walker.stepOut($('#node2'));
+  t.equal(walker.currentNode, $('#node2'));
+  t.equal(walker.exitingCurrentNode, true);
+
+  // node2 gets visited twice, so after stepping out, we are still on node2, but
+  // not exiting this time.
+  t.equal(walker.previousNode(), $('#node2'));
+  t.equal(walker.exitingCurrentNode, false);
+
+  div.remove();
+
+  t.end();
+});

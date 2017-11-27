@@ -181,6 +181,12 @@
         this._initializeWalker(Position.END);
       },
       stepInto: function(node) {
+        this._treeWalker.stepInto(node);
+        this._updateStepState(true);
+      },
+      stepOut: function(node) {
+        this._treeWalker.stepOut(node);
+        this._updateStepState(true);
       }
     }
   };

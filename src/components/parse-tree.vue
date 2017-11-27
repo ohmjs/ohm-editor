@@ -141,6 +141,9 @@
         domUtil.addMenuItem('parseTreeMenu', 'stepInItem', 'Step Into', true, function() {
           self._stepControls.stepInto(data.el);
         });
+        domUtil.addMenuItem('parseTreeMenu', 'stepOutItem', 'Step Out', true, function() {
+          self._stepControls.stepOut(data.el);
+        });
         domUtil.addMenuItem('parseTreeMenu', 'zoomItem', 'Zoom to Node', zoomEnabled, function() {
           self.zoom(data.traceNode);
         });
