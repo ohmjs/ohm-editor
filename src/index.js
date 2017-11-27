@@ -3,6 +3,8 @@
 
 'use strict';
 
+require('es6-object-assign/auto');  // Object.assign polyfill
+
 var domUtil = require('./domUtil');
 var ohmEditor = require('./ohmEditor');
 
