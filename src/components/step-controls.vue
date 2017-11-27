@@ -1,15 +1,19 @@
 <template>
   <div id="stepControls" class="flex-row" @keydown="handleKeyDown">
-    <button class="outline-btn" :disabled="!canGoToStart" @click.prevent="goToStart">
+    <button class="outline-btn" title="Jump to beginning"
+            :disabled="!canGoToStart" @click.prevent="goToStart">
       <img src="../images/start.png" width="18">
     </button>
-    <button class="outline-btn" :disabled="!canGoBack" @click.prevent="stepBack">
+    <button class="outline-btn" title="Step back"
+            :disabled="!canGoBack" @click.prevent="stepBack">
       <img src="../images/backward.png" width="18">
     </button>
-    <button class="outline-btn" :disabled="!canGoForward" @click.prevent="stepForward">
+    <button class="outline-btn" title="Step forwards"
+            :disabled="!canGoForward" @click.prevent="stepForward">
       <img src="../images/forward.png" width="18">
     </button>
-    <button class="outline-btn" :disabled="!canGoToEnd" @click.prevent="goToEnd">
+    <button class="outline-btn" title="Jump to end"
+            :disabled="!canGoToEnd" @click.prevent="goToEnd">
       <img src="../images/end.png" width="18">
     </button>
   </div>
