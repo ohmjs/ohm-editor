@@ -3,7 +3,7 @@
 
 'use strict';
 
-require('../src/utils');  // For Object.assign polyfill
+require('es6-object-assign/auto');  // Object.assign polyfill
 
 require('./test-TraceElementWalker');
 require('./test-ellipsis-dropdown');
