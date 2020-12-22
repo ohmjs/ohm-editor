@@ -29,9 +29,7 @@
     "lint": "eslint . --ext .js,.vue",
     "test": "karma start --single-run",
     "test-watch": "karma start --auto-watch",
-    "postinstall": "true",
-    "prestart": "bash bin/update-env.sh",
-    "pretest": "bash bin/update-env.sh"
+    "postinstall": "true"
   },
   "precommit": [
     "lint",
@@ -47,7 +45,7 @@
   ],
   "dependencies": {
     "electron-prebuilt": "^1.1.0",
-    "ohm-js": "git://github.com/harc/ohm.git#537ff61"
+    "ohm-js": "^15.3.0"
   },
   "devDependencies": {
     "checked-emitter": "^1.0.1",
