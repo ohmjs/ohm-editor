@@ -132,9 +132,10 @@
 
         var baseRect = $('#expandedInputWrapper').getBoundingClientRect();
         var x = rect.left - baseRect.left;
+        var y = 5; // Hack to make the text vertically centered (on macOS at least).
         for (var i = 0; i < text.length; i++) {
           x += letterPadding;
-          this.inputCtx.fillText(text[i], x * this.getPixelRatio(), 0);
+          this.inputCtx.fillText(text[i], x * this.getPixelRatio(), y);
           x += charWidth + letterPadding;
         }
         return x <= window.innerWidth;

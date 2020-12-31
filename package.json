@@ -36,11 +36,11 @@
     "test"
   ],
   "license": "MIT",
-  "author": "Alex Warth <alexwarth@gmail.com> (http://tinlizzie.org/~awarth)",
+  "author": "Patrick Dubroy <pdubroy@gmail.com>",
   "contributors": [
+    "Alex Warth <alexwarth@gmail.com> (http://tinlizzie.org/~awarth)",
     "Marko Röder <m.roeder@photon-software.de>",
     "Meixian Li <lmeixian@gmail.com>",
-    "Patrick Dubroy <pdubroy@gmail.com>",
     "Saketh Kasibatla <sake.kasi@gmail.com>"
   ],
   "dependencies": {
