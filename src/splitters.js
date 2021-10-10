@@ -30,7 +30,7 @@ function initializeSplitter(el) {
     }
   }
 
-  handle.onmousedown = function(e) {
+  handle.onmousedown = function (e) {
     if (!el.classList.contains('disabled')) {
       dragging = true;
       dragOverlay.style.display = 'block';
@@ -38,7 +38,7 @@ function initializeSplitter(el) {
       e.preventDefault();
     }
   };
-  window.addEventListener('mousemove', function(e) {
+  window.addEventListener('mousemove', function (e) {
     const parentElBounds = parentEl.getBoundingClientRect();
     const relativeX = e.clientX - parentElBounds.left;
     const relativeY = e.clientY - parentElBounds.top;
@@ -53,13 +53,13 @@ function initializeSplitter(el) {
       e.stopPropagation();
     }
   });
-  window.addEventListener('mouseup', function(e) {
+  window.addEventListener('mouseup', function (e) {
     dragging = false;
     dragOverlay.removeAttribute('style');
   });
 
   // Reset the sizes to 50% when the handle is double-clicked.
-  handle.ondblclick = function(e) {
+  handle.ondblclick = function (e) {
     setSiblingSize('next', 1);
     setSiblingSize('prev', 1);
   };

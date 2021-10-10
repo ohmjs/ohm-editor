@@ -1,15 +1,24 @@
 <template>
   <div id="parseTree">
-    <button v-if="showZoomButton" id="zoomOutButton" type="button"
-            @click="zoomOut" @mouseover="previewZoom" @mouseout="unpreviewZoom">{{
-        zoomButtonLabel
-    }}</button>
+    <button
+      v-if="showZoomButton"
+      id="zoomOutButton"
+      type="button"
+      @click="zoomOut"
+      @mouseover="previewZoom"
+      @mouseout="unpreviewZoom"
+    >
+      {{ zoomButtonLabel }}
+    </button>
     <div id="visualizerBody">
       <expanded-input ref="expandedInput" />
-      <parse-results :trace="currentRootTrace" :highlightNode="zoomHighlight"
-                     :measureInputText="measureInputText"
-                     @showContextMenu="showContextMenu"
-                     @updateExpandedInput="updateExpandedInput"/>
+      <parse-results
+        :trace="currentRootTrace"
+        :highlightNode="zoomHighlight"
+        :measureInputText="measureInputText"
+        @showContextMenu="showContextMenu"
+        @updateExpandedInput="updateExpandedInput"
+      />
     </div>
   </div>
 </template>
@@ -39,16 +48,20 @@ const StepControls = Vue.extend(require('./step-controls.vue').default);
 // -------
 
 function couldZoom(currentRootTrace, traceNode) {
-  return currentRootTrace !== traceNode &&
-           traceNode.succeeded &&
-           !isLeaf(ohmEditor.grammar, traceNode);
+  return (
+    currentRootTrace !== traceNode &&
+    traceNode.succeeded &&
+    !isLeaf(ohmEditor.grammar, traceNode)
+  );
 }
 
 function clearMarks() {
   inputMark = cmUtil.clearMark(inputMark);
   grammarMark = cmUtil.clearMark(grammarMark);
   defMark = cmUtil.clearMark(defMark);
-  ohmEditor.ui.grammarEditor.getWrapperElement().classList.remove('highlighting');
+  ohmEditor.ui.grammarEditor
+    .getWrapperElement()
+    .classList.remove('highlighting');
   ohmEditor.ui.inputEditor.getWrapperElement().classList.remove('highlighting');
 }
 
@@ -96,12 +109,17 @@ module.exports = {
   mounted() {
     window.addEventListener('resize', this.$refs.expandedInput.update);
 
-    ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
+    ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
       if (ohmEditor.grammar.rules.hasOwnProperty(ruleName)) {
         const defInterval = ohmEditor.grammar.rules[ruleName].source;
         if (defInterval) {
           const grammarEditor = ohmEditor.ui.grammarEditor;
-          defMark = cmUtil.markInterval(grammarEditor, defInterval, 'active-definition', true);
+          defMark = cmUtil.markInterval(
+            grammarEditor,
+            defInterval,
+            'active-definition',
+            true
+          );
           cmUtil.scrollToInterval(grammarEditor, defInterval);
         }
       }
@@ -138,15 +156,33 @@ module.exports = {
 
       const self = this;
       domUtil.addMenuItem('parseTreeMenu', 'getInfoItem', 'Get Info', false);
-      domUtil.addMenuItem('parseTreeMenu', 'stepInItem', 'Step Into', true, function() {
-        self._stepControls.stepInto(data.el);
-      });
-      domUtil.addMenuItem('parseTreeMenu', 'stepOutItem', 'Step Out', true, function() {
-        self._stepControls.stepOut(data.el);
-      });
-      domUtil.addMenuItem('parseTreeMenu', 'zoomItem', 'Zoom to Node', zoomEnabled, function() {
-        self.zoom(data.traceNode);
-      });
+      domUtil.addMenuItem(
+        'parseTreeMenu',
+        'stepInItem',
+        'Step Into',
+        true,
+        function () {
+          self._stepControls.stepInto(data.el);
+        }
+      );
+      domUtil.addMenuItem(
+        'parseTreeMenu',
+        'stepOutItem',
+        'Step Out',
+        true,
+        function () {
+          self._stepControls.stepOut(data.el);
+        }
+      );
+      domUtil.addMenuItem(
+        'parseTreeMenu',
+        'zoomItem',
+        'Zoom to Node',
+        zoomEnabled,
+        function () {
+          self.zoom(data.traceNode);
+        }
+      );
       ohmEditor.parseTree.emit('contextMenu', data.el, data.traceNode);
     },
     updateExpandedInput(...args) {

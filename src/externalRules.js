@@ -27,8 +27,8 @@ function extend(origin, add) {
 }
 
 function combineChildResults(attr) {
-  return function(...children) {
-    return children.reduce(function(acc, child) {
+  return function (...children) {
+    return children.reduce(function (acc, child) {
       return extend(acc, child[attr]);
     }, {});
   };
@@ -102,7 +102,7 @@ function getExternalRules(rulesObj) {
   }
   ruleNames.sort(); // Sort to ensure a stable order.
 
-  ruleNames.forEach(function(name) {
+  ruleNames.forEach(function (name) {
     if (name in builtInRules.rules) {
       ans[name] = getBuiltInRuleDefinition(name);
     }
@@ -125,14 +125,14 @@ function LastLineWidget(editor) {
   this._placeWidget(null);
 }
 
-LastLineWidget.prototype._placeWidget = function() {
+LastLineWidget.prototype._placeWidget = function () {
   if (this.widget) {
     this.clear();
   }
   const cm = this.editor;
 
   // Add the widget on the current last line.
-  const lineHandle = this.lineHandle = cm.getLineHandle(cm.lastLine());
+  const lineHandle = (this.lineHandle = cm.getLineHandle(cm.lastLine()));
   this.widget = cm.addLineWidget(lineHandle, this.node);
 
   // Register for change/delete events on the line.
@@ -143,13 +143,13 @@ LastLineWidget.prototype._placeWidget = function() {
   lineHandle.on('delete', this.placeWidget);
 };
 
-LastLineWidget.prototype.clear = function() {
+LastLineWidget.prototype.clear = function () {
   this.widget.clear();
   this.lineHandle.off('change', this.placeWidget);
   this.lineHandle.off('delete', this.placeWidget);
 };
 
-LastLineWidget.prototype.update = function(cm, matchResult, grammar) {
+LastLineWidget.prototype.update = function (cm, matchResult, grammar) {
   if (grammar) {
     this._rules = getExternalRules(semantics(matchResult).referencedRules);
   } else {
@@ -181,23 +181,23 @@ function updateExternalRules() {
   widget.update(grammarEditor, grammarState.matchResult, grammarState.grammar);
 }
 
-grammarEditor.on('swapDoc', function(cm) {
+grammarEditor.on('swapDoc', function (cm) {
   widget = new LastLineWidget(cm);
 });
 
-ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
+ohmEditor.addListener('parse:grammar', function (matchResult, grammar, err) {
   grammarState.matchResult = matchResult;
   grammarState.grammar = grammar;
   updateExternalRules();
 });
 
-ohmEditor.addListener('change:option', function(name) {
+ohmEditor.addListener('change:option', function (name) {
   if (name === 'showSpaces') {
     updateExternalRules(grammarState.grammarMatchResult, grammarState.grammar);
   }
 });
 
-ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
+ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
   if (!ohmEditor.grammar.rules.hasOwnProperty(ruleName)) {
     const elem = $('#externalRules-' + ruleName);
     if (elem) {
@@ -206,8 +206,8 @@ ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
   }
 });
 
-ohmEditor.addListener('unpeek:ruleDefinition', function() {
-  $$('.externalRules pre').forEach(function(elem) {
+ohmEditor.addListener('unpeek:ruleDefinition', function () {
+  $$('.externalRules pre').forEach(function (elem) {
     elem.classList.remove('active-definition');
   });
 });

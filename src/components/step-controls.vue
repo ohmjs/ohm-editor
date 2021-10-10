@@ -1,56 +1,72 @@
 <template>
   <div id="stepControls" class="flex-row" @keydown="handleKeyDown">
-    <button class="outline-btn" title="Jump to beginning"
-            :disabled="!canGoToStart" @click.prevent="goToStart">
-      <img src="../images/start.png" width="18">
+    <button
+      class="outline-btn"
+      title="Jump to beginning"
+      :disabled="!canGoToStart"
+      @click.prevent="goToStart"
+    >
+      <img src="../images/start.png" width="18" />
     </button>
-    <button class="outline-btn" title="Step back"
-            :disabled="!canGoBack" @click.prevent="stepBack">
-      <img src="../images/backward.png" width="18">
+    <button
+      class="outline-btn"
+      title="Step back"
+      :disabled="!canGoBack"
+      @click.prevent="stepBack"
+    >
+      <img src="../images/backward.png" width="18" />
     </button>
-    <button class="outline-btn" title="Step forwards"
-            :disabled="!canGoForward" @click.prevent="stepForward">
-      <img src="../images/forward.png" width="18">
+    <button
+      class="outline-btn"
+      title="Step forwards"
+      :disabled="!canGoForward"
+      @click.prevent="stepForward"
+    >
+      <img src="../images/forward.png" width="18" />
     </button>
-    <button class="outline-btn" title="Jump to end"
-            :disabled="!canGoToEnd" @click.prevent="goToEnd">
-      <img src="../images/end.png" width="18">
+    <button
+      class="outline-btn"
+      title="Jump to end"
+      :disabled="!canGoToEnd"
+      @click.prevent="goToEnd"
+    >
+      <img src="../images/end.png" width="18" />
     </button>
   </div>
 </template>
 
 <style>
-  #stepControls {
-    justify-content: right;
-    margin-top: 8px;
-  }
-  #stepControls button {
-    background-color: transparent;
-    border: 0;
-    border-radius: 3px;
-    height: 17px;
-    margin: 0;
-    padding: 0;
-    width: 16px;
-  }
-  #stepControls button > img {
-    margin: -1px;
-  }
-  #stepControls button:active {
-    background-color: rgba(2, 117, 216, 0.5);
-    box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);
-    filter: brightness(85%);
-  }
-  #stepControls button:focus {
-    background-color: rgba(2, 117, 216, 0.5);
-  }
-  #stepControls button[disabled] {
-    filter: grayscale(1.0);
-    opacity: 0.7;
-  }
-  #stepControls button:not(:last-child) {
-    margin-right: 4px;
-  }
+#stepControls {
+  justify-content: right;
+  margin-top: 8px;
+}
+#stepControls button {
+  background-color: transparent;
+  border: 0;
+  border-radius: 3px;
+  height: 17px;
+  margin: 0;
+  padding: 0;
+  width: 16px;
+}
+#stepControls button > img {
+  margin: -1px;
+}
+#stepControls button:active {
+  background-color: rgba(2, 117, 216, 0.5);
+  box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);
+  filter: brightness(85%);
+}
+#stepControls button:focus {
+  background-color: rgba(2, 117, 216, 0.5);
+}
+#stepControls button[disabled] {
+  filter: grayscale(1);
+  opacity: 0.7;
+}
+#stepControls button:not(:last-child) {
+  margin-right: 4px;
+}
 </style>
 
 <script>
@@ -100,11 +116,20 @@ module.exports = {
     },
     handleKeyDown(e) {
       switch (e.keyCode) {
-        case 37: this.stepBack(); break;
-        case 38: this.goToStart(); break;
-        case 39: this.stepForward(); break;
-        case 40: this.goToEnd(); break;
-        default: return;
+        case 37:
+          this.stepBack();
+          break;
+        case 38:
+          this.goToStart();
+          break;
+        case 39:
+          this.stepForward();
+          break;
+        case 40:
+          this.goToEnd();
+          break;
+        default:
+          return;
       }
       e.preventDefault();
     },
@@ -122,7 +147,7 @@ module.exports = {
       }
 
       // Use $nextTick to ensure the DOM reflects the effect of _maybeExpand().
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         if (forward) {
           this._treeWalker.nextNode();
         } else {
@@ -135,7 +160,9 @@ module.exports = {
       if (node.isLeaf || !node.collapsed) {
         return;
       }
-      const needsExpansion = forward ? !walker.exitingCurrentNode : walker.exitingCurrentNode;
+      const needsExpansion = forward
+        ? !walker.exitingCurrentNode
+        : walker.exitingCurrentNode;
       if (needsExpansion) {
         node.setCollapsed(false, 0);
         this._expandedForStepping[node.id] = true;

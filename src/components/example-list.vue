@@ -10,26 +10,33 @@
 
       <div class="contents">
         <ul id="exampleList">
-          <li v-for="(ex, id) in exampleValues" :id="id" :key="id" :class="classesForExample(id)"
-              @mousedown="handleMouseDown"
-              @dblclick="handleDblClick">
+          <li
+            v-for="(ex, id) in exampleValues"
+            :id="id"
+            :key="id"
+            :class="classesForExample(id)"
+            @mousedown="handleMouseDown"
+            @dblclick="handleDblClick"
+          >
             <code>{{ ex.text }}</code>
             <div class="startRule">{{ ex.startRule }}</div>
             <thumbs-up-button
               :showThumbsUp="ex.shouldMatch"
-              @click.native="toggleShouldMatch(id)" />
-            <div
-              class="delete"
-              @mousedown.stop
-              @click="handleDeleteClick"><span>&#x2715;</span></div>
+              @click.native="toggleShouldMatch(id)"
+            />
+            <div class="delete" @mousedown.stop @click="handleDeleteClick">
+              <span>&#x2715;</span>
+            </div>
           </li>
         </ul>
-        <example-editor ref="exampleEditor"
-            :grammar="grammar()"
-            :example="selectedExampleOrEmpty"
-            :status="selectedExampleStatus"
-            @setStartRule="handleSetStartRule"
-            @thumbClick="handleEditorThumbClick">
+        <example-editor
+          ref="exampleEditor"
+          :grammar="grammar()"
+          :example="selectedExampleOrEmpty"
+          :status="selectedExampleStatus"
+          @setStartRule="handleSetStartRule"
+          @thumbClick="handleEditorThumbClick"
+        >
         </example-editor>
       </div>
     </div>
@@ -94,7 +101,9 @@ module.exports = {
       ohmEditor.ui.inputEditor.setValue(example ? example.text : '');
       this._isSelectionChanging = false;
 
-      this.$nextTick(function() {ohmEditor.ui.inputEditor.focus();});
+      this.$nextTick(function () {
+        ohmEditor.ui.inputEditor.focus();
+      });
 
       ohmEditor.examples.emit('set:selected', id);
     },
@@ -255,7 +264,7 @@ module.exports = {
         if (value) {
           examples = JSON.parse(value);
         } else {
-          examples = domUtil.$$('#sampleExamples pre').map(function(elem) {
+          examples = domUtil.$$('#sampleExamples pre').map(function (elem) {
             return {text: elem.textContent, startRule: '', shouldMatch: true};
           });
         }
@@ -266,7 +275,7 @@ module.exports = {
       const newExampleValues = {};
 
       const self = this;
-      examples.forEach(function(ex) {
+      examples.forEach(function (ex) {
         const id = self.addExample();
         if (!ex.hasOwnProperty('shouldMatch')) {
           ex.shouldMatch = true;
@@ -281,7 +290,9 @@ module.exports = {
 
     // Save the current contents of all examples to localStorage.
     saveExamples() {
-      const data = JSON.stringify(Object.keys(this.exampleValues).map(this.getExample));
+      const data = JSON.stringify(
+        Object.keys(this.exampleValues).map(this.getExample)
+      );
       localStorage.setItem('examples', data);
     },
 
@@ -297,7 +308,9 @@ module.exports = {
         const example = this.getExample(id);
         let status;
         try {
-          const matched = this._grammar.match(example.text, example.startRule).succeeded();
+          const matched = this._grammar
+            .match(example.text, example.startRule)
+            .succeeded();
           status = {
             className: matched === example.shouldMatch ? 'pass' : 'fail',
           };
@@ -314,12 +327,16 @@ module.exports = {
     // `callback` will be called with the example id as its only argument.
     _watchExample(id, callback) {
       const opts = {deep: true};
-      const unwatch = this.$watch('exampleValues.' + id, function(newVal, oldVal) {
-        callback(id);
-        if (newVal == null) {
-          unwatch();
-        }
-      }, opts);
+      const unwatch = this.$watch(
+        'exampleValues.' + id,
+        function (newVal, oldVal) {
+          callback(id);
+          if (newVal == null) {
+            unwatch();
+          }
+        },
+        opts
+      );
     },
   },
   created() {
@@ -330,19 +347,22 @@ module.exports = {
     this.restoreExamples('examples');
 
     const self = this;
-    ohmEditor.addListener('change:grammar', function(source) {
+    ohmEditor.addListener('change:grammar', function (source) {
       self.setGrammar(null);
     });
-    ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
-      self.setGrammar(grammar);
-    });
-    ohmEditor.addListener('change:inputEditor', function(source) {
+    ohmEditor.addListener(
+      'parse:grammar',
+      function (matchResult, grammar, err) {
+        self.setGrammar(grammar);
+      }
+    );
+    ohmEditor.addListener('change:inputEditor', function (source) {
       // Don't indicate that input is pending if the user just changed the selected example.
       if (!self._isSelectionChanging) {
         self.isInputPending = true;
       }
     });
-    ohmEditor.addListener('change:input', function(source) {
+    ohmEditor.addListener('change:input', function (source) {
       self.isInputPending = false;
       const ex = self.getSelected();
       if (ex) {

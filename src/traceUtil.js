@@ -4,12 +4,17 @@
 // A primitive is any expression that should appear as a leaf in the parse tree.
 function isPrimitive(grammar, expr) {
   // An application of a primitive rule is considered to be a primitive expression.
-  if (expr instanceof ohm.pexprs.Apply && isPrimitiveRule(grammar, expr.ruleName)) {
+  if (
+    expr instanceof ohm.pexprs.Apply &&
+    isPrimitiveRule(grammar, expr.ruleName)
+  ) {
     return true;
   }
-  return expr instanceof ohm.pexprs.Range ||
-         expr instanceof ohm.pexprs.Terminal ||
-         expr instanceof ohm.pexprs.UnicodeChar;
+  return (
+    expr instanceof ohm.pexprs.Range ||
+    expr instanceof ohm.pexprs.Terminal ||
+    expr instanceof ohm.pexprs.UnicodeChar
+  );
 }
 
 // Primitive rules are ones whose body can't meaningfully be shown.

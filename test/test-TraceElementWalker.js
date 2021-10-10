@@ -158,7 +158,11 @@ test('going backwards from end', (t) => {
 
   walker.nextNode();
   walker.nextNode();
-  t.equal(walker.previousNode(), div.querySelector('#node4'), "can't go past end");
+  t.equal(
+    walker.previousNode(),
+    div.querySelector('#node4'),
+    "can't go past end"
+  );
   t.equal(walker.previousNode(), div.querySelector('#node0'));
 
   div.remove();

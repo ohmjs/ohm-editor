@@ -5,7 +5,7 @@ const webpackConfig = require('./webpack.config');
 // Remove 'entry' because the tests don't have the same entry point.
 delete webpackConfig.entry;
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     plugins: [
       require('karma-chrome-launcher'),

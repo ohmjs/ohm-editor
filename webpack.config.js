@@ -13,10 +13,7 @@ module.exports = {
       {test: /\.vue$/, loader: 'vue-loader'},
       {
         test: /\.css$/,
-        use: [
-          'vue-style-loader',
-          'css-loader',
-        ],
+        use: ['vue-style-loader', 'css-loader'],
       },
     ],
   },
@@ -25,7 +22,7 @@ module.exports = {
   },
   resolve: {
     // Use the standalone version of Vue that includes the template compiler.
-    alias: {'vue$': 'vue/dist/vue.esm.js'}, // eslint-disable-line quote-props
+    alias: {vue$: 'vue/dist/vue.esm.js'}, // eslint-disable-line quote-props
     fallback: {fs: false},
   },
   output: {
@@ -45,7 +42,5 @@ module.exports = {
     port: 8080,
     publicPath: '/assets/',
   },
-  plugins: [
-    new VueLoaderPlugin(),
-  ],
+  plugins: [new VueLoaderPlugin()],
 };

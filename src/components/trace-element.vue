@@ -1,18 +1,34 @@
 <template>
   <div class="pexpr" :class="classObj" :id="id" :hidden="isHiddenForStepping">
     <div v-if="labeled" class="self">
-      <trace-label :traceNode="traceNode" :minWidth="minWidth"
-                   @hover="onHover" @unhover="onUnhover" @click="onClick"
-                   @showContextMenu="onShowContextMenu" />
+      <trace-label
+        :traceNode="traceNode"
+        :minWidth="minWidth"
+        @hover="onHover"
+        @unhover="onUnhover"
+        @click="onClick"
+        @showContextMenu="onShowContextMenu"
+      />
     </div>
-    <div v-if="!isLeaf"
-         class="children" :class="{vbox: vbox}"
-         :hidden="collapsed">
-      <trace-element v-for="child in childrenToRender" :ref="child.id" :key="child.id"
-                     :id="child.id" :traceNode="child.traceNode" :context="child.context"
-                     :currentLR="child.currentLR" :measureInputText="measureInputText"
-                     :isInVBox="child.isInVBox" :eventHandlers="eventHandlers"
-                     :isPossiblyInvolvedInStepping="areChildrenPossiblyInvolvedInStepping" />
+    <div
+      v-if="!isLeaf"
+      class="children"
+      :class="{vbox: vbox}"
+      :hidden="collapsed"
+    >
+      <trace-element
+        v-for="child in childrenToRender"
+        :ref="child.id"
+        :key="child.id"
+        :id="child.id"
+        :traceNode="child.traceNode"
+        :context="child.context"
+        :currentLR="child.currentLR"
+        :measureInputText="measureInputText"
+        :isInVBox="child.isInVBox"
+        :eventHandlers="eventHandlers"
+        :isPossiblyInvolvedInStepping="areChildrenPossiblyInvolvedInStepping"
+      />
     </div>
   </div>
 </template>
@@ -50,7 +66,7 @@ function currentHeightPx(optEl) {
 function tweenWithCallback(endValue, cb) {
   return function tween(d, i, a) {
     const interp = d3.interpolate(a, endValue);
-    return function(t) {
+    return function (t) {
       const stepValue = interp.call(this, t);
       cb(t);
       return stepValue;
@@ -82,9 +98,11 @@ function isSyntactic(expr) {
   if (expr instanceof ohm.pexprs.Apply) {
     return expr.isSyntactic();
   }
-  if (expr instanceof ohm.pexprs.Iter ||
-        expr instanceof ohm.pexprs.Lookahead ||
-        expr instanceof ohm.pexprs.Not) {
+  if (
+    expr instanceof ohm.pexprs.Iter ||
+    expr instanceof ohm.pexprs.Lookahead ||
+    expr instanceof ohm.pexprs.Not
+  ) {
     return isSyntactic(expr.expr);
   }
   if (expr instanceof ohm.pexprs.Seq) {
@@ -109,7 +127,7 @@ function isSyntactic(expr) {
 function hasVisibleChoice(traceNode) {
   if (isAlt(traceNode.expr) && ohmEditor.options.showFailures) {
     // If there's any failed child, we need to show multiple children.
-    return traceNode.children.some(function(c) {
+    return traceNode.children.some(function (c) {
       return !c.succeeded;
     });
   }
@@ -125,7 +143,7 @@ function cloneObject(obj) {
   if (!obj) {
     return newObj;
   }
-  Object.keys(obj).forEach(function(key) {
+  Object.keys(obj).forEach(function (key) {
     newObj[key] = Array.prototype.slice.call(obj[key]);
   });
   return newObj;
@@ -157,9 +175,11 @@ module.exports = {
       return shouldNodeBeLabeled(this.traceNode);
     },
     vbox() {
-      return hasVisibleChoice(this.traceNode) ||
-               hasVisibleLeftRecursion(this.traceNode) ||
-               (isAlt(this.traceNode.expr) && this.context && this.context.vbox);
+      return (
+        hasVisibleChoice(this.traceNode) ||
+        hasVisibleLeftRecursion(this.traceNode) ||
+        (isAlt(this.traceNode.expr) && this.context && this.context.vbox)
+      );
     },
     isLeaf() {
       let leaf = isLeaf(ohmEditor.grammar, this.traceNode);
@@ -225,10 +245,12 @@ module.exports = {
       const children = [];
       const self = this;
 
-      this.traceNode.children.forEach(function(node) {
+      this.traceNode.children.forEach(function (node) {
         // Don't show or recurse into nodes that failed, unless "Explain parse" is enabled.
-        if ((!node.succeeded && !ohmEditor.options.showFailures) ||
-              (node.isImplicitSpaces && !ohmEditor.options.showSpaces)) {
+        if (
+          (!node.succeeded && !ohmEditor.options.showFailures) ||
+          (node.isImplicitSpaces && !ohmEditor.options.showSpaces)
+        ) {
           return;
         }
         // Don't bother showing whitespace nodes that didn't consume anything.
@@ -269,8 +291,10 @@ module.exports = {
       return this.measureInputText(this.traceNode.source.contents) + 'px';
     },
     isCurrentParseStep() {
-      return this.isPossiblyInvolvedInStepping &&
-            this.id === this.injectedStepState.currentParseStep;
+      return (
+        this.isPossiblyInvolvedInStepping &&
+        this.id === this.injectedStepState.currentParseStep
+      );
     },
     isInvolvedInStepping() {
       if (this.traceNode.isRootNode || this.isCurrentParseStep) {
@@ -306,17 +330,21 @@ module.exports = {
       return false;
     },
     isHiddenForStepping() {
-      if (this.isMounted &&
-            (this.isPossiblyInvolvedInStepping || this.injectedStepState.jumpCount >= 0)) {
-
+      if (
+        this.isMounted &&
+        (this.isPossiblyInvolvedInStepping ||
+          this.injectedStepState.jumpCount >= 0)
+      ) {
         if (this.isCurrentParseStep || this.injectedStepState.isAtEnd) {
           return false;
         }
 
         const currEl = byId(this.injectedStepState.currentParseStep);
         if (currEl) {
-          if (this.precedesElement(currEl) ||
-                this.containedByElement(currEl) && this.injectedStepState.exiting) {
+          if (
+            this.precedesElement(currEl) ||
+            (this.containedByElement(currEl) && this.injectedStepState.exiting)
+          ) {
             return false;
           }
         }
@@ -331,10 +359,7 @@ module.exports = {
       isMounted: false,
     };
   },
-  inject: [
-    'inSyntacticContext',
-    'injectedStepState',
-  ],
+  inject: ['inSyntacticContext', 'injectedStepState'],
   provide() {
     if (this.labeled) {
       return {inSyntacticContext: isSyntactic(this.traceNode.expr)};
@@ -354,7 +379,7 @@ module.exports = {
 
     if (!this.isLeaf) {
       // On the next tick, children will be mounted.
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         ohmEditor.parseTree.emit('exit:traceElement', el, el._traceNode);
       });
     }
@@ -427,7 +452,10 @@ module.exports = {
 
       function emitEvent() {
         el.classList.toggle('collapsed', collapse);
-        ohmEditor.parseTree.emit((collapse ? 'collapse' : 'expand') + ':traceElement', el);
+        ohmEditor.parseTree.emit(
+          (collapse ? 'collapse' : 'expand') + ':traceElement',
+          el
+        );
       }
 
       if (duration === 0) {
@@ -440,46 +468,53 @@ module.exports = {
       // Caution: direct DOM manipulation here!
       // TODO: Consider using Vue.js <transition> wrapper element.
       const self = this;
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         // Temporarily toggle the visibility of the children, which is the pre-transition state.
         el.lastChild.hidden = !el.lastChild.hidden;
 
         const childrenSize = self.measureChildren();
-        const newWidth = collapse ? self.measureLabel().width : childrenSize.width;
+        const newWidth = collapse
+          ? self.measureLabel().width
+          : childrenSize.width;
         d3.select(el)
-            .transition().duration(duration)
-            .styleTween('width', tweenWithCallback(newWidth + 'px', function(t) {
+          .transition()
+          .duration(duration)
+          .styleTween(
+            'width',
+            tweenWithCallback(newWidth + 'px', function (t) {
               self.eventHandlers.updateExpandedInput(el, collapse, t);
-            }))
-            .each('start', function() {
-              this.style.width = this.offsetWidth + 'px';
             })
-            .each('end', function() {
-              // Remove the width and allow the flexboxes to adjust to the correct
-              // size. If there is a glitch when this happens, we haven't calculated
-              // `newWidth` correctly.
-              this.style.width = '';
-            });
+          )
+          .each('start', function () {
+            this.style.width = this.offsetWidth + 'px';
+          })
+          .each('end', function () {
+            // Remove the width and allow the flexboxes to adjust to the correct
+            // size. If there is a glitch when this happens, we haven't calculated
+            // `newWidth` correctly.
+            this.style.width = '';
+          });
 
         const height = collapse ? 0 : childrenSize.height;
         d3.select(el.lastChild)
-            .style('height', currentHeightPx)
-            .transition().duration(duration)
-            .style('height', height + 'px')
-            .each('start', function() {
-              if (!collapse) {
-                emitEvent();
-                this.hidden = false;
-              }
-            })
-            .each('end', function() {
-              this.style.height = '';
-              if (collapse) {
-                this.hidden = true;
-                emitEvent();
-              }
-              self.eventHandlers.updateExpandedInput();
-            });
+          .style('height', currentHeightPx)
+          .transition()
+          .duration(duration)
+          .style('height', height + 'px')
+          .each('start', function () {
+            if (!collapse) {
+              emitEvent();
+              this.hidden = false;
+            }
+          })
+          .each('end', function () {
+            this.style.height = '';
+            if (collapse) {
+              this.hidden = true;
+              emitEvent();
+            }
+            self.eventHandlers.updateExpandedInput();
+          });
       });
     },
     measureLabel() {
@@ -507,13 +542,19 @@ module.exports = {
       return result;
     },
     containsElement(el) {
-      return el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_CONTAINS;
+      return (
+        el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_CONTAINS
+      );
     },
     containedByElement(el) {
-      return this.$el.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_CONTAINS;
+      return (
+        this.$el.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_CONTAINS
+      );
     },
     precedesElement(el) {
-      return el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_PRECEDING;
+      return (
+        el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_PRECEDING
+      );
     },
   },
 };

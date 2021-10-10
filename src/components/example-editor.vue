@@ -4,22 +4,36 @@
       <div id="exampleEditor" :class="classObj">
         <div class="header flex-row">
           <div class="title">{{ editMode }} example</div>
-          <button class="outline-btn" @mousedown.prevent @click="stopEditing">Done</button>
+          <button class="outline-btn" @mousedown.prevent @click="stopEditing">
+            Done
+          </button>
         </div>
 
         <div class="toolbar">
           <div class="contents flex-row">
             <label>Start rule:</label>
             <select id="startRuleDropdown" v-model="startRule">
-              <option v-for="option in startRuleOptions()" :key="option.value" :value="option.value"
-                      :class="{needed: false /* TODO */}">{{ option.text }}
+              <option
+                v-for="option in startRuleOptions()"
+                :key="option.value"
+                :value="option.value"
+                :class="{needed: false /* TODO */}"
+              >
+                {{ option.text }}
               </option>
             </select>
-            <div v-if="startRuleError" class="errorIcon" :title="startRuleError">⚠️</div>
+            <div
+              v-if="startRuleError"
+              class="errorIcon"
+              :title="startRuleError"
+            >
+              ⚠️
+            </div>
             <div class="gap"></div>
             <thumbs-up-button
-                :showThumbsUp="example.shouldMatch"
-                @click.native="$emit('thumbClick')" />
+              :showThumbsUp="example.shouldMatch"
+              @click.native="$emit('thumbClick')"
+            />
           </div>
         </div>
         <div class="editorWrapper"></div>
@@ -61,7 +75,7 @@ module.exports = {
     commonStartRuleOptions() {
       const options = [{text: '(default)', value: ''}];
       if (this.grammar) {
-        Object.keys(this.grammar.rules).forEach(function(ruleName) {
+        Object.keys(this.grammar.rules).forEach(function (ruleName) {
           options.push({text: ruleName, value: ruleName});
         });
       }
@@ -81,17 +95,22 @@ module.exports = {
   },
   watch: {
     showPlaceholder(newVal) {
-      ohmEditor.ui.inputEditor.setOption('placeholder', newVal ? 'Text to match' : '');
+      ohmEditor.ui.inputEditor.setOption(
+        'placeholder',
+        newVal ? 'Text to match' : ''
+      );
     },
   },
   mounted() {
     const self = this;
     const editorContainer = domUtil.$('#exampleContainer .editorWrapper');
-    const editor = ohmEditor.ui.inputEditor = CodeMirror(editorContainer, {
+    const editor = (ohmEditor.ui.inputEditor = CodeMirror(editorContainer, {
       extraKeys: {
-        Esc(cm) {self.stopEditing();},
+        Esc(cm) {
+          self.stopEditing();
+        },
       },
-    });
+    }));
     ohmEditor.emit('init:inputEditor', editor);
   },
   methods: {
@@ -112,7 +131,7 @@ module.exports = {
       }
 
       // Focus the editor and set the cursor to the end.
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         const cm = ohmEditor.ui.inputEditor;
         cm.focus();
         cm.setCursor(cm.lineCount(), 0);

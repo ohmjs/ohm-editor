@@ -21,20 +21,23 @@ const ohmEditor = require('../src/ohmEditor'); // Requires CodeMirror()
 
 let localStorageExamples;
 
-const exampleListInjector = require('!!vue?inject!../src/components/example-list.vue').default;
-const ExampleList = Vue.extend(exampleListInjector({
-  'global/window': {
-    localStorage: {
-      getItem() {
-        return '[]';
-      },
-      setItem(name, value) {
-        assert.equal(name, 'examples');
-        localStorageExamples = JSON.parse(value);
+const exampleListInjector =
+  require('!!vue?inject!../src/components/example-list.vue').default;
+const ExampleList = Vue.extend(
+  exampleListInjector({
+    'global/window': {
+      localStorage: {
+        getItem() {
+          return '[]';
+        },
+        setItem(name, value) {
+          assert.equal(name, 'examples');
+          localStorageExamples = JSON.parse(value);
+        },
       },
     },
-  },
-}));
+  })
+);
 
 // Helpers
 // -------
@@ -70,10 +73,18 @@ test('adding and updating examples', (t) => {
   t.deepEqual(vm.getSelected(), {text: '', startRule: '', shouldMatch: true});
 
   vm.setExample(id, 'woooo', 'Start');
-  t.deepEqual(vm.getSelected(), {text: 'woooo', startRule: 'Start', shouldMatch: true});
+  t.deepEqual(vm.getSelected(), {
+    text: 'woooo',
+    startRule: 'Start',
+    shouldMatch: true,
+  });
 
   vm.setExample(id, 'woooo', 'Start', false);
-  t.deepEqual(vm.getSelected(), {text: 'woooo', startRule: 'Start', shouldMatch: false});
+  t.deepEqual(vm.getSelected(), {
+    text: 'woooo',
+    startRule: 'Start',
+    shouldMatch: false,
+  });
 
   const id2 = vm.addExample();
   t.equal(vm.selectedId, id2);
@@ -106,20 +117,28 @@ test('deleting', (t) => {
 
     Vue.nextTick(() => {
       vm.deleteExample(id2);
-      t.equal(vm.selectedId, id1, 'after deleting it, the first example is selected');
+      t.equal(
+        vm.selectedId,
+        id1,
+        'after deleting it, the first example is selected'
+      );
 
       // Now add one more example, and delete the first one.
       id2 = vm.addExample();
       vm.setExample(id2, "hi i'm id2");
       Vue.nextTick(() => {
         vm.deleteExample(id1);
-        t.equal(vm.selectedId, id2, 'after deleting first example, second is selected');
+        t.equal(
+          vm.selectedId,
+          id2,
+          'after deleting first example, second is selected'
+        );
 
         Vue.nextTick(() => {
           // localStorage should hold the id2 example.
-          t.deepEqual(
-              localStorageExamples,
-              [{text: "hi i'm id2", startRule: '', shouldMatch: true}]);
+          t.deepEqual(localStorageExamples, [
+            {text: "hi i'm id2", startRule: '', shouldMatch: true},
+          ]);
 
           t.end();
         });
@@ -142,18 +161,20 @@ test('toggleShouldMatch', (t) => {
 
   Vue.nextTick(() => {
     t.deepEqual(
-        localStorageExamples,
-        [{text: '', startRule: '', shouldMatch: false}],
-        'new value is saved to localStorage');
+      localStorageExamples,
+      [{text: '', startRule: '', shouldMatch: false}],
+      'new value is saved to localStorage'
+    );
 
     vm.toggleShouldMatch(id); // Toggle it back.
     t.equal(example.shouldMatch, true);
 
     Vue.nextTick(() => {
       t.deepEqual(
-          localStorageExamples,
-          [{text: '', startRule: '', shouldMatch: true}],
-          'new value is saved to localStorage');
+        localStorageExamples,
+        [{text: '', startRule: '', shouldMatch: true}],
+        'new value is saved to localStorage'
+      );
 
       t.end();
     });
@@ -168,17 +189,29 @@ test('pass/fail status', (t) => {
   vm.setExample(id, 'abcdefg');
 
   Vue.nextTick(() => {
-    t.equal(vm.exampleStatus[id], undefined, 'status is undefined without a grammar');
+    t.equal(
+      vm.exampleStatus[id],
+      undefined,
+      'status is undefined without a grammar'
+    );
 
     simulateGrammarEdit('G { start = letter+ }', () => {
       t.equal(vm.exampleStatus[id].className, 'pass');
       vm.exampleValues[id].shouldMatch = false;
 
       Vue.nextTick(() => {
-        t.equal(vm.exampleStatus[id].className, 'fail', 'fails now that shouldMatch is false');
+        t.equal(
+          vm.exampleStatus[id].className,
+          'fail',
+          'fails now that shouldMatch is false'
+        );
 
         simulateGrammarEdit('G { start = digit+ }', () => {
-          t.equal(vm.exampleStatus[id].className, 'pass', 'passes when example fails matching');
+          t.equal(
+            vm.exampleStatus[id].className,
+            'pass',
+            'passes when example fails matching'
+          );
 
           const id2 = vm.addExample();
           vm.setExample(id2, '123');
@@ -257,24 +290,34 @@ test('start rule errors', (t) => {
   vm.setExample(id, '', 'nein');
 
   simulateGrammarEdit('G {}', () => {
-    t.equal(findEl(vm, '.toolbar .errorIcon').title, 'Rule nein is not declared in grammar G');
+    t.equal(
+      findEl(vm, '.toolbar .errorIcon').title,
+      'Rule nein is not declared in grammar G'
+    );
 
     simulateGrammarEdit('G { nein = }', () => {
-      t.notOk(findEl(vm, '.toolbar .errorIcon'), 'error disappears when rule exists');
+      t.notOk(
+        findEl(vm, '.toolbar .errorIcon'),
+        'error disappears when rule exists'
+      );
 
       vm.setExample(id, '', 'nope');
       Vue.nextTick(() => {
-        t.equal(findEl(vm, '.toolbar .errorIcon').title, 'Rule nope is not declared in grammar G');
+        t.equal(
+          findEl(vm, '.toolbar .errorIcon').title,
+          'Rule nope is not declared in grammar G'
+        );
 
         vm.setExample(id, '', '');
         Vue.nextTick(() => {
-          t.notOk(findEl(vm, '.toolbar .errorIcon'),
-              'error disappears when example uses default start rule');
+          t.notOk(
+            findEl(vm, '.toolbar .errorIcon'),
+            'error disappears when example uses default start rule'
+          );
           t.end();
         });
       });
     });
-
   });
 });
 
@@ -289,14 +332,23 @@ test('example editing', (t) => {
 
     ohmEditor.emit('change:inputEditor', 'asdf');
     Vue.nextTick(() => {
-      t.equal(vm.getSelected().text, '', "example is not updated after 'change:inputEditor'");
+      t.equal(
+        vm.getSelected().text,
+        '',
+        "example is not updated after 'change:inputEditor'"
+      );
       t.notOk(
-          li.classList.contains('pass') || li.classList.contains('fail'),
-          'after editing, example is not passing or failing');
+        li.classList.contains('pass') || li.classList.contains('fail'),
+        'after editing, example is not passing or failing'
+      );
 
       ohmEditor.emit('change:input', 'asdf');
       Vue.nextTick(() => {
-        t.equal(vm.getSelected().text, 'asdf', "example is updated after 'change:input' event");
+        t.equal(
+          vm.getSelected().text,
+          'asdf',
+          "example is updated after 'change:input' event"
+        );
         t.ok(li.classList.contains('pass'), 'test is shown as passing again');
 
         t.end();

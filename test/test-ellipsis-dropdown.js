@@ -3,7 +3,9 @@
 const Vue = require('vue').default;
 const test = require('tape');
 
-const EllipsisDropdown = Vue.extend(require('../src/components/ellipsis-dropdown.vue').default);
+const EllipsisDropdown = Vue.extend(
+  require('../src/components/ellipsis-dropdown.vue').default
+);
 
 const ArrayProto = Array.prototype;
 
@@ -22,7 +24,9 @@ test('showing and hiding the dropdown', (t) => {
   const vm = new EllipsisDropdown({
     propsData: {
       items: {
-        Foo() {counts.Foo++;},
+        Foo() {
+          counts.Foo++;
+        },
         Bar: null,
       },
     },
@@ -53,7 +57,11 @@ test('showing and hiding the dropdown', (t) => {
       t.equal(vm.hidden, true, 'menu is hidden again');
 
       const disabledItem = findEl(vm, '.disabled');
-      t.equal(disabledItem.textContent, links[1].textContent, 'Bar item is disabled');
+      t.equal(
+        disabledItem.textContent,
+        links[1].textContent,
+        'Bar item is disabled'
+      );
 
       button.click();
       links[1].click();

@@ -73,7 +73,9 @@ ohmEditor.examples.registerEvents({
 
 ohmEditor.ui = {
   inputEditor: null, // Initialized in example-list.vue.
-  grammarEditor: CodeMirror(document.querySelector('#grammarContainer .editorWrapper')),
+  grammarEditor: CodeMirror(
+    document.querySelector('#grammarContainer .editorWrapper')
+  ),
 };
 
 ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);

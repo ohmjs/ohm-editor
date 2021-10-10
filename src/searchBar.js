@@ -37,7 +37,7 @@ function installEventHandlers(editor, footer, findCallback) {
   // Handles find-related keys when the search bar has focus. `binding` is the result
   // of looking up the key in `tempKeyMap`. Returns `true` if the key was handled, and
   // `false` otherwise.
-  const handleKey = function(binding) {
+  const handleKey = function (binding) {
     if (typeof binding === 'function') {
       binding(editor);
       return true;
@@ -48,7 +48,7 @@ function installEventHandlers(editor, footer, findCallback) {
     return false;
   };
 
-  const closeFooter = function() {
+  const closeFooter = function () {
     footer.parentNode.removeChild(footer);
     editor.execCommand('clearSearch');
     editor.removeKeyMap(tempKeyMap);
@@ -56,14 +56,16 @@ function installEventHandlers(editor, footer, findCallback) {
   };
 
   // Handler for keydown events in the search bar.
-  footer.onkeydown = function(e) {
+  footer.onkeydown = function (e) {
     const keyName = CodeMirror.keyName(e);
     if (keyName === 'Esc') {
       closeFooter();
       editor.focus();
     } else if (e.target === input && keyName === 'Enter') {
       findCallback(input.value, e);
-    } else if (CodeMirror.lookupKey(keyName, tempKeyMap, handleKey) === 'handled') {
+    } else if (
+      CodeMirror.lookupKey(keyName, tempKeyMap, handleKey) === 'handled'
+    ) {
       e.preventDefault();
     }
   };
@@ -74,7 +76,7 @@ function installEventHandlers(editor, footer, findCallback) {
 
 // An implementation of CodeMirror's `openDialog` API, but specialized for use
 // as the search box. As such, it might not be very well suited to other purposes.
-CodeMirror.defineExtension('openDialog', function(template, callback, opts) {
+CodeMirror.defineExtension('openDialog', function (template, callback, opts) {
   const editor = this; // eslint-disable-line no-invalid-this
 
   if (template.indexOf('Search:') !== 0) {
@@ -82,7 +84,10 @@ CodeMirror.defineExtension('openDialog', function(template, callback, opts) {
   }
 
   // Re-use the existing footer if it's visible, or create a new one.
-  const container = ancestorWithClassName(editor.getWrapperElement(), 'flex-fix').parentNode;
+  const container = ancestorWithClassName(
+    editor.getWrapperElement(),
+    'flex-fix'
+  ).parentNode;
   let footer = container.querySelector('.footer');
   if (!footer) {
     footer = domUtil.$('#protos .footer').cloneNode(true);
@@ -105,7 +110,7 @@ CodeMirror.defineExtension('openDialog', function(template, callback, opts) {
 const editorKeyMap = {};
 editorKeyMap['Ctrl-F'] = editorKeyMap['Cmd-F'] = 'findPersistent';
 
-const handleEditorInit = function(cm) {
+const handleEditorInit = function (cm) {
   cm.addKeyMap(editorKeyMap);
 };
 ohmEditor.addListener('init:inputEditor', handleEditorInit);

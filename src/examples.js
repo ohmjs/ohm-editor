@@ -5,7 +5,9 @@
 const Vue = require('vue').default;
 const ohmEditor = require('./ohmEditor');
 
-const ExampleList = Vue.extend(require('./components/example-list.vue').default);
+const ExampleList = Vue.extend(
+  require('./components/example-list.vue').default
+);
 
 const exampleList = new ExampleList({
   el: '#exampleContainer',

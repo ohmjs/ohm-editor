@@ -1,7 +1,7 @@
 language: node_js
 node_js:
-  - "4"
-dist: trusty  # Chrome Headless needs Ubuntu Trusty on Travis
+  - '4'
+dist: trusty # Chrome Headless needs Ubuntu Trusty on Travis
 sudo: false
 addons:
   chrome: stable

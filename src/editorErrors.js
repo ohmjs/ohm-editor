@@ -28,7 +28,10 @@ function setError(category, editor, interval, messageOrNode) {
 
   errorMarks[category] = {
     mark: cmUtil.markInterval(editor, interval, 'error-interval', false),
-    timeout: setTimeout(showError.bind(null, category, editor, interval, messageOrNode), 1500),
+    timeout: setTimeout(
+      showError.bind(null, category, editor, interval, messageOrNode),
+      1500
+    ),
     widget: null,
   };
 }
@@ -41,7 +44,9 @@ function showError(category, editor, interval, messageOrNode) {
     errorEl.appendChild(messageOrNode);
   }
   const line = editor.posFromIndex(interval.endIdx).line;
-  errorMarks[category].widget = editor.addLineWidget(line, errorEl, {insertAt: 0});
+  errorMarks[category].widget = editor.addLineWidget(line, errorEl, {
+    insertAt: 0,
+  });
 }
 
 function createErrorEl(result, pos) {
@@ -51,40 +56,48 @@ function createErrorEl(result, pos) {
   const sep = ', ';
   const lastSep = failures.length >= 3 ? ', or ' : ' or '; // Oxford comma.
 
-  failures.forEach(function(f, i) {
+  failures.forEach(function (f, i) {
     let prefix = '';
     if (i > 0) {
       prefix = i === failures.length - 1 ? lastSep : sep;
     }
     el.appendChild(document.createTextNode(prefix));
-    const link = el.appendChild(domUtil.createElement('span.link', f.toString()));
-    link.onclick = function() {ohmEditor.emit('goto:failure', f);};
-    link.onmouseenter = function() {ohmEditor.emit('peek:failure', f);};
-    link.onmouseout = function() {ohmEditor.emit('unpeek:failure');};
+    const link = el.appendChild(
+      domUtil.createElement('span.link', f.toString())
+    );
+    link.onclick = function () {
+      ohmEditor.emit('goto:failure', f);
+    };
+    link.onmouseenter = function () {
+      ohmEditor.emit('peek:failure', f);
+    };
+    link.onmouseout = function () {
+      ohmEditor.emit('unpeek:failure');
+    };
   });
   return el;
 }
 
 // Hide errors in the editors as soon as the user starts typing again.
-ohmEditor.addListener('change:grammarEditor', function(cm) {
+ohmEditor.addListener('change:grammarEditor', function (cm) {
   hideError('grammar', cm);
 });
-ohmEditor.addListener('change:inputEditor', function(cm) {
+ohmEditor.addListener('change:inputEditor', function (cm) {
   hideError('input', cm);
 });
 
 // Hide the input error when the grammar is about to be reparsed.
-ohmEditor.addListener('change:grammar', function(source) {
+ohmEditor.addListener('change:grammar', function (source) {
   hideError('input', ohmEditor.ui.inputEditor);
 });
 
-ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
+ohmEditor.addListener('parse:grammar', function (matchResult, grammar, err) {
   if (err) {
     const editor = ohmEditor.ui.grammarEditor;
     setError('grammar', editor, err.interval, err.shortMessage || err.message);
   }
 });
-ohmEditor.addListener('parse:input', function(matchResult, trace) {
+ohmEditor.addListener('parse:input', function (matchResult, trace) {
   if (trace.result.failed()) {
     const editor = ohmEditor.ui.inputEditor;
     // Intervals with start == end won't show up in CodeMirror.

@@ -57,7 +57,11 @@ function getWordUnderPoint(cm, x, y) {
 }
 
 function isRuleApplication(wordInfo) {
-  if (wordInfo.value.length > 0 && grammarMemoTable && grammarMemoTable[wordInfo.startIdx]) {
+  if (
+    wordInfo.value.length > 0 &&
+    grammarMemoTable &&
+    grammarMemoTable[wordInfo.startIdx]
+  ) {
     const memo = grammarMemoTable[wordInfo.startIdx].memo;
     if (memo && memo.Base_application && memo.Base_application.value) {
       return true;
@@ -69,34 +73,47 @@ function isRuleApplication(wordInfo) {
 function goToRuleDefinition(ruleName) {
   const interval = grammar.rules[ruleName].source;
   if (interval) {
-    const defMark = cmUtil.markInterval(grammarEditor, interval, 'active-definition', true);
+    const defMark = cmUtil.markInterval(
+      grammarEditor,
+      interval,
+      'active-definition',
+      true
+    );
     setTimeout(defMark.clear.bind(defMark), 1000);
     cmUtil.scrollToInterval(grammarEditor, interval);
   }
 }
 
 function isSameWord(cm, a, b) {
-  return cm.indexFromPos(a.startPos) === cm.indexFromPos(b.startPos) &&
-         cm.indexFromPos(a.endPos) === cm.indexFromPos(b.endPos);
+  return (
+    cm.indexFromPos(a.startPos) === cm.indexFromPos(b.startPos) &&
+    cm.indexFromPos(a.endPos) === cm.indexFromPos(b.endPos)
+  );
 }
 
 function registerListeners(editor) {
-  editor.getWrapperElement().addEventListener('mousemove', handleMouseMove.bind(null, editor));
+  editor
+    .getWrapperElement()
+    .addEventListener('mousemove', handleMouseMove.bind(null, editor));
   window.addEventListener('keydown', updateLinks.bind(null, editor));
   window.addEventListener('keyup', updateLinks.bind(null, editor));
 
   // Prevent CodeMirror's default behaviour for Cmd-click, which is to place an additional
   // cursor at the clicked location. This must be done during the capture phase.
-  editor.on('mousedown', function(cm, e) {
-    isMouseDown = true;
-    if (areLinksEnabled(e)) {
-      e.preventDefault();
-    }
-  }, true);
+  editor.on(
+    'mousedown',
+    function (cm, e) {
+      isMouseDown = true;
+      if (areLinksEnabled(e)) {
+        e.preventDefault();
+      }
+    },
+    true
+  );
 
   // It's not possible to capture `click` events inside the editor window, so do link
   // navigation on mouseup.
-  editor.getWrapperElement().addEventListener('mouseup', function(e) {
+  editor.getWrapperElement().addEventListener('mouseup', function (e) {
     isMouseDown = false;
     if (markWordInfo) {
       const wordInfo = getWordUnderPoint(editor, e.clientX, e.clientY);
@@ -107,11 +124,13 @@ function registerListeners(editor) {
   });
 }
 
-ohmEditor.addListener('parse:grammar', function(matchResult, g, err) {
+ohmEditor.addListener('parse:grammar', function (matchResult, g, err) {
   if (!grammarEditor) {
     grammarEditor = ohmEditor.ui.grammarEditor;
     registerListeners(grammarEditor);
   }
   grammar = g;
-  grammarMemoTable = matchResult.succeeded() ? matchResult.matcher.memoTable : null;
+  grammarMemoTable = matchResult.succeeded()
+    ? matchResult.matcher.memoTable
+    : null;
 });

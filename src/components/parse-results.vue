@@ -25,8 +25,12 @@ module.exports = {
       const self = this;
       return {
         showContextMenu: this.onShowContextMenu,
-        hover() {self.emitUpdateExpandedInput();},
-        unhover() {self.emitUpdateExpandedInput();},
+        hover() {
+          self.emitUpdateExpandedInput();
+        },
+        unhover() {
+          self.emitUpdateExpandedInput();
+        },
         updateExpandedInput: this.emitUpdateExpandedInput,
       };
     },
@@ -81,13 +85,17 @@ module.exports = {
         eventHandlers: this.pexprEventHandlers,
       },
     });
-    const rootContainer = createElement('div', {
-      domProps: {id: 'parseResults'},
-      on: {
-        wheel: this.onWheel,
-        scroll: this.onScroll,
+    const rootContainer = createElement(
+      'div',
+      {
+        domProps: {id: 'parseResults'},
+        on: {
+          wheel: this.onWheel,
+          scroll: this.onScroll,
+        },
       },
-    }, [rootTraceElement]);
+      [rootTraceElement]
+    );
 
     ohmEditor.parseTree.emit('render:parseTree', this.trace);
     this.$nextTick(() => {

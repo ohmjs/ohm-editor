@@ -1,33 +1,44 @@
 <style src="../third_party/css/bootstrap-dropdown-3.3.7.css"></style>
 
 <style>
-  button.ellipsis-btn {
-    border: none;
-    font-size: 18px;
-    font-weight: 900;
-    margin-top: 1px;
-    padding: 0 4px;
-  }
-  button.ellipsis-btn:hover {
-    background-color: #eee;
-    border: none;
-  }
-  .dropdown-menu {
-    margin-top: 4px;
-  }
+button.ellipsis-btn {
+  border: none;
+  font-size: 18px;
+  font-weight: 900;
+  margin-top: 1px;
+  padding: 0 4px;
+}
+button.ellipsis-btn:hover {
+  background-color: #eee;
+  border: none;
+}
+.dropdown-menu {
+  margin-top: 4px;
+}
 </style>
 
 <template>
   <div class="dropdown">
-    <button class="outline-btn ellipsis-btn"
-        @click="toggleHidden"
-        @keydown.esc="hide"
-        @blur="hide">&#x22ee;</button>
+    <button
+      class="outline-btn ellipsis-btn"
+      @click="toggleHidden"
+      @keydown.esc="hide"
+      @blur="hide"
+    >
+      &#x22ee;
+    </button>
     <ul class="dropdown-menu dropdown-menu-right" :hidden="hidden">
-      <li v-for="(cb, label) in items" v-bind:key="label" :class="itemClass(label)">
-        <a href="#"
-            @mousedown.prevent="/* Prevent blur of button */"
-            @click="handleItemClick(label)">{{ label }}</a>
+      <li
+        v-for="(cb, label) in items"
+        v-bind:key="label"
+        :class="itemClass(label)"
+      >
+        <a
+          href="#"
+          @mousedown.prevent="/* Prevent blur of button */"
+          @click="handleItemClick(label)"
+          >{{ label }}</a
+        >
       </li>
     </ul>
   </div>

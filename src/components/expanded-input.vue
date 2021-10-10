@@ -74,7 +74,9 @@ module.exports = {
       }
 
       const root = $('.pexpr');
-      const firstFailedEl = domUtil.$('#parseResults > .pexpr > .children > .pexpr.failed');
+      const firstFailedEl = domUtil.$(
+        '#parseResults > .pexpr > .children > .pexpr.failed'
+      );
 
       const self = this;
       (function renderInput(el, isAncestorAnimating) {
@@ -82,8 +84,12 @@ module.exports = {
 
         // Skip anything that falls outside the viewport, and any failed nodes apart
         // from the first top-level failure.
-        if (!isRectInViewport(rect) ||
-              (el.classList.contains('failed') && el !== root && el !== firstFailedEl)) {
+        if (
+          !isRectInViewport(rect) ||
+          (el.classList.contains('failed') &&
+            el !== root &&
+            el !== firstFailedEl)
+        ) {
           return;
         }
 
@@ -91,7 +97,10 @@ module.exports = {
           self.renderHighlight(el);
         }
 
-        if (el.classList.contains('leaf') || el.classList.contains('collapsed')) {
+        if (
+          el.classList.contains('leaf') ||
+          el.classList.contains('collapsed')
+        ) {
           if (el === firstFailedEl) {
             self.renderFailedInputText(el, rect);
           } else {
@@ -104,12 +113,16 @@ module.exports = {
 
           // Render the input of the animating element, even though it's not a leaf.
           if (isAnimating) {
-            self.renderInputText(self.getConsumedInput(el), rect, animatingElAlpha);
+            self.renderInputText(
+              self.getConsumedInput(el),
+              rect,
+              animatingElAlpha
+            );
           }
 
           // Ask the subtrees to render.
           const children = el.lastChild.childNodes;
-          ArrayProto.forEach.call(children, function(childEl) {
+          ArrayProto.forEach.call(children, function (childEl) {
             renderInput(childEl, isAnimating || isAncestorAnimating);
           });
         }
@@ -118,16 +131,19 @@ module.exports = {
 
     measureText(text) {
       // Always update the font before measuring -- devicePixelRatio may have changed.
-      this.inputCtx.font = 16 * this.getPixelRatio() + 'px Menlo, Monaco, monospace';
+      this.inputCtx.font =
+        16 * this.getPixelRatio() + 'px Menlo, Monaco, monospace';
       return this.inputCtx.measureText(text).width / this.getPixelRatio();
     },
 
     renderInputText(text, rect, optAlpha) {
       const textWidth = this.measureText(text);
-      const letterPadding = (rect.right - rect.left - textWidth) / text.length / 2;
+      const letterPadding =
+        (rect.right - rect.left - textWidth) / text.length / 2;
       const charWidth = textWidth / text.length;
 
-      this.inputCtx.fillStyle = 'rgba(51, 51, 51, ' + (optAlpha == null ? 1 : optAlpha) + ')';
+      this.inputCtx.fillStyle =
+        'rgba(51, 51, 51, ' + (optAlpha == null ? 1 : optAlpha) + ')';
       this.inputCtx.textBaseline = 'top';
 
       const baseRect = $('#expandedInputWrapper').getBoundingClientRect();

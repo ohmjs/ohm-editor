@@ -1,538 +1,567 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Ohm Editor</title>
-  <link rel="stylesheet" href="style/parseTree.css">
-  <link rel="stylesheet" href="third_party/codemirror-5.11/lib/codemirror.css">
-  <style>
-    html, body {
-      height: 100%;
-    }
-    body {
-      background-color: white;
-      display: flex;
-      flex-direction: column;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Helvetica", "Arial", sans-serif;;
-      margin: 0;
-      overflow: hidden;
-      padding: 0;
-    }
-    #dragOverlay {
-      bottom: 0;
-      display: none;
-      left: 0;
-      position: absolute;
-      right: 0;
-      top: 0;
+  <head>
+    <meta charset="utf-8" />
+    <title>Ohm Editor</title>
+    <link rel="stylesheet" href="style/parseTree.css" />
+    <link
+      rel="stylesheet"
+      href="third_party/codemirror-5.11/lib/codemirror.css"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
+          'Helvetica', 'Arial', sans-serif;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+      }
+      #dragOverlay {
+        bottom: 0;
+        display: none;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
 
-      /* Must be less than the .splitter z-index, but greater than everything in codemirror.css. */
-      z-index: 9;
-    }
+        /* Must be less than the .splitter z-index, but greater than everything in codemirror.css. */
+        z-index: 9;
+      }
 
-    #grammarControls {
-      margin: 0 -4px;
-    }
-    #grammarControls > * {
-      margin: 0 4px;
-    }
+      #grammarControls {
+        margin: 0 -4px;
+      }
+      #grammarControls > * {
+        margin: 0 4px;
+      }
 
-    #grammarControls label {
-      font-size: 0.75em;
-    }
-    #grammarName {
-      font-family: Menlo, Monaco, sans-serif;
-    }
-    #grammarName.unnamed {
-      font-style: italic;
-      color: #999;
-    }
+      #grammarControls label {
+        font-size: 0.75em;
+      }
+      #grammarName {
+        font-family: Menlo, Monaco, sans-serif;
+      }
+      #grammarName.unnamed {
+        font-style: italic;
+        color: #999;
+      }
 
-    #saveGrammar {
-      min-width: 64px;
-    }
+      #saveGrammar {
+        min-width: 64px;
+      }
 
-    /* Clever hack: when the button is disabled, make it say 'Saved' */
-    #saveGrammar::after {
-      content: 'd';
-    }
-    #saveGrammar:not([disabled])::after {
-      display: none;
-    }
-    #saveGrammar[disabled] {
-      color: #888;
-    }
+      /* Clever hack: when the button is disabled, make it say 'Saved' */
+      #saveGrammar::after {
+        content: 'd';
+      }
+      #saveGrammar:not([disabled])::after {
+        display: none;
+      }
+      #saveGrammar[disabled] {
+        color: #888;
+      }
 
-    #optionPanel {
-      align-items: center;
-      background-color: white;
-      border-radius: 3px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-      color: #444;
-      display: flex;
-      flex-direction: column;
-      font-size: 13px;
-      bottom: 15px;
-      padding: 8px 12px 10px 10px;
-      position: fixed;
-      right: 15px;
-    }
-    #options input[type=checkbox] {
-      position: relative;
-      margin: 0 4px 0 0;
-    }
-    #options ul {
-      list-style: none;
-      margin: 0.3em 0 0 0;
-      padding: 0;
-    }
-    #options li {
-      margin-top: 4px;
-    }
-    #options hr {
-      border: none;
-      border-top: 1px solid #ddd;
-      margin: 8px 0 2px 0;
-    }
+      #optionPanel {
+        align-items: center;
+        background-color: white;
+        border-radius: 3px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+        color: #444;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        bottom: 15px;
+        padding: 8px 12px 10px 10px;
+        position: fixed;
+        right: 15px;
+      }
+      #options input[type='checkbox'] {
+        position: relative;
+        margin: 0 4px 0 0;
+      }
+      #options ul {
+        list-style: none;
+        margin: 0.3em 0 0 0;
+        padding: 0;
+      }
+      #options li {
+        margin-top: 4px;
+      }
+      #options hr {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 8px 0 2px 0;
+      }
 
-    #measuringDiv {
-      height: auto;
-      position: absolute;
-      visibility: hidden;
-      white-space: nowrap;
-      width: auto;
-    }
+      #measuringDiv {
+        height: auto;
+        position: absolute;
+        visibility: hidden;
+        white-space: nowrap;
+        width: auto;
+      }
 
-    #topSection {
-      display: flex;
-      flex: 1;
-    }
+      #topSection {
+        display: flex;
+        flex: 1;
+      }
 
-    #bottomSection {
-      display: flex;
-      flex: 1;
+      #bottomSection {
+        display: flex;
+        flex: 1;
+      }
 
-    }
+      #bottomSection .overlay {
+        background-color: white;
+        height: 100%;
+        left: 0;
+        opacity: 0.4;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
 
-    #bottomSection .overlay {
-      background-color: white;
-      height: 100%;
-      left: 0;
-      opacity: 0.4;
-      position: absolute;
-      top: 0;
-      width: 100%;
-    }
+      #exampleContainer {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+      }
 
-    #exampleContainer {
-      display: flex;
-      flex-direction: row;
-      flex: 1;
-    }
+      #exampleRequestContainer,
+      #userExampleContainer,
+      #grammarContainer,
+      #visualizerContainer {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+      }
 
-    #exampleRequestContainer,
-    #userExampleContainer,
-    #grammarContainer,
-    #visualizerContainer {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      overflow: hidden;
-    }
+      #grammarContainer,
+      #visualizerContainer {
+        position: relative;
+      }
 
-    #grammarContainer,
-    #visualizerContainer {
-      position: relative;
-    }
+      #exampleContainer[hidden] {
+        display: none;
+      }
 
-    #exampleContainer[hidden] {
-      display: none;
-    }
+      h2 {
+        color: #e0a;
+        font-size: 1em;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+      }
 
-    h2 {
-      color: #e0a;
-      font-size: 1em;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      -webkit-user-select: none;
-    }
+      .section-head {
+        padding: 0 10px;
+      }
 
-    .section-head {
-      padding: 0 10px;
-    }
+      .section-head h2 {
+        flex: 1;
+      }
 
-    .section-head h2 {
-      flex: 1;
-    }
-
-    /*
+      /*
       Hack to fix a problem with `height: 100%` in flex items.
       See https://github.com/codemirror/CodeMirror/issues/3679
      */
-    .flex-fix {
-      flex: 1;
-      position: relative;
-    }
+      .flex-fix {
+        flex: 1;
+        position: relative;
+      }
 
-    .editorWrapper .CodeMirror {
-      font-family: Menlo, Monaco, sans-serif;
-      font-size: 12px;
-      height: 100%;
-      position: absolute;  /* See .flex-fix above. */
-      width: 100%;
-    }
+      .editorWrapper .CodeMirror {
+        font-family: Menlo, Monaco, sans-serif;
+        font-size: 12px;
+        height: 100%;
+        position: absolute; /* See .flex-fix above. */
+        width: 100%;
+      }
 
-    .CodeMirror .error-interval {
-      border-bottom: 1px dashed #C7254E;
-    }
+      .CodeMirror .error-interval {
+        border-bottom: 1px dashed #c7254e;
+      }
 
-    .CodeMirror.highlighting {
-      color: rgba(51, 51, 51, 0.8);
-    }
+      .CodeMirror.highlighting {
+        color: rgba(51, 51, 51, 0.8);
+      }
 
-    .CodeMirror .highlight {
-      background-color: #B5D5FF;
-    }
+      .CodeMirror .highlight {
+        background-color: #b5d5ff;
+      }
 
-    .CodeMirror .error {
-      background-color: #FBE3EA;
-      border-radius: 2px;
-      color: #C7254E;
-      margin: 2px 4px;
-      padding: 12px;
-    }
-    .CodeMirror .error .link {
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .CodeMirror .error .link:active {
-      color: #941B3A;  /* #C7254E, but 20% darker. */
-    }
+      .CodeMirror .error {
+        background-color: #fbe3ea;
+        border-radius: 2px;
+        color: #c7254e;
+        margin: 2px 4px;
+        padding: 12px;
+      }
+      .CodeMirror .error .link {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .CodeMirror .error .link:active {
+        color: #941b3a; /* #C7254E, but 20% darker. */
+      }
 
-    .CodeMirror div {
-      background-color: rgba(238, 0, 170, 0);
-      transition: background-color .25s ease-in-out;
-    }
-    .CodeMirror .active-definition {
-      background-color: rgba(238, 0, 170, 0.1);
-    }
+      .CodeMirror div {
+        background-color: rgba(238, 0, 170, 0);
+        transition: background-color 0.25s ease-in-out;
+      }
+      .CodeMirror .active-definition {
+        background-color: rgba(238, 0, 170, 0.1);
+      }
 
-    .CodeMirror .active-appl {
-      font-weight: bold;
-      position: relative;
-      color: black;
-    }
-    .CodeMirror-lines {
-      padding-top: 0;
-    }
-    .CodeMirror-lines pre {
-      padding-left: 14px;
-    }
+      .CodeMirror .active-appl {
+        font-weight: bold;
+        position: relative;
+        color: black;
+      }
+      .CodeMirror-lines {
+        padding-top: 0;
+      }
+      .CodeMirror-lines pre {
+        padding-left: 14px;
+      }
 
-    .footer {
-      align-items: stretch;
-      background-color: #ececec;
-      border-top: 1px solid #ddd;
-      color: #666;
-      display: flex;
-      margin-top: 1px;
-      overflow: hidden;
-      padding: 5px 6px 4px 6px;
-    }
-    .footer[hidden] {
-      display: none;
-    }
-    .footer [type=search] {
-      border: 1px solid hsl(225,10%,85%);
-      border-radius: 3px;
-      flex: 1;
-      height: 19px;
-      margin-right: 4px;
-      padding: 2px 3px 2px 0;
-    }
-    .footer [type=button] {
-      position: relative;
-      top: 1px;
-    }
-    .footer [type=search]:focus {
-      box-shadow: 0 0 0 1px hsla(216, 89%, 62%, .5) inset,
-                  0 0 0 1px hsla(216, 89%, 62%, .5);
-      border-color: hsl(217,60%,71%);
-      outline: none;
-    }
+      .footer {
+        align-items: stretch;
+        background-color: #ececec;
+        border-top: 1px solid #ddd;
+        color: #666;
+        display: flex;
+        margin-top: 1px;
+        overflow: hidden;
+        padding: 5px 6px 4px 6px;
+      }
+      .footer[hidden] {
+        display: none;
+      }
+      .footer [type='search'] {
+        border: 1px solid hsl(225, 10%, 85%);
+        border-radius: 3px;
+        flex: 1;
+        height: 19px;
+        margin-right: 4px;
+        padding: 2px 3px 2px 0;
+      }
+      .footer [type='button'] {
+        position: relative;
+        top: 1px;
+      }
+      .footer [type='search']:focus {
+        box-shadow: 0 0 0 1px hsla(216, 89%, 62%, 0.5) inset,
+          0 0 0 1px hsla(216, 89%, 62%, 0.5);
+        border-color: hsl(217, 60%, 71%);
+        outline: none;
+      }
 
-    .splitter {
-      background-color: #ddd;
-      height: 1px;
-      min-height: 1px;
-      overflow: visible;
-      position: relative;
-    }
-    .vertical.splitter {
-      height: auto;
-      min-height: auto;
-      min-width: 1px;
-      width: 1px;
-    }
-    .splitter .handle {
-      bottom: -2px;
-      cursor: ns-resize;
-      left: 0;
-      position: absolute;
-      right: 0;
-      top: -2px;
-      z-index: 10;
-    }
-    .vertical.splitter .handle {
-      bottom: 0;
-      cursor: ew-resize;
-      left: -2px;
-      right: -2px;
-      top: 0;
-    }
+      .splitter {
+        background-color: #ddd;
+        height: 1px;
+        min-height: 1px;
+        overflow: visible;
+        position: relative;
+      }
+      .vertical.splitter {
+        height: auto;
+        min-height: auto;
+        min-width: 1px;
+        width: 1px;
+      }
+      .splitter .handle {
+        bottom: -2px;
+        cursor: ns-resize;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -2px;
+        z-index: 10;
+      }
+      .vertical.splitter .handle {
+        bottom: 0;
+        cursor: ew-resize;
+        left: -2px;
+        right: -2px;
+        top: 0;
+      }
 
-    .externalRules {
-      color: #999;
-      margin: 0;
-      padding-top: 14px;
-    }
-    .externalRules .content {
-      border-top: 1px solid #eee;
-      padding-top: 14px;
-    }
-    .externalRules pre {
-      margin-bottom: 14px;
-    }
+      .externalRules {
+        color: #999;
+        margin: 0;
+        padding-top: 14px;
+      }
+      .externalRules .content {
+        border-top: 1px solid #eee;
+        padding-top: 14px;
+      }
+      .externalRules pre {
+        margin-bottom: 14px;
+      }
 
-    .contextMenu {
-      background-color: #f0f0f0;
-      border: 1px solid #bbb;
-      border-radius: 4px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-      position: fixed;
-      left: 20px;
-      top: 20px;
-      z-index: 11;  /* Must be great than .splitter .handle */
-    }
-    .contextMenu > ul {
-      margin: 6px 0;
-      padding: 0;
-    }
-    .contextMenu ul ul {
-      left: 100%;
-      top: 0;
-      padding: 0;
-      margin-top: -1px;  /* For aligning diff caused by 1px border */
-      position: absolute;
-      border-radius: 4px;
-      border: 1px solid #bbb;
-      border-left-color: rgba(187, 187, 187, 0.26);
-      background-color: #f0f0f0;
-    }
-    .contextMenu li {
-      position: relative;  /* For position submenus */
-      display: flex;
-      font-family: Helvetica, Arial, sans-serif;
-      font-size: 14px;
-      padding: 2px 20px;
-    }
-    .contextMenu li.disabled {
-      color: #aaa;
-    }
-    .contextMenu li:hover {
-      cursor: default;
-    }
-    .contextMenu li:hover:not(.disabled) {
-      background-color: #4f9dfb;
-    }
-    .contextMenu li:hover:not(.disabled) > label {
-      color: white;
-    }
-    .contextMenu li:not(.disabled):hover > ul {
-      display: block;
-    }
+      .contextMenu {
+        background-color: #f0f0f0;
+        border: 1px solid #bbb;
+        border-radius: 4px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        position: fixed;
+        left: 20px;
+        top: 20px;
+        z-index: 11; /* Must be great than .splitter .handle */
+      }
+      .contextMenu > ul {
+        margin: 6px 0;
+        padding: 0;
+      }
+      .contextMenu ul ul {
+        left: 100%;
+        top: 0;
+        padding: 0;
+        margin-top: -1px; /* For aligning diff caused by 1px border */
+        position: absolute;
+        border-radius: 4px;
+        border: 1px solid #bbb;
+        border-left-color: rgba(187, 187, 187, 0.26);
+        background-color: #f0f0f0;
+      }
+      .contextMenu li {
+        position: relative; /* For position submenus */
+        display: flex;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        padding: 2px 20px;
+      }
+      .contextMenu li.disabled {
+        color: #aaa;
+      }
+      .contextMenu li:hover {
+        cursor: default;
+      }
+      .contextMenu li:hover:not(.disabled) {
+        background-color: #4f9dfb;
+      }
+      .contextMenu li:hover:not(.disabled) > label {
+        color: white;
+      }
+      .contextMenu li:not(.disabled):hover > ul {
+        display: block;
+      }
 
-    #promptScreen {
-      display: none;
-      position: fixed;
-      z-index: 15; /* z-index = 11 is .contexMenu */
-      padding-top: 200px;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgb(0,0,0);
-      background-color: rgba(0,0,0,0.4);
-    }
+      #promptScreen {
+        display: none;
+        position: fixed;
+        z-index: 15; /* z-index = 11 is .contexMenu */
+        padding-top: 200px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+      }
 
-    #promptScreen > * {
-      background-color: #fefefe;
-      margin: auto;
-      padding: 15px;
-      border: 1px solid #888;
-      width: 300px;
-    }
+      #promptScreen > * {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 15px;
+        border: 1px solid #888;
+        width: 300px;
+      }
 
-    #promptScreen h2 {
-      margin: 0;
-    }
+      #promptScreen h2 {
+        margin: 0;
+      }
 
-    #loginBoxMessage, #newGrammarBoxMessage {
-      margin: 8px 8px 0;
-      display: inline-block;
-      font-size: 14px;
-      font-style: italic;
-      font-weight: bold;
-    }
+      #loginBoxMessage,
+      #newGrammarBoxMessage {
+        margin: 8px 8px 0;
+        display: inline-block;
+        font-size: 14px;
+        font-style: italic;
+        font-weight: bold;
+      }
 
-    #loginBoxMessage:empty, #newGrammarBoxMessage:empty {
-      display: none;
-    }
+      #loginBoxMessage:empty,
+      #newGrammarBoxMessage:empty {
+        display: none;
+      }
 
-    #promptScreen label {
-      display: inline-block;
-      font-size: 14px;
-      width: 85px;
-    }
+      #promptScreen label {
+        display: inline-block;
+        font-size: 14px;
+        width: 85px;
+      }
 
-    #promptScreen label,
-    #promptScreen input[type="submit"],
-    #promptScreen input[type="reset"] {
-      margin-top: 10px;
-    }
+      #promptScreen label,
+      #promptScreen input[type='submit'],
+      #promptScreen input[type='reset'] {
+        margin-top: 10px;
+      }
 
-    .close {
-      color: #aaaaaa;
-      float: right;
-      margin: -10px -5px 0 0;
-      font-size: 20px;
-      font-weight: bold;
-    }
+      .close {
+        color: #aaaaaa;
+        float: right;
+        margin: -10px -5px 0 0;
+        font-size: 20px;
+        font-weight: bold;
+      }
 
-    .close:hover, .close:focus {
-      color: #e0a;
-      text-decoration: none;
-      cursor: pointer;
-    }
+      .close:hover,
+      .close:focus {
+        color: #e0a;
+        text-decoration: none;
+        cursor: pointer;
+      }
 
-    .outline-btn {
-      background-color: transparent;
-      border: 1px solid #aaa;
-      border-radius: 3px;
-      color: #888;
-      padding: 1px 6px 2px 6px;
-    }
+      .outline-btn {
+        background-color: transparent;
+        border: 1px solid #aaa;
+        border-radius: 3px;
+        color: #888;
+        padding: 1px 6px 2px 6px;
+      }
 
-    .outline-btn:hover {
-      border-color: #666;
-      color: #444;
-    }
+      .outline-btn:hover {
+        border-color: #666;
+        color: #444;
+      }
 
-    .outline-btn[disabled],
-    .outline-btn[disabled]:hover {
-      border-color: #ddd;
-      color: #ccc;
-    }
+      .outline-btn[disabled],
+      .outline-btn[disabled]:hover {
+        border-color: #ddd;
+        color: #ccc;
+      }
 
-    .outline-btn:active,
-    .outline-btn:active:focus {
-      color: rgba(2, 117, 216, 0.8);
-      border-color: rgba(2, 117, 216, 0.8);
-      box-shadow: none;
-      outline-style: none;
-    }
+      .outline-btn:active,
+      .outline-btn:active:focus {
+        color: rgba(2, 117, 216, 0.8);
+        border-color: rgba(2, 117, 216, 0.8);
+        box-shadow: none;
+        outline-style: none;
+      }
 
-    .outline-btn:focus {
-      box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);
-      outline-style: none;
-    }
+      .outline-btn:focus {
+        box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);
+        outline-style: none;
+      }
 
-    .flex-row {
-      align-items: center;
-      display: flex;
-      flex-direction: row;
-    }
-  </style>
-  <link rel="stylesheet" href="style/parseTree.css">
-</head>
-<body>
-  <div id="topSection">
-    <div id="grammarContainer">
-      <div class="section-head flex-row">
-        <h2>Grammar</h2>
-        <div id="grammarControls" class="flex-row" hidden>
-          <select id="grammarList" hidden><option value="">[local storage]</option></select>
-          <button class="outline-btn" id="saveGrammar">Save</button>
-          <div id="grammarDropdown"><!-- See components/ellipsis-dropdown.vue --></div>
+      .flex-row {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+      }
+    </style>
+    <link rel="stylesheet" href="style/parseTree.css" />
+  </head>
+  <body>
+    <div id="topSection">
+      <div id="grammarContainer">
+        <div class="section-head flex-row">
+          <h2>Grammar</h2>
+          <div id="grammarControls" class="flex-row" hidden>
+            <select id="grammarList" hidden>
+              <option value="">[local storage]</option>
+            </select>
+            <button class="outline-btn" id="saveGrammar">Save</button>
+            <div id="grammarDropdown">
+              <!-- See components/ellipsis-dropdown.vue -->
+            </div>
+          </div>
         </div>
+        <div class="flex-fix"><div class="editorWrapper"></div></div>
       </div>
-      <div class="flex-fix"><div class="editorWrapper"></div></div>
+      <div id="topSplitter" class="splitter vertical"></div>
+      <div id="exampleContainer"><!-- See components/example-list.vue --></div>
     </div>
-    <div id="topSplitter" class="splitter vertical"></div>
-    <div id="exampleContainer"><!-- See components/example-list.vue --></div>
-  </div>
 
-  <div id="mainSplitter" class="splitter"></div>
+    <div id="mainSplitter" class="splitter"></div>
 
-  <div id="bottomSection">
-    <div id="visualizerContainer"></div>
-  </div>
-
-  <div id="dragOverlay"></div>
-
-  <div id="optionPanel">
-    <div id="options">
-      <ul>
-        <li><input type="checkbox" name="showFailures"><label>Explain parse</label></li>
-        <li><input type="checkbox" name="showSpaces"><label>Show spaces</label></li>
-      </ul>
-      <hr>
+    <div id="bottomSection">
+      <div id="visualizerContainer"></div>
     </div>
-    <div id="stepControls"><!-- See components/step-controls.vue --></div>
-  </div>
 
-  <div id="promptScreen">
-    <div id="loginBox" hidden>
-      <span class="close">×</span>
-      <h2>Log into GitHub</h1>
-      <p id="loginBoxMessage"></p>
-      <form id="gitHubForm">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username"><br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password"><br>
-        <input type="submit" value="Login">
-      </form>
+    <div id="dragOverlay"></div>
+
+    <div id="optionPanel">
+      <div id="options">
+        <ul>
+          <li>
+            <input type="checkbox" name="showFailures" /><label
+              >Explain parse</label
+            >
+          </li>
+          <li>
+            <input type="checkbox" name="showSpaces" /><label
+              >Show spaces</label
+            >
+          </li>
+        </ul>
+        <hr />
+      </div>
+      <div id="stepControls"><!-- See components/step-controls.vue --></div>
     </div>
-    <div id="newGrammarBox" hidden>
-      <span class="close">×</span>
-      <h2>Save Grammar As</h1>
-      <p id="newGrammarBoxMessage"></p>
-      <form id="newGrammarForm">
-        <label for="newGrammarName" style="width: 110px">Grammar name:</label>
-        <input type="text" name="newGrammarName" id="newGrammarName" style="width: 290px"><br>
-        <input type="submit" value="Save">
-        <input type="reset" value="Cancel">
-      </form>
+
+    <div id="promptScreen">
+      <div id="loginBox" hidden>
+        <span class="close">×</span>
+        <h2>Log into GitHub</h2>
+        <p id="loginBoxMessage"></p>
+        <form id="gitHubForm">
+          <label for="username">Username:</label>
+          <input type="text" name="username" id="username" /><br />
+          <label for="password">Password:</label>
+          <input type="password" name="password" id="password" /><br />
+          <input type="submit" value="Login" />
+        </form>
+      </div>
+      <div id="newGrammarBox" hidden>
+        <span class="close">×</span>
+        <h2>Save Grammar As</h2>
+        <p id="newGrammarBoxMessage"></p>
+        <form id="newGrammarForm">
+          <label for="newGrammarName" style="width: 110px">Grammar name:</label>
+          <input
+            type="text"
+            name="newGrammarName"
+            id="newGrammarName"
+            style="width: 290px"
+          /><br />
+          <input type="submit" value="Save" />
+          <input type="reset" value="Cancel" />
+        </form>
+      </div>
     </div>
-  </div>
 
-  <div id="measuringDiv">
-    <div class="pexpr"></div>
-  </div>
-
-  <div id="protos" hidden>
-    <div class="footer">
-      <input type="search"></input><input class="closeButton" type="button" value="Done"></input>
+    <div id="measuringDiv">
+      <div class="pexpr"></div>
     </div>
-    <div class="externalRules"><div class="content"></div></div>
-  </div>
 
-  <div id="parseTreeMenu" class="contextMenu" hidden><ul></ul></div>
-  <div id="operationMenu" class="contextMenu" hidden><ul></ul></div>
-  <div hidden>
-    <pre id="sampleGrammar">Arithmetic {
+    <div id="protos" hidden>
+      <div class="footer">
+        <input type="search" /><input
+          class="closeButton"
+          type="button"
+          value="Done"
+        />
+      </div>
+      <div class="externalRules"><div class="content"></div></div>
+    </div>
+
+    <div id="parseTreeMenu" class="contextMenu" hidden><ul></ul></div>
+    <div id="operationMenu" class="contextMenu" hidden><ul></ul></div>
+    <div hidden>
+      <pre id="sampleGrammar">
+Arithmetic {
   Exp
     = AddExp
 
@@ -563,27 +592,28 @@
   number  (a number)
     = digit* "." digit+  -- fract
     | digit+             -- whole
-}</pre>
-    <pre id="sampleExamples">
+}</pre
+      >
+      <pre id="sampleExamples">
       <pre>2 * (42 - 1) / 9</pre>
       <pre>1+2*3</pre>
       <pre>oh no</pre>
       <pre> (  	123   ) </pre>
       <pre>(2+4)*7</pre>
     </pre>
-  </div>
+    </div>
 
-  <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
+    <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
 
-  <script src="third_party/es6.js"></script>
-  <script src="third_party/d3.min.js"></script>
-  <script src="third_party/codemirror-5.11/lib/codemirror.js"></script>
-  <script src="third_party/codemirror-5.11/addon/display/placeholder.js"></script>
-  <script src="third_party/codemirror-5.11/addon/search/search.js"></script>
-  <script src="third_party/codemirror-5.11/addon/search/searchcursor.js"></script>
-  <script src="third_party/autosize.min.js"></script>
-  <script src="third_party/GitHub.bundle.min-2.3.0.js"></script>
+    <script src="third_party/es6.js"></script>
+    <script src="third_party/d3.min.js"></script>
+    <script src="third_party/codemirror-5.11/lib/codemirror.js"></script>
+    <script src="third_party/codemirror-5.11/addon/display/placeholder.js"></script>
+    <script src="third_party/codemirror-5.11/addon/search/search.js"></script>
+    <script src="third_party/codemirror-5.11/addon/search/searchcursor.js"></script>
+    <script src="third_party/autosize.min.js"></script>
+    <script src="third_party/GitHub.bundle.min-2.3.0.js"></script>
 
-  <script src="assets/visualizer-bundle.js"></script>
-</body>
+    <script src="assets/visualizer-bundle.js"></script>
+  </body>
 </html>

@@ -6,7 +6,7 @@ const CheckedEmitter = require('checked-emitter');
 const Vue = require('vue').default;
 const ohmEditor = require('./ohmEditor');
 
-const parseTree = ohmEditor.parseTree = new CheckedEmitter();
+const parseTree = (ohmEditor.parseTree = new CheckedEmitter());
 parseTree.vue = new Vue({
   data: {
     parsing: false,
@@ -32,14 +32,14 @@ parseTree.vue = new Vue({
 
     // Refresh the parse tree after attempting to parse the input.
     const self = this;
-    ohmEditor.addListener('parse:input', function(matchResult, trace) {
+    ohmEditor.addListener('parse:input', function (matchResult, trace) {
       self.parsing = false;
       self.trace = Object.freeze(trace);
     });
   },
 });
 
-parseTree.setTraceElementCollapsed = function(el, collapsed, optDuration) {
+parseTree.setTraceElementCollapsed = function (el, collapsed, optDuration) {
   el.__vue__.setCollapsed(collapsed, optDuration);
 };
 parseTree.registerEvents({
@@ -54,7 +54,7 @@ parseTree.registerEvents({
   'collapse:traceElement': ['el'],
 
   // Emitted when the contextMenu for the trace element of `traceNode` is about to be shown.
-  'contextMenu': ['target', 'traceNode'],
+  contextMenu: ['target', 'traceNode'],
 
   // Emitted before start rendering the parse tree
   'render:parseTree': ['traceNode'],

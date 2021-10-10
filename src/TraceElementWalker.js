@@ -11,13 +11,18 @@ function TraceElementWalker(root, optConfig) {
   const config = optConfig || {};
 
   this._root = root;
-  this._walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
-    acceptNode(node) {
-      return node.classList.contains('pexpr') && node.classList.contains('labeled')
+  this._walker = root.ownerDocument.createTreeWalker(
+    root,
+    NodeFilter.SHOW_ELEMENT,
+    {
+      acceptNode(node) {
+        return node.classList.contains('pexpr') &&
+          node.classList.contains('labeled')
           ? NodeFilter.FILTER_ACCEPT
           : NodeFilter.FILTER_SKIP;
-    },
-  });
+      },
+    }
+  );
   this.isAtEnd = !!config.startAtEnd;
   this.currentNode = null;
   this.exitingCurrentNode = false;
@@ -31,15 +36,18 @@ function TraceElementWalker(root, optConfig) {
   }
 }
 
-TraceElementWalker.prototype._isInInitialState = function() {
+TraceElementWalker.prototype._isInInitialState = function () {
   return this._walker.currentNode === this._root;
 };
 
 // Advance to the next node using pre-order traversal. But, unlike the regular TreeWalker, visit
 // interior nodes twice -- once going in, and once coming out.
-TraceElementWalker.prototype.nextNode = function() {
+TraceElementWalker.prototype.nextNode = function () {
   // Case 1: Entering an interior node or the first node.
-  if (!this.exitingCurrentNode && (this._isOnInteriorNode() || this._isInInitialState())) {
+  if (
+    !this.exitingCurrentNode &&
+    (this._isOnInteriorNode() || this._isInInitialState())
+  ) {
     const oldCurrentNode = this.currentNode;
     if ((this.currentNode = this._walker.firstChild()) != null) {
       this.exitingCurrentNode = false;
@@ -66,12 +74,12 @@ TraceElementWalker.prototype.nextNode = function() {
   return this.currentNode;
 };
 
-TraceElementWalker.prototype._isOnInteriorNode = function() {
+TraceElementWalker.prototype._isOnInteriorNode = function () {
   const node = this.currentNode;
   return node && !node.classList.contains('leaf');
 };
 
-TraceElementWalker.prototype.previousNode = function() {
+TraceElementWalker.prototype.previousNode = function () {
   // Case 1: Entering an interior node (or the first node) backwards
   if (this.exitingCurrentNode) {
     const oldCurrentNode = this.currentNode;
@@ -106,14 +114,14 @@ TraceElementWalker.prototype.previousNode = function() {
 };
 
 // Make `node` the walker's current node, as if we are just stepping into it.
-TraceElementWalker.prototype.stepInto = function(node) {
+TraceElementWalker.prototype.stepInto = function (node) {
   this.currentNode = this._walker.currentNode = node;
   this.exitingCurrentNode = false;
   this.isAtEnd = false;
 };
 
 // Make `node` the walker's current node, as if we are just stepping out of it.
-TraceElementWalker.prototype.stepOut = function(node) {
+TraceElementWalker.prototype.stepOut = function (node) {
   this.stepInto(node);
   this.exitingCurrentNode = this._isOnInteriorNode();
 };

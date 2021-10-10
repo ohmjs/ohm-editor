@@ -18,8 +18,10 @@ function indexToHeight(cm, index) {
 
 function isBlockSelectable(cm, startPos, endPos) {
   const lastLine = cm.getLine(endPos.line);
-  return countLeadingWhitespace(cm.getLine(startPos.line)) === startPos.ch &&
-         (lastLine.length - countTrailingWhitespace(lastLine)) === endPos.ch;
+  return (
+    countLeadingWhitespace(cm.getLine(startPos.line)) === startPos.ch &&
+    lastLine.length - countTrailingWhitespace(lastLine) === endPos.ch
+  );
 }
 
 // Mark a block of text with `className` by marking entire lines.
@@ -62,11 +64,14 @@ module.exports = {
     const endHeight = indexToHeight(cm, interval.endIdx);
     const scrollInfo = cm.getScrollInfo();
     const margin = scrollInfo.clientHeight - (endHeight - startHeight);
-    if (startHeight < scrollInfo.top ||
-        endHeight > (scrollInfo.top + scrollInfo.clientHeight)) {
+    if (
+      startHeight < scrollInfo.top ||
+      endHeight > scrollInfo.top + scrollInfo.clientHeight
+    ) {
       cm.scrollIntoView(
-          {left: 0, top: startHeight, right: 0, bottom: endHeight},
-          margin > 0 ? margin / 2 : undefined);
+        {left: 0, top: startHeight, right: 0, bottom: endHeight},
+        margin > 0 ? margin / 2 : undefined
+      );
     }
   },
 };
