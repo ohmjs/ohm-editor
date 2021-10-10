@@ -160,6 +160,7 @@ LastLineWidget.prototype.update = function (cm, matchResult, grammar) {
   const container = this.node.querySelector('.content');
   container.textContent = '';
 
+  // eslint-disable-next-line guard-for-in
   for (const ruleName in this._rules) {
     const pre = document.createElement('pre');
     pre.id = 'externalRules-' + ruleName;
@@ -198,7 +199,9 @@ ohmEditor.addListener('change:option', function (name) {
 });
 
 ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
-  if (!ohmEditor.grammar.rules.hasOwnProperty(ruleName)) {
+  if (
+    !Object.prototype.hasOwnProperty.call(ohmEditor.grammar.rules, ruleName)
+  ) {
     const elem = $('#externalRules-' + ruleName);
     if (elem) {
       elem.classList.add('active-definition');

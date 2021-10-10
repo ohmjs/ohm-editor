@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 'use strict';
 
 const open = require('open');

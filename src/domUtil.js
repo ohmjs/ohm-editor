@@ -86,7 +86,7 @@ module.exports = {
 
   toggleClasses(el, map) {
     for (const k in map) {
-      if (map.hasOwnProperty(k)) {
+      if (Object.prototype.hasOwnProperty.call(map, k)) {
         el.classList.toggle(k, !!map[k]);
       }
     }

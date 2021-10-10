@@ -277,7 +277,7 @@ module.exports = {
       const self = this;
       examples.forEach(function (ex) {
         const id = self.addExample();
-        if (!ex.hasOwnProperty('shouldMatch')) {
+        if (!Object.prototype.hasOwnProperty.call(ex, 'shouldMatch')) {
           ex.shouldMatch = true;
         }
         newExampleValues[id] = ex;

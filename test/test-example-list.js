@@ -1,3 +1,5 @@
+/* global global */
+
 'use strict';
 
 const Vue = require('vue').default;
@@ -220,7 +222,7 @@ test('pass/fail status', (t) => {
 
             ohmEditor.emit('change:grammar', '');
             Vue.nextTick(() => {
-              for (const k in vm.exampleStatus) {
+              for (const k of Object.keys(vm.exampleStatus)) {
                 t.equal(vm.exampleStatus[k], undefined);
               }
               t.end();

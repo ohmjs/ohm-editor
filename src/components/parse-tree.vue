@@ -110,7 +110,9 @@ module.exports = {
     window.addEventListener('resize', this.$refs.expandedInput.update);
 
     ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
-      if (ohmEditor.grammar.rules.hasOwnProperty(ruleName)) {
+      if (
+        Object.prototype.hasOwnProperty.call(ohmEditor.grammar.rules, ruleName)
+      ) {
         const defInterval = ohmEditor.grammar.rules[ruleName].source;
         if (defInterval) {
           const grammarEditor = ohmEditor.ui.grammarEditor;
