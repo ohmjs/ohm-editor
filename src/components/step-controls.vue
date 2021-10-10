@@ -73,7 +73,7 @@ function getVM(el) {
 
 module.exports = {
   name: 'step-controls',
-  data: function() {
+  data() {
     return {
       rootEl: null,
       canGoToStart: true,
@@ -93,12 +93,12 @@ module.exports = {
     };
   },
   methods: {
-    reset: function(rootEl) {
+    reset(rootEl) {
       this.rootEl = rootEl;
       this._initializeWalker(Position.END);
       this._expandedForStepping = {};
     },
-    handleKeyDown: function(e) {
+    handleKeyDown(e) {
       switch (e.keyCode) {
         case 37: this.stepBack(); break;
         case 38: this.goToStart(); break;
@@ -108,13 +108,13 @@ module.exports = {
       }
       e.preventDefault();
     },
-    _initializeWalker: function(initialPos) {
+    _initializeWalker(initialPos) {
       this._treeWalker = new TraceElementWalker(this.rootEl, {
         startAtEnd: initialPos === Position.END,
       });
       this._updateStepState(true);
     },
-    _doStep: function(forward) {
+    _doStep(forward) {
       const curr = getVM(this._treeWalker.currentNode);
       if (curr) {
         // If necessary, expand the node before stepping into it.
@@ -131,7 +131,7 @@ module.exports = {
         this._updateStepState();
       });
     },
-    _maybeExpand: function(node, walker, forward) {
+    _maybeExpand(node, walker, forward) {
       if (node.isLeaf || !node.collapsed) {
         return;
       }
@@ -141,7 +141,7 @@ module.exports = {
         this._expandedForStepping[node.id] = true;
       }
     },
-    _maybeRecollapse: function(node) {
+    _maybeRecollapse(node) {
       // NOTE: It doesn't matter which way we're going! If it's in this._expandedForStepping,
       // and `node` is the current parse step, then by definition we've left the subtree.
       if (this._expandedForStepping[node.id]) {
@@ -152,7 +152,7 @@ module.exports = {
     // Updates `this.stepState` based on the current state of the treewalker. Should be
     // called whenever the treewalker's currentNode changes.
     // If `optDidJump` is true, the current parse step moved by more than a single step.
-    _updateStepState: function(optDidJump) {
+    _updateStepState(optDidJump) {
       const curr = getVM(this._treeWalker.currentNode);
       if (curr && curr.id !== this.stepState.currentParseStep) {
         // When returning to a node that was expanded for stepping, re-collapse it.
@@ -169,27 +169,27 @@ module.exports = {
       this.canGoToEnd = this.canGoForward = !isAtEnd;
       this.canGoToStart = this.canGoBack = curr || isAtEnd;
     },
-    goToStart: function() {
+    goToStart() {
       this._initializeWalker(Position.START);
     },
-    stepBack: function() {
+    stepBack() {
       if (this.canGoBack) {
         this._doStep(false);
       }
     },
-    stepForward: function() {
+    stepForward() {
       if (this.canGoForward) {
         this._doStep(true);
       }
     },
-    goToEnd: function() {
+    goToEnd() {
       this._initializeWalker(Position.END);
     },
-    stepInto: function(node) {
+    stepInto(node) {
       this._treeWalker.stepInto(node);
       this._updateStepState(true);
     },
-    stepOut: function(node) {
+    stepOut(node) {
       this._treeWalker.stepOut(node);
       this._updateStepState(true);
     },

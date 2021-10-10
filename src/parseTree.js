@@ -22,11 +22,11 @@ parseTree.vue = new Vue({
     '  <div v-show="parsing" class="overlay"></div>' +
     '</div>',
   methods: {
-    onEdit: function(cm) {
+    onEdit(cm) {
       this.parsing = true;
     },
   },
-  mounted: function() {
+  mounted() {
     ohmEditor.addListener('change:inputEditor', this.onEdit);
     ohmEditor.addListener('change:grammarEditor', this.onEdit);
 

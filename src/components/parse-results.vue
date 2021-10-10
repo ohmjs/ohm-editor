@@ -21,12 +21,12 @@ module.exports = {
   },
   computed: {
     // Vue event handlers that are attached to each TraceElement component instance.
-    pexprEventHandlers: function() {
+    pexprEventHandlers() {
       const self = this;
       return {
         showContextMenu: this.onShowContextMenu,
-        hover: function() {self.emitUpdateExpandedInput();},
-        unhover: function() {self.emitUpdateExpandedInput();},
+        hover() {self.emitUpdateExpandedInput();},
+        unhover() {self.emitUpdateExpandedInput();},
         updateExpandedInput: this.emitUpdateExpandedInput,
       };
     },
@@ -39,7 +39,7 @@ module.exports = {
     // and translate vertical overscroll into horizontal movement. I.e., when scrolled all
     // the way down, further downwards scrolling instead moves to the right -- and similarly
     // with up and left.
-    onWheel: function(e) {
+    onWheel(e) {
       const el = this.$el;
       let overscroll;
       const scrollingDown = e.deltaY > 0;
@@ -57,17 +57,17 @@ module.exports = {
         }
       }
     },
-    onScroll: function() {
+    onScroll() {
       this.emitUpdateExpandedInput();
     },
-    onShowContextMenu: function(data) {
+    onShowContextMenu(data) {
       this.$emit('showContextMenu', data);
     },
-    emitUpdateExpandedInput: function(...args) {
+    emitUpdateExpandedInput(...args) {
       this.$emit('updateExpandedInput', ...args);
     },
   },
-  render: function(createElement) {
+  render(createElement) {
     if (!this.trace) {
       return createElement('div');
     }

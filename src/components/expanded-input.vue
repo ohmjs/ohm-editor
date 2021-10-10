@@ -27,24 +27,24 @@ function isRectInViewport(rect) {
 module.exports = {
   name: 'expanded-input',
   computed: {
-    canvasEl: function() {
+    canvasEl() {
       return this.$el.querySelector('canvas');
     },
-    inputCtx: function() {
+    inputCtx() {
       return this.canvasEl.getContext('2d');
     },
   },
-  mounted: function() {
+  mounted() {
     this.update();
   },
   methods: {
-    getPixelRatio: function() {
+    getPixelRatio() {
       return window.devicePixelRatio || 1;
     },
 
     // Updates the size of the canvas to exactly cover the #sizer element.
     // As a side effect, the contents of the canvas are cleared.
-    updateCanvasSize: function() {
+    updateCanvasSize() {
       const el = this.canvasEl;
       const sizer = this.$el.querySelector('#sizer');
       const pixelRatio = this.getPixelRatio();
@@ -58,7 +58,7 @@ module.exports = {
       this.inputCtx.fillStyle = 'white';
       this.inputCtx.fillRect(0, 0, el.width, el.height);
     },
-    update: function(optAnimatingEl, isCollapsing, t) {
+    update(optAnimatingEl, isCollapsing, t) {
       this.updateCanvasSize();
 
       // If a parse tree node is currently being hovered, highlight it. If not, highlight
@@ -116,13 +116,13 @@ module.exports = {
       })(root, false);
     },
 
-    measureText: function(text) {
+    measureText(text) {
       // Always update the font before measuring -- devicePixelRatio may have changed.
       this.inputCtx.font = 16 * this.getPixelRatio() + 'px Menlo, Monaco, monospace';
       return this.inputCtx.measureText(text).width / this.getPixelRatio();
     },
 
-    renderInputText: function(text, rect, optAlpha) {
+    renderInputText(text, rect, optAlpha) {
       const textWidth = this.measureText(text);
       const letterPadding = (rect.right - rect.left - textWidth) / text.length / 2;
       const charWidth = textWidth / text.length;
@@ -141,7 +141,7 @@ module.exports = {
       return x <= window.innerWidth;
     },
 
-    renderFailedInputText: function(el, rect) {
+    renderFailedInputText(el, rect) {
       const text = el._traceNode.input.substring(el._traceNode.pos);
       const baseRect = $('#expandedInputWrapper').getBoundingClientRect();
       const renderRect = {
@@ -153,7 +153,7 @@ module.exports = {
       this.renderInputText(text, renderRect, 0.5);
     },
 
-    renderHighlight: function(el) {
+    renderHighlight(el) {
       const elBounds = el.getBoundingClientRect();
       const pixelRatio = this.getPixelRatio();
       const baseRect = $('#expandedInputWrapper').getBoundingClientRect();
@@ -167,7 +167,7 @@ module.exports = {
       this.inputCtx.fillRect(rect.x, rect.y, rect.width, rect.height);
     },
 
-    getConsumedInput: function(el) {
+    getConsumedInput(el) {
       if (el._traceNode) {
         return el._traceNode.source.contents;
       }

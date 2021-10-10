@@ -26,16 +26,16 @@ module.exports = {
     minWidth: {type: String, required: true},
   },
   computed: {
-    extraInfo: function() {
+    extraInfo() {
       if (isLRBaseCase(this.traceNode)) {
         return '[LR]';
       }
     },
-    inlineRuleNameParts: function() {
+    inlineRuleNameParts() {
       const ruleName = this.traceNode.expr.ruleName;
       return ruleName ? ruleName.split('_') : [];
     },
-    labelData: function() {
+    labelData() {
       if (this.traceNode.terminatesLR) {
         return {text: '[Grow LR]'};
       }
@@ -58,13 +58,13 @@ module.exports = {
     },
   },
   methods: {
-    emitHover: function() {
+    emitHover() {
       this.$emit('hover');
     },
-    emitUnhover: function() {
+    emitUnhover() {
       this.$emit('unhover');
     },
-    onClick: function(e) {
+    onClick(e) {
       const isPlatformMac = /Mac/.test(window.navigator.platform);
       const modifierKey = isPlatformMac ? e.metaKey : e.ctrlKey;
 
@@ -77,7 +77,7 @@ module.exports = {
       }
       e.preventDefault();
     },
-    onContextMenu: function(e) {
+    onContextMenu(e) {
       this.$emit('showContextMenu', {
         x: e.clientX,
         y: e.clientY - 6,

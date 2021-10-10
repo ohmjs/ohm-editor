@@ -34,11 +34,11 @@ function assert(cond, msg) {
 // -------
 
 module.exports = {
-  $: function(sel) {return document.querySelector(sel);},
+  $(sel) {return document.querySelector(sel);},
 
-  $$: function(sel) {return Array.prototype.slice.call(document.querySelectorAll(sel));},
+  $$(sel) {return Array.prototype.slice.call(document.querySelectorAll(sel));},
 
-  clearAll: function(classSelector) {
+  clearAll(classSelector) {
     assert(classSelector[0] === '.', "Expected a selector beginning with '.'");
     const className = classSelector.slice(1);
     const nodes = document.querySelectorAll(classSelector);
@@ -47,7 +47,7 @@ module.exports = {
     }
   },
 
-  createElement: function(sel, optContent) {
+  createElement(sel, optContent) {
     const parts = sel.split('.');
     let tagName = parts[0];
     if (tagName.length === 0) {
@@ -62,7 +62,7 @@ module.exports = {
     return el;
   },
 
-  closestElementMatching: function(sel, startEl) {
+  closestElementMatching(sel, startEl) {
     let el = startEl;
     while (el != null) {
       if (el.matches(sel)) {
@@ -73,14 +73,14 @@ module.exports = {
   },
 
   // Add an event handler to `el` that is removed right after it runs.
-  once: function(el, eventType, cb) {
+  once(el, eventType, cb) {
     el.addEventListener(eventType, function handler(e) {
       cb(e);
       el.removeEventListener(eventType, handler);
     });
   },
 
-  toggleClasses: function(el, map) {
+  toggleClasses(el, map) {
     for (const k in map) {
       if (map.hasOwnProperty(k)) {
         el.classList.toggle(k, !!map[k]);
@@ -95,7 +95,7 @@ module.exports = {
   // `onClick` is a function to use as the onclick handler for the item.
   // If an item with the same id was already added, then the old item will be updated
   // with the new values from `label`, `enabled`, and `onClick`.
-  addMenuItem: function(menuId, id, label, enabled, onClick) {
+  addMenuItem(menuId, id, label, enabled, onClick) {
     const itemList = document.querySelector('#' + menuId + ' ul');
     let li = itemList.querySelector('#' + id);
     if (!li) {

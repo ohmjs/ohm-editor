@@ -153,15 +153,15 @@ module.exports = {
     currentLR: {type: Object},
   },
   computed: {
-    labeled: function() {
+    labeled() {
       return shouldNodeBeLabeled(this.traceNode);
     },
-    vbox: function() {
+    vbox() {
       return hasVisibleChoice(this.traceNode) ||
                hasVisibleLeftRecursion(this.traceNode) ||
                (isAlt(this.traceNode.expr) && this.context && this.context.vbox);
     },
-    isLeaf: function() {
+    isLeaf() {
       let leaf = isLeaf(ohmEditor.grammar, this.traceNode);
       if (this.traceNode.isMemoized) {
         const memoKey = this.traceNode.expr.toMemoKey();
@@ -172,10 +172,10 @@ module.exports = {
       }
       return leaf;
     },
-    isWhitespace: function() {
+    isWhitespace() {
       return this.traceNode.ruleName === 'spaces';
     },
-    initiallyCollapsed: function() {
+    initiallyCollapsed() {
       if (!this.labeled || this.isLeaf) {
         return false;
       }
@@ -197,7 +197,7 @@ module.exports = {
       // Collapse the non-syntactic nodes that are in syntactic contexts.
       return this.inSyntacticContext && !isSyntactic(this.traceNode.expr);
     },
-    classObj: function() {
+    classObj() {
       const obj = {
         disclosure: this.labeled && this.isInVBox,
       };
@@ -215,13 +215,13 @@ module.exports = {
     },
     // The children to actually be rendered in the DOM. By using a separate property, we can
     // defer calculation of the children until the first time the node is expanded.
-    childrenToRender: function() {
+    childrenToRender() {
       if (this.initiallyCollapsed && !this.hasUserToggledCollapsedState) {
         return null;
       }
       return this.children;
     },
-    children: function() {
+    children() {
       const children = [];
       const self = this;
 
@@ -265,14 +265,14 @@ module.exports = {
       }
       return children;
     },
-    minWidth: function() {
+    minWidth() {
       return this.measureInputText(this.traceNode.source.contents) + 'px';
     },
-    isCurrentParseStep: function() {
+    isCurrentParseStep() {
       return this.isPossiblyInvolvedInStepping &&
             this.id === this.injectedStepState.currentParseStep;
     },
-    isInvolvedInStepping: function() {
+    isInvolvedInStepping() {
       if (this.traceNode.isRootNode || this.isCurrentParseStep) {
         return true;
       }
@@ -285,7 +285,7 @@ module.exports = {
       }
       return false;
     },
-    areChildrenPossiblyInvolvedInStepping: function() {
+    areChildrenPossiblyInvolvedInStepping() {
       if (this.isPossiblyInvolvedInStepping) {
         // If a node is involved in stepping, then its children are possibly involved.
         // This prevents re-rendering every single element whenever the step state changes.
@@ -293,7 +293,7 @@ module.exports = {
       }
       return false;
     },
-    isUndecided: function() {
+    isUndecided() {
       if (this.isPossiblyInvolvedInStepping) {
         // All ancestors of the current parse step are undecided -- i.e., any involved nodes
         // except the current parse step. The current parse step is only undecided if it's a
@@ -305,7 +305,7 @@ module.exports = {
       }
       return false;
     },
-    isHiddenForStepping: function() {
+    isHiddenForStepping() {
       if (this.isMounted &&
             (this.isPossiblyInvolvedInStepping || this.injectedStepState.jumpCount >= 0)) {
 
@@ -324,7 +324,7 @@ module.exports = {
       }
     },
   },
-  data: function() {
+  data() {
     return {
       collapsed: false,
       hasUserToggledCollapsedState: false,
@@ -335,15 +335,15 @@ module.exports = {
     'inSyntacticContext',
     'injectedStepState',
   ],
-  provide: function() {
+  provide() {
     if (this.labeled) {
       return {inSyntacticContext: isSyntactic(this.traceNode.expr)};
     }
   },
-  beforeMount: function() {
+  beforeMount() {
     this.initializeCollapsedState();
   },
-  mounted: function() {
+  mounted() {
     const el = this.$el;
     el._traceNode = this.traceNode;
 
@@ -360,20 +360,20 @@ module.exports = {
     }
     this.isMounted = true;
   },
-  beforeUpdate: function() {
+  beforeUpdate() {
     if (this.traceNode !== this.$el._traceNode) {
       this.initializeCollapsedState();
     }
   },
-  updated: function() {
+  updated() {
     this.$el._traceNode = this.traceNode;
   },
   methods: {
-    initializeCollapsedState: function() {
+    initializeCollapsedState() {
       this.collapsed = this.initiallyCollapsed;
       this.hasUserToggledCollapsedState = false;
     },
-    onHover: function() {
+    onHover() {
       const grammarEditor = ohmEditor.ui.grammarEditor;
       const inputEditor = ohmEditor.ui.inputEditor;
 
@@ -396,11 +396,11 @@ module.exports = {
       }
       this.eventHandlers.hover();
     },
-    onUnhover: function() {
+    onUnhover() {
       ohmEditor.emit('unpeek:ruleDefinition');
       this.eventHandlers.unhover();
     },
-    onClick: function(modifier) {
+    onClick(modifier) {
       if (modifier === 'alt') {
         console.log(this.traceNode); // eslint-disable-line no-console
       } else if (modifier === 'cmd') {
@@ -410,15 +410,15 @@ module.exports = {
         this.toggleCollapsed();
       }
     },
-    onShowContextMenu: function(data) {
+    onShowContextMenu(data) {
       data.el = this.$el;
       this.eventHandlers.showContextMenu(data);
     },
-    toggleCollapsed: function() {
+    toggleCollapsed() {
       this.setCollapsed(!this.collapsed);
     },
     // Hides or shows the children of `el`, which is a div.pexpr.
-    setCollapsed: function(collapse, optDurationInMs) {
+    setCollapsed(collapse, optDurationInMs) {
       this.collapsed = collapse;
       this.hasUserToggledCollapsedState = true;
 
@@ -482,7 +482,7 @@ module.exports = {
             });
       });
     },
-    measureLabel: function() {
+    measureLabel() {
       const tempWrapper = $('#measuringDiv .pexpr');
       const labelClone = this.$el.querySelector('.label').cloneNode(true);
       const clone = tempWrapper.appendChild(labelClone);
@@ -493,7 +493,7 @@ module.exports = {
       tempWrapper.innerHTML = '';
       return result;
     },
-    measureChildren: function() {
+    measureChildren() {
       const measuringDiv = $('#measuringDiv');
       const clone = measuringDiv.appendChild(this.$el.cloneNode(true));
       clone.style.width = '';
@@ -506,13 +506,13 @@ module.exports = {
       measuringDiv.removeChild(clone);
       return result;
     },
-    containsElement: function(el) {
+    containsElement(el) {
       return el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_CONTAINS;
     },
-    containedByElement: function(el) {
+    containedByElement(el) {
       return this.$el.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_CONTAINS;
     },
-    precedesElement: function(el) {
+    precedesElement(el) {
       return el.compareDocumentPosition(this.$el) & Node.DOCUMENT_POSITION_PRECEDING;
     },
   },

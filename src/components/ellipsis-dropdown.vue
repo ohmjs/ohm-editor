@@ -43,29 +43,29 @@ module.exports = {
     // If the callback is null, the item will be disabled.
     items: {type: Object, required: true},
   },
-  data: function() {
+  data() {
     return {
       hidden: true,
     };
   },
   computed: {
-    button: function() {
+    button() {
       return this.$el.querySelector('button');
     },
   },
   methods: {
-    itemClass: function(label) {
+    itemClass(label) {
       if (this.items[label] == null) {
         return 'disabled';
       }
     },
-    handleMouseDown: function(e) {
+    handleMouseDown(e) {
       e.preventDefault();
     },
-    toggleHidden: function(e) {
+    toggleHidden(e) {
       this.hidden = !this.hidden;
     },
-    handleItemClick: function(label) {
+    handleItemClick(label) {
       const cb = this.items[label];
       if (cb) {
         cb();
@@ -73,7 +73,7 @@ module.exports = {
       this.button.blur();
       this.hide(); // Redundant, but blur() is flaky in tests.
     },
-    hide: function() {
+    hide() {
       this.hidden = true;
     },
   },

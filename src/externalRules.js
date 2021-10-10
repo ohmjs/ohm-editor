@@ -39,14 +39,14 @@ const semantics = ohmGrammar.createSemantics();
 // An attribute for collecting all of the rule names referenced within a grammar.
 // Returns an object whose own properties represent all the referenced rule names.
 semantics.addAttribute('referencedRules', {
-  Base_application: function(ident, args) {
+  Base_application(ident, args) {
     const ans = {};
     ans[ident.sourceString] = true;
     return extend(ans, args.referencedRules);
   },
   _iter: combineChildResults('referencedRules'),
   _nonterminal: combineChildResults('referencedRules'),
-  _terminal: function() {
+  _terminal() {
     return {};
   },
 });
@@ -54,14 +54,14 @@ semantics.addAttribute('referencedRules', {
 // An attribute for collecting all of the identifiers found in a (possibly invalid) grammar.
 // Returns an object whose own properties represent all the identifiers found in the source.
 semantics.addAttribute('identifiers', {
-  ident: function(_) {
+  ident(_) {
     const ans = {};
     ans[this.sourceString] = true;
     return ans;
   },
   _iter: combineChildResults('identifiers'),
   _nonterminal: combineChildResults('identifiers'),
-  _terminal: function() {
+  _terminal() {
     return {};
   },
 });

@@ -35,8 +35,8 @@ function isLeaf(grammar, traceNode) {
 }
 
 module.exports = {
-  isLeaf: isLeaf,
-  isLRBaseCase: isLRBaseCase,
-  isPrimitive: isPrimitive,
-  isPrimitiveRule: isPrimitiveRule,
+  isLeaf,
+  isLRBaseCase,
+  isPrimitive,
+  isPrimitiveRule,
 };

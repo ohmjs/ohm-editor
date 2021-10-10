@@ -62,7 +62,7 @@ module.exports = {
     'thumbs-up-button': require('./thumbs-up-button.vue').default,
   },
   props: [],
-  data: function() {
+  data() {
     return {
       selectedId: null,
       editing: false,
@@ -77,16 +77,16 @@ module.exports = {
     };
   },
   computed: {
-    selectedExampleStatus: function() {
+    selectedExampleStatus() {
       return this.exampleStatus[this.selectedId];
     },
-    selectedExampleOrEmpty: function() {
+    selectedExampleOrEmpty() {
       const ex = this.getSelected();
       return ex || {text: '', startRule: '', shouldMatch: true};
     },
   },
   watch: {
-    selectedId: function(id) {
+    selectedId(id) {
       // Update the inputEditor contents whenever the selected example changes.
       const example = this.getSelected();
 
@@ -100,16 +100,16 @@ module.exports = {
     },
     exampleValues: {
       deep: true,
-      handler: function(values) {
+      handler(values) {
         this.saveExamples();
       },
     },
   },
   methods: {
-    grammar: function() {
+    grammar() {
       return this._grammar;
     },
-    setGrammar: function(newVal) {
+    setGrammar(newVal) {
       this._grammar = newVal;
 
       // Re-check all the examples.
@@ -117,12 +117,12 @@ module.exports = {
 
       this.$forceUpdate();
     },
-    classesForExample: function(id) {
+    classesForExample(id) {
       const pendingUpdate = this.indicatePendingInput(id);
       const classes = {
         example: true,
         selected: this.selectedId === id,
-        pendingUpdate: pendingUpdate,
+        pendingUpdate,
       };
       classes['flex-row'] = true;
 
@@ -132,44 +132,44 @@ module.exports = {
       }
       return classes;
     },
-    handleAddClick: function(e) {
+    handleAddClick(e) {
       this.addExample();
       this.$refs.exampleEditor.startEditing('Add');
       e.preventDefault();
     },
-    handleSignClick: function(e) {
+    handleSignClick(e) {
       const id = e.target.closest('li.example').id;
       this.toggleShouldMatch(id);
     },
-    handleDblClick: function(e) {
+    handleDblClick(e) {
       this.$refs.exampleEditor.startEditing();
     },
-    handleDeleteClick: function(e) {
+    handleDeleteClick(e) {
       const li = e.target.closest('li.example');
       this.deleteExample(li.id);
       e.preventDefault();
     },
-    handleMouseDown: function(e) {
+    handleMouseDown(e) {
       const li = e.target.closest('li.example');
       this.selectedId = li.id;
       e.preventDefault();
     },
 
     // Emitted from the example editor when the user chooses a start rule.
-    handleSetStartRule: function(newVal) {
+    handleSetStartRule(newVal) {
       this.setStartRule(this.selectedId, newVal);
     },
-    handleEditorThumbClick: function() {
+    handleEditorThumbClick() {
       this.toggleShouldMatch(this.selectedId);
     },
 
-    indicatePendingInput: function(id) {
+    indicatePendingInput(id) {
       return this.isInputPending && this.selectedId === id;
     },
 
     // Add a new example to the list, and return its ID.
     // Every example added to the list must go through this function!
-    addExample: function(optData) {
+    addExample(optData) {
       const id = uniqueId();
       this.$set(this.exampleValues, id, {
         text: '',
@@ -185,7 +185,7 @@ module.exports = {
       return id;
     },
 
-    deleteExample: function(id, optListEl) {
+    deleteExample(id, optListEl) {
       const li = optListEl || this.$el.querySelector('#' + id);
       const elToSelect = li.previousSibling || li.nextSibling;
       this.$delete(this.exampleValues, id);
@@ -197,20 +197,20 @@ module.exports = {
     },
 
     // Return the contents of the example with the given id.
-    getExample: function(id) {
+    getExample(id) {
       if (!(id in this.exampleValues)) {
         throw new Error(id + ' is not a valid example id');
       }
       return this.exampleValues[id];
     },
 
-    getExamples: function() {
+    getExamples() {
       // Return a deep clone.
       return JSON.parse(JSON.stringify(this.exampleValues));
     },
 
     // Set the contents of an example with the given id to `value`.
-    setExample: function(id, text, optStartRule, optShouldMatch) {
+    setExample(id, text, optStartRule, optShouldMatch) {
       if (!(id in this.exampleValues)) {
         throw new Error(id + ' is not a valid example id');
       }
@@ -218,7 +218,7 @@ module.exports = {
       const example = this.exampleValues[id];
       const oldValue = Object.assign({}, example);
       const newValue = {
-        text: text,
+        text,
         startRule: optStartRule || '',
         shouldMatch: optShouldMatch == null ? true : optShouldMatch,
       };
@@ -227,28 +227,28 @@ module.exports = {
       ohmEditor.examples.emit('set:example', id, oldValue, newValue);
     },
 
-    toggleShouldMatch: function(id) {
+    toggleShouldMatch(id) {
       const example = this.exampleValues[id];
       example.shouldMatch = !example.shouldMatch;
     },
 
-    getSelected: function() {
+    getSelected() {
       if (this.selectedId) {
         return this.exampleValues[this.selectedId];
       }
     },
 
     // Select the example with the given id.
-    setSelected: function(id) {
+    setSelected(id) {
       this.selectedId = id;
     },
 
-    setStartRule: function(id, ruleName) {
+    setStartRule(id, ruleName) {
       this.exampleValues[id].startRule = ruleName;
     },
 
     // Restore the examples from localStorage or the given object.
-    restoreExamples: function(key /* orExamples */) {
+    restoreExamples(key /* orExamples */) {
       let examples = [];
       if (typeof key === 'string') {
         const value = localStorage.getItem(key);
@@ -280,14 +280,14 @@ module.exports = {
     },
 
     // Save the current contents of all examples to localStorage.
-    saveExamples: function() {
+    saveExamples() {
       const data = JSON.stringify(Object.keys(this.exampleValues).map(this.getExample));
       localStorage.setItem('examples', data);
     },
 
     // Try to match the example given by `id` against the current grammar.
     // Automatically executed whenever anything in `this.examplesValues` changes.
-    updateExampleStatus: function(id) {
+    updateExampleStatus(id) {
       // If the example was deleted, delete its status as well.
       if (!(id in this.exampleValues)) {
         this.$delete(this.exampleStatus, id);
@@ -312,7 +312,7 @@ module.exports = {
 
     // Watch for changes to the example with the given id. When any of its data changes,
     // `callback` will be called with the example id as its only argument.
-    _watchExample: function(id, callback) {
+    _watchExample(id, callback) {
       const opts = {deep: true};
       const unwatch = this.$watch('exampleValues.' + id, function(newVal, oldVal) {
         callback(id);
@@ -322,11 +322,11 @@ module.exports = {
       }, opts);
     },
   },
-  created: function() {
+  created() {
     // This is not a data property because we don't want Vue to observe its internals.
     this._grammar = null;
   },
-  mounted: function() {
+  mounted() {
     this.restoreExamples('examples');
 
     const self = this;

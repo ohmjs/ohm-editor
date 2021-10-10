@@ -55,8 +55,8 @@ function parseGrammar() {
     };
   }
   return {
-    matchResult: matchResult,
-    grammar: grammar,
+    matchResult,
+    grammar,
     error: err,
   };
 }

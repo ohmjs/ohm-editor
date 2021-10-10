@@ -12,7 +12,7 @@ function TraceElementWalker(root, optConfig) {
 
   this._root = root;
   this._walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
-    acceptNode: function(node) {
+    acceptNode(node) {
       return node.classList.contains('pexpr') && node.classList.contains('labeled')
           ? NodeFilter.FILTER_ACCEPT
           : NodeFilter.FILTER_SKIP;

@@ -28,7 +28,7 @@ function markBlock(cm, startLine, endLine, className) {
     cm.addLineClass(i, 'wrap', className);
   }
   return {
-    clear: function() {
+    clear() {
       for (let i = startLine; i <= endLine; ++i) {
         cm.removeLineClass(i, 'wrap', className);
       }
@@ -40,7 +40,7 @@ function markBlock(cm, startLine, endLine, className) {
 // -------
 
 module.exports = {
-  markInterval: function(cm, interval, className, canHighlightBlocks) {
+  markInterval(cm, interval, className, canHighlightBlocks) {
     const startPos = cm.posFromIndex(interval.startIdx);
     const endPos = cm.posFromIndex(interval.endIdx);
 
@@ -48,16 +48,16 @@ module.exports = {
     if (canHighlightBlocks && isBlockSelectable(cm, startPos, endPos)) {
       return markBlock(cm, startPos.line, endPos.line, className);
     }
-    return cm.markText(startPos, endPos, {className: className});
+    return cm.markText(startPos, endPos, {className});
   },
 
-  clearMark: function(mark) {
+  clearMark(mark) {
     if (mark) {
       mark.clear();
     }
   },
 
-  scrollToInterval: function(cm, interval) {
+  scrollToInterval(cm, interval) {
     const startHeight = indexToHeight(cm, interval.startIdx);
     const endHeight = indexToHeight(cm, interval.endIdx);
     const scrollInfo = cm.getScrollInfo();

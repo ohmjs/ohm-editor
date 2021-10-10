@@ -63,29 +63,29 @@ module.exports = {
   props: {
     rootTrace: Object,
   },
-  data: function() {
+  data() {
     return {
       zoomTrace: null,
       previewedZoomTrace: null,
     };
   },
   computed: {
-    zoomButtonLabel: function() {
+    zoomButtonLabel() {
       return ANTICLOCKWISE_OPEN_CIRCLE_ARROW;
     },
-    showZoomButton: function() {
+    showZoomButton() {
       return this.zoomTrace || this.previewedZoomTrace;
     },
-    currentRootTrace: function() {
+    currentRootTrace() {
       return this.zoomTrace || this.rootTrace;
     },
-    zoomHighlight: function() {
+    zoomHighlight() {
       if (this.previewedZoomTrace) {
         return {node: this.previewedZoomTrace, class: 'zoomBorder'};
       }
     },
   },
-  provide: function() {
+  provide() {
     // Create the step controls here so that we can inject its state into the tree.
     this._stepControls = new StepControls({el: '#stepControls'});
     return {
@@ -93,7 +93,7 @@ module.exports = {
       isPossiblyInvolvedInStepping: true,
     };
   },
-  mounted: function() {
+  mounted() {
     window.addEventListener('resize', this.$refs.expandedInput.update);
 
     ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
@@ -109,26 +109,26 @@ module.exports = {
     ohmEditor.addListener('unpeek:ruleDefinition', clearMarks);
     this.$nextTick(this.resetStepControls);
   },
-  updated: function() {
+  updated() {
     this.$nextTick(this.resetStepControls);
   },
   methods: {
-    zoom: function(traceNode) {
+    zoom(traceNode) {
       this.zoomTrace = traceNode;
       clearMarks();
     },
-    zoomOut: function() {
+    zoomOut() {
       this.zoomTrace = this.previewedZoomTrace = null;
     },
-    previewZoom: function() {
+    previewZoom() {
       this.previewedZoomTrace = this.zoomTrace;
       this.zoomTrace = null;
     },
-    unpreviewZoom: function() {
+    unpreviewZoom() {
       this.zoomTrace = this.previewedZoomTrace;
       this.previewedZoomTrace = null;
     },
-    showContextMenu: function(data) {
+    showContextMenu(data) {
       const zoomEnabled = couldZoom(this.rootTrace, data.traceNode);
 
       const menuDiv = domUtil.$('#parseTreeMenu');
@@ -149,13 +149,13 @@ module.exports = {
       });
       ohmEditor.parseTree.emit('contextMenu', data.el, data.traceNode);
     },
-    updateExpandedInput: function(...args) {
+    updateExpandedInput(...args) {
       this.$refs.expandedInput.update.apply(null, args);
     },
-    measureInputText: function(text) {
+    measureInputText(text) {
       return this.$refs.expandedInput.measureText(text);
     },
-    resetStepControls: function() {
+    resetStepControls() {
       this._stepControls.reset(domUtil.$('#visualizerBody'));
     },
   },

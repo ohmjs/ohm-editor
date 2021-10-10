@@ -46,7 +46,7 @@ module.exports = {
     status: {type: Object},
     grammar: {type: Object},
   },
-  data: function() {
+  data() {
     return {
       editing: false,
       editMode: '',
@@ -54,11 +54,11 @@ module.exports = {
     };
   },
   computed: {
-    classObj: function() {
+    classObj() {
       // Hide parse errors while the placeholder text is visible.
       return this.showPlaceholder ? 'hideInputErrors' : '';
     },
-    commonStartRuleOptions: function() {
+    commonStartRuleOptions() {
       const options = [{text: '(default)', value: ''}];
       if (this.grammar) {
         Object.keys(this.grammar.rules).forEach(function(ruleName) {
@@ -67,35 +67,35 @@ module.exports = {
       }
       return options;
     },
-    startRuleError: function() {
+    startRuleError() {
       return this.status && this.status.err && this.status.err.message;
     },
     startRule: {
-      get: function() {
+      get() {
         return this.example.startRule;
       },
-      set: function(newVal) {
+      set(newVal) {
         this.$emit('setStartRule', newVal);
       },
     },
   },
   watch: {
-    showPlaceholder: function(newVal) {
+    showPlaceholder(newVal) {
       ohmEditor.ui.inputEditor.setOption('placeholder', newVal ? 'Text to match' : '');
     },
   },
-  mounted: function() {
+  mounted() {
     const self = this;
     const editorContainer = domUtil.$('#exampleContainer .editorWrapper');
     const editor = ohmEditor.ui.inputEditor = CodeMirror(editorContainer, {
       extraKeys: {
-        Esc: function(cm) {self.stopEditing();},
+        Esc(cm) {self.stopEditing();},
       },
     });
     ohmEditor.emit('init:inputEditor', editor);
   },
   methods: {
-    startEditing: function(optMode) {
+    startEditing(optMode) {
       this.editing = true;
       this.editMode = optMode || 'Edit';
 
@@ -119,11 +119,11 @@ module.exports = {
         cm.refresh();
       });
     },
-    stopEditing: function() {
+    stopEditing() {
       this.editing = false;
     },
     // An array of objects representing the options to show in #startRuleDropdown.
-    startRuleOptions: function() {
+    startRuleOptions() {
       const ex = this.example;
       const options = this.commonStartRuleOptions;
 

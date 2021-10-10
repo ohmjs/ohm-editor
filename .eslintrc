@@ -71,6 +71,7 @@
 
     no-warning-comments: ["error", {terms: ["xxx", "fixme"]}],
 
+    object-shorthand: ["error", "always"],
     operator-linebreak: ["error", "after", {overrides: {":": "ignore", "?": "ignore"}}],
     padded-blocks: 0,
     quotes: ["error", "single", "avoid-escape"],

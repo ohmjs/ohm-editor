@@ -122,7 +122,7 @@ ohmEditor.parseTree.addListener('create:traceElement', function(el, traceNode) {
     stepsByNodeId[el.id] = {enter: parsingSteps.length};
     addParsingStep({
       type: 'enter',
-      el: el,
+      el,
       node: traceNode,
       collapsed: el.classList.contains('collapsed'),
     });
@@ -135,7 +135,7 @@ ohmEditor.parseTree.addListener('exit:traceElement', function(el, traceNode) {
     // This means that we prefer the 'exit' step over the 'enter' step.
     maybeRecordFailureStep(matchResult, traceNode);
     stepsByNodeId[el.id].exit = parsingSteps.length;
-    addParsingStep({type: 'exit', node: traceNode, el: el});
+    addParsingStep({type: 'exit', node: traceNode, el});
   }
 });
 

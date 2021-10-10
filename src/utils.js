@@ -7,14 +7,14 @@ function objectForEach(obj, func) {
 }
 
 module.exports = {
-  objectForEach: objectForEach,
-  objectMap: function(obj, func) {
+  objectForEach,
+  objectMap(obj, func) {
     return Object.keys(obj).map(function(key) {
       return func(key, obj[key], obj);
     });
   },
 
-  repeat: function(n, fn) {
+  repeat(n, fn) {
     if (n < 0) {return;}
     while (n > 0) {
       fn();
@@ -22,7 +22,7 @@ module.exports = {
     }
   },
 
-  shuffle: function(a) {
+  shuffle(a) {
     let j;
     let x;
     let i;
@@ -35,13 +35,13 @@ module.exports = {
   },
 
   // same as a\b
-  difference: function(a, b) {
+  difference(a, b) {
     return a.filter(function(item) {
       return b.indexOf(item) === -1;
     });
   },
 
-  includes: function(array, item) {
+  includes(array, item) {
     return array.indexOf(item) !== -1;
   },
 };

@@ -12,7 +12,7 @@ module.exports = {
   name: 'thumbs-up-button',
   props: ['showThumbsUp'],
   computed: {
-    title: function() {
+    title() {
       return 'Example should ' + (this.showThumbsUp ? 'match' : 'NOT match');
     },
   },

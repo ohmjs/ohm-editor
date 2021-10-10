@@ -153,7 +153,7 @@ function isLoggedIn() {
 function saveToGist(description, grammarName, grammarText, examples, gistIdOrNull) {
   const gist = gitHub.getGist(gistIdOrNull);
   const gistData = {
-    description: description,
+    description,
     public: false,
     files: {},
   };
@@ -250,7 +250,7 @@ function doSaveAs() {
     const password = $('#password').value;
     $('#password').value = '';
     if (username !== '' && password !== '') {
-      gitHub = new GitHub({username: username, password: password});
+      gitHub = new GitHub({username, password});
       loadUserGrammars(gitHub.getUser());
     }
     localStorage.removeItem('gitHubAuth');
@@ -373,7 +373,7 @@ function doSaveAs() {
   window.loadFromHash = loadFromHash;
 
   ohmEditor.ui.grammarEditor.setOption('extraKeys', {
-    'Cmd-S': function(cm) {
+    'Cmd-S'(cm) {
       if (saveButton.disabled) {
         doSaveAs();
       } else {
