@@ -25,7 +25,7 @@
   var cmUtil = require('../cmUtil');
   var isLeaf = require('../traceUtil').isLeaf;
   var ohmEditor = require('../ohmEditor');
-  var traceLabel = require('./trace-label.vue');
+  var traceLabel = require('./trace-label.vue').default;
 
   var nextNodeId = 1;  // Node 0 is always the root.
 

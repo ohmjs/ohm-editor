@@ -1,9 +1,9 @@
 'use strict';
 
-const Vue = require('vue');
+const Vue = require('vue').default;
 const test = require('tape');
 
-const EllipsisDropdown = Vue.extend(require('../src/components/ellipsis-dropdown.vue'));
+const EllipsisDropdown = Vue.extend(require('../src/components/ellipsis-dropdown.vue').default);
 
 const ArrayProto = Array.prototype;
 

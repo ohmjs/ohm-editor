@@ -3,11 +3,11 @@
 
 'use strict';
 
-var Vue = require('vue');
+var Vue = require('vue').default;
 var ohmEditor = require('./ohmEditor');
 var domUtil = require('./domUtil');
 
-var EllipsisDropdown = Vue.extend(require('./components/ellipsis-dropdown.vue'));
+var EllipsisDropdown = Vue.extend(require('./components/ellipsis-dropdown.vue').default);
 
 var $ = domUtil.$;
 var $$ = domUtil.$$;

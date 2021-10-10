@@ -1,6 +1,6 @@
 'use strict';
 
-const Vue = require('vue');
+const Vue = require('vue').default;
 const assert = require('assert');
 const ohm = require('ohm-js');
 const test = require('tape');
@@ -21,7 +21,7 @@ const ohmEditor = require('../src/ohmEditor');  // Requires CodeMirror()
 
 let localStorageExamples;
 
-const exampleListInjector = require('!!vue?inject!../src/components/example-list.vue');
+const exampleListInjector = require('!!vue?inject!../src/components/example-list.vue').default;
 const ExampleList = Vue.extend(exampleListInjector({
   'global/window': {
     localStorage: {

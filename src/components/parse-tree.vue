@@ -18,14 +18,14 @@
   /* global window */
   'use strict';
 
-  var Vue = require('vue');
+  var Vue = require('vue').default;
   var cmUtil = require('../cmUtil');
   var domUtil = require('../domUtil');
   var isLeaf = require('../traceUtil').isLeaf;
   var ohmEditor = require('../ohmEditor');
 
-  var expandedInput = require('./expanded-input.vue');
-  var parseResults = require('./parse-results.vue');
+  var expandedInput = require('./expanded-input.vue').default;
+  var parseResults = require('./parse-results.vue').default;
 
   var ANTICLOCKWISE_OPEN_CIRCLE_ARROW = '\u21BA';
 
@@ -33,7 +33,7 @@
   var grammarMark;
   var defMark;
 
-  var StepControls = Vue.extend(require('./step-controls.vue'));
+  var StepControls = Vue.extend(require('./step-controls.vue').default);
 
   // Helpers
   // -------

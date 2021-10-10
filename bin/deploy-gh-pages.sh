@@ -25,9 +25,6 @@ fi
 # Do a build and copy everything to $PAGES_DIR/editor
 "$ROOT/bin/build-visualizer.sh" "$PAGES_DIR/editor"
 
-# Manually copy the Ohm bundle, as build-visualizer.sh doesn't do that.
-cp "$ROOT/node_modules/ohm-js/dist/ohm.min.js" "$PAGES_DIR/editor/assets"
-
 # Double check that $PAGES_DIR is actually a git repo.
 pushd "$PAGES_DIR"
 if ! git rev-parse --quiet --verify master > /dev/null; then

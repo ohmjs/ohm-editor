@@ -3,7 +3,7 @@
 'use strict';
 
 var CheckedEmitter = require('checked-emitter');
-var Vue = require('vue');
+var Vue = require('vue').default;
 var ohmEditor = require('./ohmEditor');
 
 var parseTree = ohmEditor.parseTree = new CheckedEmitter();
@@ -14,7 +14,7 @@ parseTree.vue = new Vue({
   },
   el: '#visualizerContainer',
   components: {
-    'parse-tree': require('./components/parse-tree.vue')
+    'parse-tree': require('./components/parse-tree.vue').default
   },
   template:
     '<div id="visualizerContainer">' +

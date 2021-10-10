@@ -2,10 +2,10 @@
 
 'use strict';
 
-var Vue = require('vue');
+var Vue = require('vue').default;
 var ohmEditor = require('./ohmEditor');
 
-var ExampleList = Vue.extend(require('./components/example-list.vue'));
+var ExampleList = Vue.extend(require('./components/example-list.vue').default);
 
 var exampleList = new ExampleList({
   el: '#exampleContainer',

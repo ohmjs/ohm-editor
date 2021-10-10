@@ -27,7 +27,7 @@ function extend(origin, add) {
 }
 
 function combineChildResults(attr) {
-  return function(children) {
+  return function(...children) {
     return children.reduce(function(acc, child) {
       return extend(acc, child[attr]);
     }, {});

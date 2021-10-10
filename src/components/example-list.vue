@@ -53,8 +53,8 @@
   module.exports = {
     name: 'example-list',
     components: {
-      'example-editor': require('./example-editor.vue'),
-      'thumbs-up-button': require('./thumbs-up-button.vue')
+      'example-editor': require('./example-editor.vue').default,
+      'thumbs-up-button': require('./thumbs-up-button.vue').default
     },
     props: [],
     data: function() {

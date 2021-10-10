@@ -39,7 +39,7 @@
   module.exports = {
     name: 'example-editor',
     components: {
-      'thumbs-up-button': require('./thumbs-up-button.vue')
+      'thumbs-up-button': require('./thumbs-up-button.vue').default
     },
     props: {
       example: {type: Object, required: true},
