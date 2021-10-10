@@ -15,7 +15,7 @@ module.exports = {
   },
 
   repeat: function(n, fn) {
-    if (n < 0) { return; }
+    if (n < 0) {return;}
     while (n > 0) {
       fn();
       n--;
@@ -23,9 +23,9 @@ module.exports = {
   },
 
   shuffle: function(a) {
-    var j;
-    var x;
-    var i;
+    let j;
+    let x;
+    let i;
     for (i = a.length; i; i -= 1) {
       j = Math.floor(Math.random() * i);
       x = a[i - 1];
@@ -43,5 +43,5 @@ module.exports = {
 
   includes: function(array, item) {
     return array.indexOf(item) !== -1;
-  }
+  },
 };

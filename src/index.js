@@ -3,10 +3,10 @@
 
 'use strict';
 
-require('es6-object-assign/auto');  // Object.assign polyfill
+require('es6-object-assign/auto'); // Object.assign polyfill
 
-var domUtil = require('./domUtil');
-var ohmEditor = require('./ohmEditor');
+const domUtil = require('./domUtil');
+const ohmEditor = require('./ohmEditor');
 
 require('./editorErrors');
 require('./examples');
@@ -17,31 +17,30 @@ require('./searchBar');
 require('./splitters');
 require('./persistence');
 
-var checkboxes;
-var grammarChanged = true;
-var inputChanged = true;
+let grammarChanged = true;
+let inputChanged = true;
 
-var showFailuresImplicitly = true;
+let showFailuresImplicitly = true;
 
-var $ = domUtil.$;
-var $$ = domUtil.$$;
+const $ = domUtil.$;
+const $$ = domUtil.$$;
 
-var grammarMatcher = ohm.ohmGrammar.matcher();
+let grammarMatcher = ohm.ohmGrammar.matcher();
 
 // Helpers
 // -------
 
 function parseGrammar() {
-  var matchResult = grammarMatcher.match();
+  const matchResult = grammarMatcher.match();
 
-  var grammar;
-  var err;
+  let grammar;
+  let err;
 
   if (matchResult.succeeded()) {
-    var ns = {};
+    const ns = {};
     try {
       ohm._buildGrammar(matchResult, ns);
-      var firstProp = Object.keys(ns)[0];
+      const firstProp = Object.keys(ns)[0];
       if (firstProp) {
         grammar = ns[firstProp];
       }
@@ -52,13 +51,13 @@ function parseGrammar() {
     err = {
       message: matchResult.message,
       shortMessage: matchResult.shortMessage,
-      interval: matchResult.getInterval()
+      interval: matchResult.getInterval(),
     };
   }
   return {
     matchResult: matchResult,
     grammar: grammar,
-    error: err
+    error: err,
   };
 }
 
@@ -75,22 +74,22 @@ function getValidStartRule(grammar, optRuleName) {
 }
 
 function refresh() {
-  var grammarEditor = ohmEditor.ui.grammarEditor;
-  var inputEditor = ohmEditor.ui.inputEditor;
+  const grammarEditor = ohmEditor.ui.grammarEditor;
+  const inputEditor = ohmEditor.ui.inputEditor;
 
-  var grammarSource = grammarEditor.getValue();
-  var inputSource = inputEditor.getValue();
+  const grammarSource = grammarEditor.getValue();
+  const inputSource = inputEditor.getValue();
 
   ohmEditor.saveState(inputEditor, 'input');
 
   // Refresh the option values.
-  for (var i = 0; i < checkboxes.length; ++i) {
-    var checkbox = checkboxes[i];
+  for (let i = 0; i < checkboxes.length; ++i) {
+    const checkbox = checkboxes[i];
     ohmEditor.options[checkbox.name] = checkbox.checked;
   }
 
   if (inputChanged || grammarChanged) {
-    showFailuresImplicitly = true;  // Reset to default.
+    showFailuresImplicitly = true; // Reset to default.
   }
 
   if (inputChanged) {
@@ -102,19 +101,19 @@ function refresh() {
     grammarChanged = false;
     ohmEditor.emit('change:grammar', grammarSource);
 
-    var result = parseGrammar();
+    const result = parseGrammar();
     ohmEditor.grammar = result.grammar;
     ohmEditor.emit('parse:grammar', result.matchResult, result.grammar, result.error);
   }
 
   if (ohmEditor.grammar) {
-    var startRule = getValidStartRule(ohmEditor.grammar, ohmEditor.startRule);
+    const startRule = getValidStartRule(ohmEditor.grammar, ohmEditor.startRule);
     if (startRule) {
-      var trace = ohmEditor.grammar.trace(inputSource, startRule);
+      const trace = ohmEditor.grammar.trace(inputSource, startRule);
 
       // When the input fails to parse, turn on "show failures" automatically.
       if (showFailuresImplicitly) {
-        var checked = $('input[name=showFailures]').checked = trace.result.failed();
+        const checked = $('input[name=showFailures]').checked = trace.result.failed();
         ohmEditor.options.showFailures = checked;
       }
 
@@ -130,7 +129,7 @@ ohmEditor.setGrammar = function(grammar) {
       grammar = $('#sampleGrammar').textContent; // default element
     }
   }
-  var doc = CodeMirror.Doc(grammar, 'null');
+  const doc = CodeMirror.Doc(grammar, 'null');
   ohmEditor.ui.grammarEditor.swapDoc(doc);
 };
 
@@ -141,7 +140,7 @@ ohmEditor.saveState = function(editor, key) {
 // Main
 // ----
 
-var refreshTimeout;
+let refreshTimeout;
 function triggerRefresh(delay) {
   if (refreshTimeout) {
     clearTimeout(refreshTimeout);
@@ -154,10 +153,10 @@ function resetGrammarMatcher() {
   grammarMatcher.setInput(ohmEditor.ui.grammarEditor.getValue());
 }
 
-checkboxes = $$('#options input[type=checkbox]');
+const checkboxes = $$('#options input[type=checkbox]');
 checkboxes.forEach(function(cb) {
   cb.addEventListener('click', function(e) {
-    var optionName = cb.name;
+    const optionName = cb.name;
 
     // Respect the user's wishes if they automatically enable/disable "show failures".
     if (optionName === 'showFailures') {
@@ -203,7 +202,7 @@ console.log([
   '- `ohm` is the Ohm library',
   '- `ohmEditor` is editor object with',
   '  `.grammar` as the current grammar object (if the source is valid)',
-  '  `.ui` containing the `inputEditor` and `grammarEditor`'
+  '  `.ui` containing the `inputEditor` and `grammarEditor`',
 ].join('\n'));
 /* eslint-enable no-console */
 

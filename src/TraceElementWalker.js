@@ -8,7 +8,7 @@
 // the way out -- even if they have no actual children. Whereas, the regular TreeWalker just
 // does a standard pre-order traversal.
 function TraceElementWalker(root, optConfig) {
-  var config = optConfig || {};
+  const config = optConfig || {};
 
   this._root = root;
   this._walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
@@ -16,7 +16,7 @@ function TraceElementWalker(root, optConfig) {
       return node.classList.contains('pexpr') && node.classList.contains('labeled')
           ? NodeFilter.FILTER_ACCEPT
           : NodeFilter.FILTER_SKIP;
-    }
+    },
   });
   this.isAtEnd = !!config.startAtEnd;
   this.currentNode = null;
@@ -40,7 +40,7 @@ TraceElementWalker.prototype._isInInitialState = function() {
 TraceElementWalker.prototype.nextNode = function() {
   // Case 1: Entering an interior node or the first node.
   if (!this.exitingCurrentNode && (this._isOnInteriorNode() || this._isInInitialState())) {
-    var oldCurrentNode = this.currentNode;
+    const oldCurrentNode = this.currentNode;
     if ((this.currentNode = this._walker.firstChild()) != null) {
       this.exitingCurrentNode = false;
     } else {
@@ -67,14 +67,14 @@ TraceElementWalker.prototype.nextNode = function() {
 };
 
 TraceElementWalker.prototype._isOnInteriorNode = function() {
-  var node = this.currentNode;
+  const node = this.currentNode;
   return node && !node.classList.contains('leaf');
 };
 
 TraceElementWalker.prototype.previousNode = function() {
   // Case 1: Entering an interior node (or the first node) backwards
   if (this.exitingCurrentNode) {
-    var oldCurrentNode = this.currentNode;
+    const oldCurrentNode = this.currentNode;
     if ((this.currentNode = this._walker.lastChild()) != null) {
       this.exitingCurrentNode = this._isOnInteriorNode();
     } else {

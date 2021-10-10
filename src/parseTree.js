@@ -2,19 +2,19 @@
 
 'use strict';
 
-var CheckedEmitter = require('checked-emitter');
-var Vue = require('vue').default;
-var ohmEditor = require('./ohmEditor');
+const CheckedEmitter = require('checked-emitter');
+const Vue = require('vue').default;
+const ohmEditor = require('./ohmEditor');
 
-var parseTree = ohmEditor.parseTree = new CheckedEmitter();
+const parseTree = ohmEditor.parseTree = new CheckedEmitter();
 parseTree.vue = new Vue({
   data: {
     parsing: false,
-    trace: null
+    trace: null,
   },
   el: '#visualizerContainer',
   components: {
-    'parse-tree': require('./components/parse-tree.vue').default
+    'parse-tree': require('./components/parse-tree.vue').default,
   },
   template:
     '<div id="visualizerContainer">' +
@@ -24,19 +24,19 @@ parseTree.vue = new Vue({
   methods: {
     onEdit: function(cm) {
       this.parsing = true;
-    }
+    },
   },
   mounted: function() {
     ohmEditor.addListener('change:inputEditor', this.onEdit);
     ohmEditor.addListener('change:grammarEditor', this.onEdit);
 
     // Refresh the parse tree after attempting to parse the input.
-    var self = this;
+    const self = this;
     ohmEditor.addListener('parse:input', function(matchResult, trace) {
       self.parsing = false;
       self.trace = Object.freeze(trace);
     });
-  }
+  },
 });
 
 parseTree.setTraceElementCollapsed = function(el, collapsed, optDuration) {
@@ -60,5 +60,5 @@ parseTree.registerEvents({
   'render:parseTree': ['traceNode'],
 
   // Emitted after cmd/ctrl + 'click' on a label
-  'cmdOrCtrlClick:traceElement': ['wrapper']
+  'cmdOrCtrlClick:traceElement': ['wrapper'],
 });

@@ -17,15 +17,15 @@ function findEl(vm, query) {
 // Tests
 // -----
 
-test('showing and hiding the dropdown', t => {
+test('showing and hiding the dropdown', (t) => {
   const counts = {Foo: 0, Bar: 0};
   const vm = new EllipsisDropdown({
     propsData: {
       items: {
-        Foo() { counts.Foo++; },
-        Bar: null
-      }
-    }
+        Foo() {counts.Foo++;},
+        Bar: null,
+      },
+    },
   });
   vm.$mount();
 
@@ -38,7 +38,7 @@ test('showing and hiding the dropdown', t => {
   Vue.nextTick(() => {
     const links = ArrayProto.slice.call(vm.$el.querySelectorAll('li > a'));
 
-    const labels = links.map(el => el.textContent);
+    const labels = links.map((el) => el.textContent);
     t.deepEqual(labels, ['Foo', 'Bar'], 'labels are correct');
 
     links[0].click();

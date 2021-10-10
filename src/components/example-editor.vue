@@ -29,113 +29,113 @@
 </template>
 
 <script>
-  /* global CodeMirror */
+/* global CodeMirror */
 
-  'use strict';
+'use strict';
 
-  var domUtil = require('../domUtil');
-  var ohmEditor = require('../ohmEditor');
+const domUtil = require('../domUtil');
+const ohmEditor = require('../ohmEditor');
 
-  module.exports = {
-    name: 'example-editor',
-    components: {
-      'thumbs-up-button': require('./thumbs-up-button.vue').default
+module.exports = {
+  name: 'example-editor',
+  components: {
+    'thumbs-up-button': require('./thumbs-up-button.vue').default,
+  },
+  props: {
+    example: {type: Object, required: true},
+    status: {type: Object},
+    grammar: {type: Object},
+  },
+  data: function() {
+    return {
+      editing: false,
+      editMode: '',
+      showPlaceholder: false,
+    };
+  },
+  computed: {
+    classObj: function() {
+      // Hide parse errors while the placeholder text is visible.
+      return this.showPlaceholder ? 'hideInputErrors' : '';
     },
-    props: {
-      example: {type: Object, required: true},
-      status: {type: Object},
-      grammar: {type: Object}
-    },
-    data: function() {
-      return {
-        editing: false,
-        editMode: '',
-        showPlaceholder: false
-      };
-    },
-    computed: {
-      classObj: function() {
-        // Hide parse errors while the placeholder text is visible.
-        return this.showPlaceholder ? 'hideInputErrors' : '';
-      },
-      commonStartRuleOptions: function() {
-        var options = [{text: '(default)', value: ''}];
-        if (this.grammar) {
-          Object.keys(this.grammar.rules).forEach(function(ruleName) {
-            options.push({text: ruleName, value: ruleName});
-          });
-        }
-        return options;
-      },
-      startRuleError: function() {
-        return this.status && this.status.err && this.status.err.message;
-      },
-      startRule: {
-        get: function() {
-          return this.example.startRule;
-        },
-        set: function(newVal) {
-          this.$emit('setStartRule', newVal);
-        }
-      }
-    },
-    watch: {
-      showPlaceholder: function(newVal) {
-        ohmEditor.ui.inputEditor.setOption('placeholder', newVal ? 'Text to match' : '');
-      }
-    },
-    mounted: function() {
-      var self = this;
-      var editorContainer = domUtil.$('#exampleContainer .editorWrapper');
-      var editor = ohmEditor.ui.inputEditor = CodeMirror(editorContainer, {
-        extraKeys: {
-          Esc: function(cm) { self.stopEditing(); }
-        }
-      });
-      ohmEditor.emit('init:inputEditor', editor);
-    },
-    methods: {
-      startEditing: function(optMode) {
-        this.editing = true;
-        this.editMode = optMode || 'Edit';
-
-        this.showPlaceholder = this.editMode === 'Add';
-
-        // When adding a new example, show placeholder text only until the user types something,
-        // rather than whenever the editor is empty (which is the default behaviour).
-        if (this.showPlaceholder) {
-          var self = this;
-          ohmEditor.ui.inputEditor.on('change', function handler(cm) {
-            self.showPlaceholder = false;
-            cm.off('change', handler);
-          });
-        }
-
-        // Focus the editor and set the cursor to the end.
-        this.$nextTick(function() {
-          var cm = ohmEditor.ui.inputEditor;
-          cm.focus();
-          cm.setCursor(cm.lineCount(), 0);
-          cm.refresh();
+    commonStartRuleOptions: function() {
+      const options = [{text: '(default)', value: ''}];
+      if (this.grammar) {
+        Object.keys(this.grammar.rules).forEach(function(ruleName) {
+          options.push({text: ruleName, value: ruleName});
         });
-      },
-      stopEditing: function() {
-        this.editing = false;
-      },
-      // An array of objects representing the options to show in #startRuleDropdown.
-      startRuleOptions: function() {
-        var ex = this.example;
-        var options = this.commonStartRuleOptions;
-
-        // Ensure the example's start rule always appears in the dropdown, even if the
-        // rule no longer appears in the grammar.
-        for (var i = 0; i < options.length; ++i) {
-          if (options[i].value === ex.startRule) {
-            return options;
-          }
-        }
-        return [{text: ex.startRule, value: ex.startRule}].concat(options);
       }
-    }
-  };
+      return options;
+    },
+    startRuleError: function() {
+      return this.status && this.status.err && this.status.err.message;
+    },
+    startRule: {
+      get: function() {
+        return this.example.startRule;
+      },
+      set: function(newVal) {
+        this.$emit('setStartRule', newVal);
+      },
+    },
+  },
+  watch: {
+    showPlaceholder: function(newVal) {
+      ohmEditor.ui.inputEditor.setOption('placeholder', newVal ? 'Text to match' : '');
+    },
+  },
+  mounted: function() {
+    const self = this;
+    const editorContainer = domUtil.$('#exampleContainer .editorWrapper');
+    const editor = ohmEditor.ui.inputEditor = CodeMirror(editorContainer, {
+      extraKeys: {
+        Esc: function(cm) {self.stopEditing();},
+      },
+    });
+    ohmEditor.emit('init:inputEditor', editor);
+  },
+  methods: {
+    startEditing: function(optMode) {
+      this.editing = true;
+      this.editMode = optMode || 'Edit';
+
+      this.showPlaceholder = this.editMode === 'Add';
+
+      // When adding a new example, show placeholder text only until the user types something,
+      // rather than whenever the editor is empty (which is the default behaviour).
+      if (this.showPlaceholder) {
+        const self = this;
+        ohmEditor.ui.inputEditor.on('change', function handler(cm) {
+          self.showPlaceholder = false;
+          cm.off('change', handler);
+        });
+      }
+
+      // Focus the editor and set the cursor to the end.
+      this.$nextTick(function() {
+        const cm = ohmEditor.ui.inputEditor;
+        cm.focus();
+        cm.setCursor(cm.lineCount(), 0);
+        cm.refresh();
+      });
+    },
+    stopEditing: function() {
+      this.editing = false;
+    },
+    // An array of objects representing the options to show in #startRuleDropdown.
+    startRuleOptions: function() {
+      const ex = this.example;
+      const options = this.commonStartRuleOptions;
+
+      // Ensure the example's start rule always appears in the dropdown, even if the
+      // rule no longer appears in the grammar.
+      for (let i = 0; i < options.length; ++i) {
+        if (options[i].value === ex.startRule) {
+          return options;
+        }
+      }
+      return [{text: ex.startRule, value: ex.startRule}].concat(options);
+    },
+  },
+};
 </script>

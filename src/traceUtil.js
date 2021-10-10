@@ -38,5 +38,5 @@ module.exports = {
   isLeaf: isLeaf,
   isLRBaseCase: isLRBaseCase,
   isPrimitive: isPrimitive,
-  isPrimitiveRule: isPrimitiveRule
+  isPrimitiveRule: isPrimitiveRule,
 };

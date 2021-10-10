@@ -30,5 +30,5 @@ function makeGrammars(source, optNamespace) {
 
 module.exports = {
   makeGrammar,
-  makeGrammars
+  makeGrammars,
 };

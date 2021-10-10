@@ -2,12 +2,12 @@
 
 'use strict';
 
-var ohmEditor = require('./ohmEditor');
-var domUtil = require('./domUtil');
+const ohmEditor = require('./ohmEditor');
+const domUtil = require('./domUtil');
 
 // Returns the first ancestor node of `el` that has class `className`.
 function ancestorWithClassName(el, className) {
-  var node = el;
+  let node = el;
   while ((node = node.parentElement) != null) {
     if (node.classList.contains(className)) {
       return node;
@@ -16,13 +16,13 @@ function ancestorWithClassName(el, className) {
 }
 
 function installEventHandlers(editor, footer, findCallback) {
-  var input = footer.querySelector('input[type=search]');
+  const input = footer.querySelector('input[type=search]');
 
   // Install a temporary keymap while the toolbar is open, which makes Cmd-F
   // refocus the search bar rather than starting a new search.
-  var tempKeyMap = {fallthrough: 'default'};
+  const tempKeyMap = {fallthrough: 'default'};
   tempKeyMap['Cmd-F'] = tempKeyMap['Ctrl-F'] = function doFind(cm) {
-    var selection = cm.getSelection();
+    const selection = cm.getSelection();
 
     // If there's no selection or it's the same as the current search, refocus the search bar.
     // Otherwise, start a new search.
@@ -37,7 +37,7 @@ function installEventHandlers(editor, footer, findCallback) {
   // Handles find-related keys when the search bar has focus. `binding` is the result
   // of looking up the key in `tempKeyMap`. Returns `true` if the key was handled, and
   // `false` otherwise.
-  var handleKey = function(binding) {
+  const handleKey = function(binding) {
     if (typeof binding === 'function') {
       binding(editor);
       return true;
@@ -48,7 +48,7 @@ function installEventHandlers(editor, footer, findCallback) {
     return false;
   };
 
-  var closeFooter = function() {
+  const closeFooter = function() {
     footer.parentNode.removeChild(footer);
     editor.execCommand('clearSearch');
     editor.removeKeyMap(tempKeyMap);
@@ -57,7 +57,7 @@ function installEventHandlers(editor, footer, findCallback) {
 
   // Handler for keydown events in the search bar.
   footer.onkeydown = function(e) {
-    var keyName = CodeMirror.keyName(e);
+    const keyName = CodeMirror.keyName(e);
     if (keyName === 'Esc') {
       closeFooter();
       editor.focus();
@@ -68,22 +68,22 @@ function installEventHandlers(editor, footer, findCallback) {
     }
   };
 
-  var closeButton = footer.querySelector('.closeButton');
+  const closeButton = footer.querySelector('.closeButton');
   closeButton.onclick = closeFooter;
 }
 
 // An implementation of CodeMirror's `openDialog` API, but specialized for use
 // as the search box. As such, it might not be very well suited to other purposes.
 CodeMirror.defineExtension('openDialog', function(template, callback, opts) {
-  var editor = this;
+  const editor = this; // eslint-disable-line no-invalid-this
 
   if (template.indexOf('Search:') !== 0) {
     throw new Error('No dialog for template ' + template);
   }
 
   // Re-use the existing footer if it's visible, or create a new one.
-  var container = ancestorWithClassName(editor.getWrapperElement(), 'flex-fix').parentNode;
-  var footer = container.querySelector('.footer');
+  const container = ancestorWithClassName(editor.getWrapperElement(), 'flex-fix').parentNode;
+  let footer = container.querySelector('.footer');
   if (!footer) {
     footer = domUtil.$('#protos .footer').cloneNode(true);
     container.appendChild(footer);
@@ -91,8 +91,8 @@ CodeMirror.defineExtension('openDialog', function(template, callback, opts) {
     installEventHandlers(editor, footer, callback);
   }
 
-  var closeButton = footer.querySelector('.closeButton');
-  var input = footer.querySelector('input[type=search]');
+  const closeButton = footer.querySelector('.closeButton');
+  const input = footer.querySelector('input[type=search]');
 
   if (opts.value) {
     input.value = opts.value;
@@ -102,10 +102,10 @@ CodeMirror.defineExtension('openDialog', function(template, callback, opts) {
 });
 
 // A keymap which maps Ctrl-F/Cmd-F to 'findPersistent' (rather than 'find').
-var editorKeyMap = {};
+const editorKeyMap = {};
 editorKeyMap['Ctrl-F'] = editorKeyMap['Cmd-F'] = 'findPersistent';
 
-var handleEditorInit = function(cm) {
+const handleEditorInit = function(cm) {
   cm.addKeyMap(editorKeyMap);
 };
 ohmEditor.addListener('init:inputEditor', handleEditorInit);

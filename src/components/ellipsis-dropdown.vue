@@ -24,7 +24,7 @@
         @keydown.esc="hide"
         @blur="hide">&#x22ee;</button>
     <ul class="dropdown-menu dropdown-menu-right" :hidden="hidden">
-      <li v-for="(cb, label) in items" :class="itemClass(label)">
+      <li v-for="(cb, label) in items" v-bind:key="label" :class="itemClass(label)">
         <a href="#"
             @mousedown.prevent="/* Prevent blur of button */"
             @click="handleItemClick(label)">{{ label }}</a>
@@ -34,48 +34,48 @@
 </template>
 
 <script>
-  'use strict';
+'use strict';
 
-  module.exports = {
-    name: 'ellipsis-dropdown',
-    props: {
-      // Specifies the menu items. Format is {<label>: <callback>, ...}
-      // If the callback is null, the item will be disabled.
-      items: {type: Object, required: true}
+module.exports = {
+  name: 'ellipsis-dropdown',
+  props: {
+    // Specifies the menu items. Format is {<label>: <callback>, ...}
+    // If the callback is null, the item will be disabled.
+    items: {type: Object, required: true},
+  },
+  data: function() {
+    return {
+      hidden: true,
+    };
+  },
+  computed: {
+    button: function() {
+      return this.$el.querySelector('button');
     },
-    data: function() {
-      return {
-        hidden: true
-      };
-    },
-    computed: {
-      button: function() {
-        return this.$el.querySelector('button');
+  },
+  methods: {
+    itemClass: function(label) {
+      if (this.items[label] == null) {
+        return 'disabled';
       }
     },
-    methods: {
-      itemClass: function(label) {
-        if (this.items[label] == null) {
-          return 'disabled';
-        }
-      },
-      handleMouseDown: function(e) {
-        e.preventDefault();
-      },
-      toggleHidden: function(e) {
-        this.hidden = !this.hidden;
-      },
-      handleItemClick: function(label) {
-        var cb = this.items[label];
-        if (cb) {
-          cb();
-        }
-        this.button.blur();
-        this.hide();  // Redundant, but blur() is flaky in tests.
-      },
-      hide: function() {
-        this.hidden = true;
+    handleMouseDown: function(e) {
+      e.preventDefault();
+    },
+    toggleHidden: function(e) {
+      this.hidden = !this.hidden;
+    },
+    handleItemClick: function(label) {
+      const cb = this.items[label];
+      if (cb) {
+        cb();
       }
-    }
-  };
+      this.button.blur();
+      this.hide(); // Redundant, but blur() is flaky in tests.
+    },
+    hide: function() {
+      this.hidden = true;
+    },
+  },
+};
 </script>

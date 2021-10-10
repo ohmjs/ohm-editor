@@ -2,24 +2,24 @@
 
 'use strict';
 
-var domUtil = require('./domUtil');
-var ohmEditor = require('./ohmEditor');
+const domUtil = require('./domUtil');
+const ohmEditor = require('./ohmEditor');
 
-var parsingSteps;
+let parsingSteps;
 
 // Maps from a node ID (i.e., the `id` property of a trace element) to an object
 // {enter: Number, exit: Number}. The numbers are the indices in `parsingSteps` where
 // the enter and exit steps are found.
-var stepsByNodeId;
+let stepsByNodeId;
 
 // Maps from a Failure key to the parsing step for that failure.
-var stepsByFailureKey;
+let stepsByFailureKey;
 
-var matchResult;
-var oldStep;
-var slider = domUtil.$('#timeSlider');
+let matchResult;
+let oldStep;
+const slider = domUtil.$('#timeSlider');
 
-var timelineEnabled;
+let timelineEnabled;
 
 // Helpers
 // -------
@@ -48,10 +48,10 @@ function maybeRecordFailureStep(result, node) {
 
 function gotoTimestep(step) {
   slider.value = step;
-  for (var i = 0; i < parsingSteps.length; ++i) {
-    var cmd = parsingSteps[i];
-    var el = cmd.el;
-    var isStepComplete = i <= step;
+  for (let i = 0; i < parsingSteps.length; ++i) {
+    const cmd = parsingSteps[i];
+    const el = cmd.el;
+    const isStepComplete = i <= step;
 
     switch (cmd.type) {
       case 'enter':
@@ -70,7 +70,7 @@ function gotoTimestep(step) {
     }
   }
   // Highlight the currently-active step (unhighlighting the previous one first).
-  var stepEl = domUtil.$('.currentParseStep');
+  let stepEl = domUtil.$('.currentParseStep');
   if (stepEl) {
     stepEl.classList.remove('currentParseStep');
 
@@ -124,7 +124,7 @@ ohmEditor.parseTree.addListener('create:traceElement', function(el, traceNode) {
       type: 'enter',
       el: el,
       node: traceNode,
-      collapsed: el.classList.contains('collapsed')
+      collapsed: el.classList.contains('collapsed'),
     });
   }
 });

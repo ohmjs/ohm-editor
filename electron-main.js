@@ -1,17 +1,17 @@
 'use strict';
 
-var Server = require('./server');
-var electron = require('electron');
+const Server = require('./server');
+const electron = require('electron');
 
-var app = electron.app;  // Module to control application life.
-var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
+const app = electron.app; // Module to control application life.
+const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null;
+let mainWindow = null;
 
 app.on('ready', function() {
-  var devServer = new Server();
+  const devServer = new Server();
 
   mainWindow = new BrowserWindow({width: 1400, height: 900});
   mainWindow.loadURL(devServer.indexURL);

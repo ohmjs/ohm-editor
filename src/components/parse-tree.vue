@@ -15,149 +15,149 @@
 </template>
 
 <script>
-  /* global window */
-  'use strict';
+/* global window */
+'use strict';
 
-  var Vue = require('vue').default;
-  var cmUtil = require('../cmUtil');
-  var domUtil = require('../domUtil');
-  var isLeaf = require('../traceUtil').isLeaf;
-  var ohmEditor = require('../ohmEditor');
+const Vue = require('vue').default;
+const cmUtil = require('../cmUtil');
+const domUtil = require('../domUtil');
+const isLeaf = require('../traceUtil').isLeaf;
+const ohmEditor = require('../ohmEditor');
 
-  var expandedInput = require('./expanded-input.vue').default;
-  var parseResults = require('./parse-results.vue').default;
+const expandedInput = require('./expanded-input.vue').default;
+const parseResults = require('./parse-results.vue').default;
 
-  var ANTICLOCKWISE_OPEN_CIRCLE_ARROW = '\u21BA';
+const ANTICLOCKWISE_OPEN_CIRCLE_ARROW = '\u21BA';
 
-  var inputMark;
-  var grammarMark;
-  var defMark;
+let inputMark;
+let grammarMark;
+let defMark;
 
-  var StepControls = Vue.extend(require('./step-controls.vue').default);
+const StepControls = Vue.extend(require('./step-controls.vue').default);
 
-  // Helpers
-  // -------
+// Helpers
+// -------
 
-  function couldZoom(currentRootTrace, traceNode) {
-    return currentRootTrace !== traceNode &&
+function couldZoom(currentRootTrace, traceNode) {
+  return currentRootTrace !== traceNode &&
            traceNode.succeeded &&
            !isLeaf(ohmEditor.grammar, traceNode);
-  }
+}
 
-  function clearMarks() {
-    inputMark = cmUtil.clearMark(inputMark);
-    grammarMark = cmUtil.clearMark(grammarMark);
-    defMark = cmUtil.clearMark(defMark);
-    ohmEditor.ui.grammarEditor.getWrapperElement().classList.remove('highlighting');
-    ohmEditor.ui.inputEditor.getWrapperElement().classList.remove('highlighting');
-  }
+function clearMarks() {
+  inputMark = cmUtil.clearMark(inputMark);
+  grammarMark = cmUtil.clearMark(grammarMark);
+  defMark = cmUtil.clearMark(defMark);
+  ohmEditor.ui.grammarEditor.getWrapperElement().classList.remove('highlighting');
+  ohmEditor.ui.inputEditor.getWrapperElement().classList.remove('highlighting');
+}
 
-  // Exports
-  // -------
+// Exports
+// -------
 
-  module.exports = {
-    components: {
-      'expanded-input': expandedInput,
-      'parse-results': parseResults
+module.exports = {
+  components: {
+    'expanded-input': expandedInput,
+    'parse-results': parseResults,
+  },
+  props: {
+    rootTrace: Object,
+  },
+  data: function() {
+    return {
+      zoomTrace: null,
+      previewedZoomTrace: null,
+    };
+  },
+  computed: {
+    zoomButtonLabel: function() {
+      return ANTICLOCKWISE_OPEN_CIRCLE_ARROW;
     },
-    props: {
-      rootTrace: Object
+    showZoomButton: function() {
+      return this.zoomTrace || this.previewedZoomTrace;
     },
-    data: function() {
-      return {
-        zoomTrace: null,
-        previewedZoomTrace: null
-      };
+    currentRootTrace: function() {
+      return this.zoomTrace || this.rootTrace;
     },
-    computed: {
-      zoomButtonLabel: function() {
-        return ANTICLOCKWISE_OPEN_CIRCLE_ARROW;
-      },
-      showZoomButton: function() {
-        return this.zoomTrace || this.previewedZoomTrace;
-      },
-      currentRootTrace: function() {
-        return this.zoomTrace || this.rootTrace;
-      },
-      zoomHighlight: function() {
-        if (this.previewedZoomTrace) {
-          return {node: this.previewedZoomTrace, class: 'zoomBorder'};
-        }
+    zoomHighlight: function() {
+      if (this.previewedZoomTrace) {
+        return {node: this.previewedZoomTrace, class: 'zoomBorder'};
       }
     },
-    provide: function() {
-      // Create the step controls here so that we can inject its state into the tree.
-      this._stepControls = new StepControls({el: '#stepControls'});
-      return {
-        injectedStepState: this._stepControls.stepState,
-        isPossiblyInvolvedInStepping: true
-      };
-    },
-    mounted: function() {
-      window.addEventListener('resize', this.$refs.expandedInput.update);
+  },
+  provide: function() {
+    // Create the step controls here so that we can inject its state into the tree.
+    this._stepControls = new StepControls({el: '#stepControls'});
+    return {
+      injectedStepState: this._stepControls.stepState,
+      isPossiblyInvolvedInStepping: true,
+    };
+  },
+  mounted: function() {
+    window.addEventListener('resize', this.$refs.expandedInput.update);
 
-      ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
-        if (ohmEditor.grammar.rules.hasOwnProperty(ruleName)) {
-          var defInterval = ohmEditor.grammar.rules[ruleName].source;
-          if (defInterval) {
-            var grammarEditor = ohmEditor.ui.grammarEditor;
-            defMark = cmUtil.markInterval(grammarEditor, defInterval, 'active-definition', true);
-            cmUtil.scrollToInterval(grammarEditor, defInterval);
-          }
+    ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
+      if (ohmEditor.grammar.rules.hasOwnProperty(ruleName)) {
+        const defInterval = ohmEditor.grammar.rules[ruleName].source;
+        if (defInterval) {
+          const grammarEditor = ohmEditor.ui.grammarEditor;
+          defMark = cmUtil.markInterval(grammarEditor, defInterval, 'active-definition', true);
+          cmUtil.scrollToInterval(grammarEditor, defInterval);
         }
+      }
+    });
+    ohmEditor.addListener('unpeek:ruleDefinition', clearMarks);
+    this.$nextTick(this.resetStepControls);
+  },
+  updated: function() {
+    this.$nextTick(this.resetStepControls);
+  },
+  methods: {
+    zoom: function(traceNode) {
+      this.zoomTrace = traceNode;
+      clearMarks();
+    },
+    zoomOut: function() {
+      this.zoomTrace = this.previewedZoomTrace = null;
+    },
+    previewZoom: function() {
+      this.previewedZoomTrace = this.zoomTrace;
+      this.zoomTrace = null;
+    },
+    unpreviewZoom: function() {
+      this.zoomTrace = this.previewedZoomTrace;
+      this.previewedZoomTrace = null;
+    },
+    showContextMenu: function(data) {
+      const zoomEnabled = couldZoom(this.rootTrace, data.traceNode);
+
+      const menuDiv = domUtil.$('#parseTreeMenu');
+      menuDiv.style.left = data.x + 'px';
+      menuDiv.style.top = data.y + 'px';
+      menuDiv.hidden = false;
+
+      const self = this;
+      domUtil.addMenuItem('parseTreeMenu', 'getInfoItem', 'Get Info', false);
+      domUtil.addMenuItem('parseTreeMenu', 'stepInItem', 'Step Into', true, function() {
+        self._stepControls.stepInto(data.el);
       });
-      ohmEditor.addListener('unpeek:ruleDefinition', clearMarks);
-      this.$nextTick(this.resetStepControls);
+      domUtil.addMenuItem('parseTreeMenu', 'stepOutItem', 'Step Out', true, function() {
+        self._stepControls.stepOut(data.el);
+      });
+      domUtil.addMenuItem('parseTreeMenu', 'zoomItem', 'Zoom to Node', zoomEnabled, function() {
+        self.zoom(data.traceNode);
+      });
+      ohmEditor.parseTree.emit('contextMenu', data.el, data.traceNode);
     },
-    updated: function() {
-      this.$nextTick(this.resetStepControls);
+    updateExpandedInput: function(...args) {
+      this.$refs.expandedInput.update.apply(null, args);
     },
-    methods: {
-      zoom: function(traceNode) {
-        this.zoomTrace = traceNode;
-        clearMarks();
-      },
-      zoomOut: function() {
-        this.zoomTrace = this.previewedZoomTrace = null;
-      },
-      previewZoom: function() {
-        this.previewedZoomTrace = this.zoomTrace;
-        this.zoomTrace = null;
-      },
-      unpreviewZoom: function() {
-        this.zoomTrace = this.previewedZoomTrace;
-        this.previewedZoomTrace = null;
-      },
-      showContextMenu: function(data) {
-        var zoomEnabled = couldZoom(this.rootTrace, data.traceNode);
-
-        var menuDiv = domUtil.$('#parseTreeMenu');
-        menuDiv.style.left = data.x + 'px';
-        menuDiv.style.top = data.y + 'px';
-        menuDiv.hidden = false;
-
-        var self = this;
-        domUtil.addMenuItem('parseTreeMenu', 'getInfoItem', 'Get Info', false);
-        domUtil.addMenuItem('parseTreeMenu', 'stepInItem', 'Step Into', true, function() {
-          self._stepControls.stepInto(data.el);
-        });
-        domUtil.addMenuItem('parseTreeMenu', 'stepOutItem', 'Step Out', true, function() {
-          self._stepControls.stepOut(data.el);
-        });
-        domUtil.addMenuItem('parseTreeMenu', 'zoomItem', 'Zoom to Node', zoomEnabled, function() {
-          self.zoom(data.traceNode);
-        });
-        ohmEditor.parseTree.emit('contextMenu', data.el, data.traceNode);
-      },
-      updateExpandedInput: function(/* ...args */) {
-        this.$refs.expandedInput.update.apply(null, arguments);
-      },
-      measureInputText: function(text) {
-        return this.$refs.expandedInput.measureText(text);
-      },
-      resetStepControls: function() {
-        this._stepControls.reset(domUtil.$('#visualizerBody'));
-      }
-    }
-  };
+    measureInputText: function(text) {
+      return this.$refs.expandedInput.measureText(text);
+    },
+    resetStepControls: function() {
+      this._stepControls.reset(domUtil.$('#visualizerBody'));
+    },
+  },
+};
 </script>

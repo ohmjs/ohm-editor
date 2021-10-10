@@ -19,13 +19,13 @@ function createTestDiv() {
     '    </p>',
     '  </div>',
     '  <div id="node4" class="pexpr labeled leaf"></div>',
-    '</p>'
+    '</p>',
   ].join('');
 
   return div;
 }
 
-test('nextNode', t => {
+test('nextNode', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
@@ -59,7 +59,7 @@ test('nextNode', t => {
   t.end();
 });
 
-test('previousNode', t => {
+test('previousNode', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
@@ -89,7 +89,7 @@ test('previousNode', t => {
   t.end();
 });
 
-test('mixing nextNode and previousNode', t => {
+test('mixing nextNode and previousNode', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
@@ -124,7 +124,7 @@ test('mixing nextNode and previousNode', t => {
   t.end();
 });
 
-test('startAtEnd option', t => {
+test('startAtEnd option', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div, {startAtEnd: true});
 
@@ -149,7 +149,7 @@ test('startAtEnd option', t => {
   t.end();
 });
 
-test('going backwards from end', t => {
+test('going backwards from end', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
@@ -166,11 +166,11 @@ test('going backwards from end', t => {
   t.end();
 });
 
-test('step into', t => {
+test('step into', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
-  const $ = sel => div.querySelector(sel);
+  const $ = (sel) => div.querySelector(sel);
 
   walker.stepInto($('#node0'));
   t.equal(walker.previousNode(), null);
@@ -196,11 +196,11 @@ test('step into', t => {
   t.end();
 });
 
-test('step into from end', t => {
+test('step into from end', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div, {startAtEnd: true});
 
-  const $ = sel => div.querySelector(sel);
+  const $ = (sel) => div.querySelector(sel);
 
   walker.stepInto($('#node0'));
   t.equal(walker.isAtEnd, false);
@@ -210,11 +210,11 @@ test('step into from end', t => {
   t.end();
 });
 
-test('step out', t => {
+test('step out', (t) => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
-  const $ = sel => div.querySelector(sel);
+  const $ = (sel) => div.querySelector(sel);
 
   walker.stepOut($('#node0'));
   t.equal(walker.currentNode, $('#node0'));

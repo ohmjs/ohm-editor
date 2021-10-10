@@ -13,11 +13,11 @@ global.CodeMirror = () => {
   return {
     focus() {},
     setOption() {},
-    setValue(val) {}
+    setValue(val) {},
   };
 };
 
-const ohmEditor = require('../src/ohmEditor');  // Requires CodeMirror()
+const ohmEditor = require('../src/ohmEditor'); // Requires CodeMirror()
 
 let localStorageExamples;
 
@@ -31,9 +31,9 @@ const ExampleList = Vue.extend(exampleListInjector({
       setItem(name, value) {
         assert.equal(name, 'examples');
         localStorageExamples = JSON.parse(value);
-      }
-    }
-  }
+      },
+    },
+  },
 }));
 
 // Helpers
@@ -53,13 +53,13 @@ function findEl(vm, query) {
 
 function getDropdownOptionValues(dropdown) {
   const options = dropdown.querySelectorAll('option');
-  return Array.prototype.map.call(options, opt => opt.value);
+  return Array.prototype.map.call(options, (opt) => opt.value);
 }
 
 // Tests
 // -----
 
-test('adding and updating examples', t => {
+test('adding and updating examples', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -82,7 +82,7 @@ test('adding and updating examples', t => {
   t.end();
 });
 
-test('deleting', t => {
+test('deleting', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -128,7 +128,7 @@ test('deleting', t => {
   });
 });
 
-test('toggleShouldMatch', t => {
+test('toggleShouldMatch', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -146,7 +146,7 @@ test('toggleShouldMatch', t => {
         [{text: '', startRule: '', shouldMatch: false}],
         'new value is saved to localStorage');
 
-    vm.toggleShouldMatch(id);  // Toggle it back.
+    vm.toggleShouldMatch(id); // Toggle it back.
     t.equal(example.shouldMatch, true);
 
     Vue.nextTick(() => {
@@ -160,7 +160,7 @@ test('toggleShouldMatch', t => {
   });
 });
 
-test('pass/fail status', t => {
+test('pass/fail status', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -199,7 +199,7 @@ test('pass/fail status', t => {
   });
 });
 
-test('start rule text', t => {
+test('start rule text', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -222,7 +222,7 @@ test('start rule text', t => {
   });
 });
 
-test('start rule dropdown', t => {
+test('start rule dropdown', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -249,7 +249,7 @@ test('start rule dropdown', t => {
   });
 });
 
-test('start rule errors', t => {
+test('start rule errors', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -278,7 +278,7 @@ test('start rule errors', t => {
   });
 });
 
-test('example editing', t => {
+test('example editing', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -305,7 +305,7 @@ test('example editing', t => {
   });
 });
 
-test('thumbs up button', t => {
+test('thumbs up button', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
@@ -313,7 +313,7 @@ test('thumbs up button', t => {
   simulateGrammarEdit('G { start = any }', () => {
     t.equal(vm.exampleStatus[id].className, 'fail', 'initially fails');
 
-    findEl(vm, '.thumbsUpButton').click();  // Fake a button click.
+    findEl(vm, '.thumbsUpButton').click(); // Fake a button click.
     Vue.nextTick(() => {
       t.equal(vm.exampleStatus[id].className, 'pass', 'passes after toggling');
 
@@ -322,14 +322,14 @@ test('thumbs up button', t => {
   });
 });
 
-test('editor - thumbs up button', t => {
+test('editor - thumbs up button', (t) => {
   const vm = new ExampleList();
   vm.$mount();
 
   const id = vm.addExample();
   simulateGrammarEdit('G { start = any }', () => {
     t.equal(vm.exampleStatus[id].className, 'fail', 'initially fails');
-    findEl(vm, '#exampleEditor .thumbsUpButton').click();  // Fake a button click.
+    findEl(vm, '#exampleEditor .thumbsUpButton').click(); // Fake a button click.
 
     Vue.nextTick(() => {
       t.equal(vm.exampleStatus[id].className, 'pass', 'passes after toggling');

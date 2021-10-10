@@ -2,9 +2,9 @@
 
 'use strict';
 
-var KeyCode = {
+const KeyCode = {
   ENTER: 13,
-  ESC: 27
+  ESC: 27,
 };
 
 // Hide the context menus when Esc or Enter is pressed, any click happens, or another
@@ -18,7 +18,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 function hideContextMenus() {
-  var menus = document.querySelectorAll('.contextMenu');
+  const menus = document.querySelectorAll('.contextMenu');
   Array.prototype.forEach.call(menus, function(menu) {
     menu.hidden = true;
   });
@@ -34,27 +34,27 @@ function assert(cond, msg) {
 // -------
 
 module.exports = {
-  $: function(sel) { return document.querySelector(sel); },
+  $: function(sel) {return document.querySelector(sel);},
 
-  $$: function(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); },
+  $$: function(sel) {return Array.prototype.slice.call(document.querySelectorAll(sel));},
 
   clearAll: function(classSelector) {
     assert(classSelector[0] === '.', "Expected a selector beginning with '.'");
-    var className = classSelector.slice(1);
-    var nodes = document.querySelectorAll(classSelector);
-    for (var i = 0; i < nodes.length; i++) {
+    const className = classSelector.slice(1);
+    const nodes = document.querySelectorAll(classSelector);
+    for (let i = 0; i < nodes.length; i++) {
       nodes[i].classList.remove(className);
     }
   },
 
   createElement: function(sel, optContent) {
-    var parts = sel.split('.');
-    var tagName = parts[0];
+    const parts = sel.split('.');
+    let tagName = parts[0];
     if (tagName.length === 0) {
       tagName = 'div';
     }
 
-    var el = document.createElement(tagName);
+    const el = document.createElement(tagName);
     el.className = parts.slice(1).join(' ');
     if (optContent) {
       el.textContent = optContent;
@@ -63,7 +63,7 @@ module.exports = {
   },
 
   closestElementMatching: function(sel, startEl) {
-    var el = startEl;
+    let el = startEl;
     while (el != null) {
       if (el.matches(sel)) {
         return el;
@@ -81,7 +81,7 @@ module.exports = {
   },
 
   toggleClasses: function(el, map) {
-    for (var k in map) {
+    for (const k in map) {
       if (map.hasOwnProperty(k)) {
         el.classList.toggle(k, !!map[k]);
       }
@@ -96,8 +96,8 @@ module.exports = {
   // If an item with the same id was already added, then the old item will be updated
   // with the new values from `label`, `enabled`, and `onClick`.
   addMenuItem: function(menuId, id, label, enabled, onClick) {
-    var itemList = document.querySelector('#' + menuId + ' ul');
-    var li = itemList.querySelector('#' + id);
+    const itemList = document.querySelector('#' + menuId + ' ul');
+    let li = itemList.querySelector('#' + id);
     if (!li) {
       li = itemList.appendChild(this.createElement('li'));
       li.id = id;
@@ -111,5 +111,5 @@ module.exports = {
       li.onclick = onClick;
     }
     return li;
-  }
+  },
 };

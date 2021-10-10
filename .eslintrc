@@ -1,13 +1,14 @@
 {
   "parserOptions": {
-    ecmaVersion: 5,
     sourceType: "script"
   },
 
   // To minimize dependencies on Node- or browser-specific features, leave the
   // env empty, and instead define globals as needed.
-  "env": {},
-  "extends": "google",
+  "env": {
+    "es2017": true
+  },
+  "extends": ["google", 'plugin:vue/essential'],
 
   // Project-wide globals. If other globals are necessary, prefer putting them
   // in a comment at the top of the file rather than adding them here.
@@ -51,10 +52,6 @@
 
     // Don't require `new` when calling functions whose name starts with a capital letter.
     new-cap: ["error", {capIsNew: false}],
-
-    // Prevent use of ES6 features that don't work our minimum supported Node version,
-    // which is determined by the "engines" field of package.json.
-    node/no-unsupported-features: "error",
 
     no-constant-condition: 0,  // Allow things like `while(true)`.
     no-else-return: 0,  // Allow `else` after a return statement.

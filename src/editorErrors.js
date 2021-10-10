@@ -2,17 +2,17 @@
 
 'use strict';
 
-var cmUtil = require('./cmUtil');
-var domUtil = require('./domUtil');
-var ohmEditor = require('./ohmEditor');
+const cmUtil = require('./cmUtil');
+const domUtil = require('./domUtil');
+const ohmEditor = require('./ohmEditor');
 
-var errorMarks = {
+const errorMarks = {
   grammar: null,
-  input: null
+  input: null,
 };
 
 function hideError(category, editor) {
-  var errInfo = errorMarks[category];
+  const errInfo = errorMarks[category];
   if (errInfo) {
     errInfo.mark.clear();
     clearTimeout(errInfo.timeout);
@@ -29,38 +29,38 @@ function setError(category, editor, interval, messageOrNode) {
   errorMarks[category] = {
     mark: cmUtil.markInterval(editor, interval, 'error-interval', false),
     timeout: setTimeout(showError.bind(null, category, editor, interval, messageOrNode), 1500),
-    widget: null
+    widget: null,
   };
 }
 
 function showError(category, editor, interval, messageOrNode) {
-  var errorEl = domUtil.createElement('.error');
+  const errorEl = domUtil.createElement('.error');
   if (typeof messageOrNode === 'string') {
     errorEl.textContent = messageOrNode;
   } else {
     errorEl.appendChild(messageOrNode);
   }
-  var line = editor.posFromIndex(interval.endIdx).line;
+  const line = editor.posFromIndex(interval.endIdx).line;
   errorMarks[category].widget = editor.addLineWidget(line, errorEl, {insertAt: 0});
 }
 
 function createErrorEl(result, pos) {
-  var el = domUtil.createElement('span', 'Expected ');
+  const el = domUtil.createElement('span', 'Expected ');
 
-  var failures = result.getRightmostFailures();
-  var sep = ', ';
-  var lastSep = failures.length >= 3 ? ', or ' : ' or ';  // Oxford comma.
+  const failures = result.getRightmostFailures();
+  const sep = ', ';
+  const lastSep = failures.length >= 3 ? ', or ' : ' or '; // Oxford comma.
 
   failures.forEach(function(f, i) {
-    var prefix = '';
+    let prefix = '';
     if (i > 0) {
       prefix = i === failures.length - 1 ? lastSep : sep;
     }
     el.appendChild(document.createTextNode(prefix));
-    var link = el.appendChild(domUtil.createElement('span.link', f.toString()));
-    link.onclick = function() { ohmEditor.emit('goto:failure', f); };
-    link.onmouseenter = function() { ohmEditor.emit('peek:failure', f); };
-    link.onmouseout = function() { ohmEditor.emit('unpeek:failure'); };
+    const link = el.appendChild(domUtil.createElement('span.link', f.toString()));
+    link.onclick = function() {ohmEditor.emit('goto:failure', f);};
+    link.onmouseenter = function() {ohmEditor.emit('peek:failure', f);};
+    link.onmouseout = function() {ohmEditor.emit('unpeek:failure');};
   });
   return el;
 }
@@ -80,15 +80,15 @@ ohmEditor.addListener('change:grammar', function(source) {
 
 ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
   if (err) {
-    var editor = ohmEditor.ui.grammarEditor;
+    const editor = ohmEditor.ui.grammarEditor;
     setError('grammar', editor, err.interval, err.shortMessage || err.message);
   }
 });
 ohmEditor.addListener('parse:input', function(matchResult, trace) {
   if (trace.result.failed()) {
-    var editor = ohmEditor.ui.inputEditor;
+    const editor = ohmEditor.ui.inputEditor;
     // Intervals with start == end won't show up in CodeMirror.
-    var interval = trace.result.getInterval();
+    const interval = trace.result.getInterval();
     interval.endIdx += 1;
 
     setError('input', editor, interval, createErrorEl(trace.result));
