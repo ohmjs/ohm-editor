@@ -3,8 +3,6 @@
 
 'use strict';
 
-require('es6-object-assign/auto'); // Object.assign polyfill
-
 const domUtil = require('./domUtil');
 const ohmEditor = require('./ohmEditor');
 
@@ -204,6 +202,8 @@ ohmEditor.ui.grammarEditor.on('swapDoc', function (cm) {
   triggerRefresh(250);
 });
 
+window.ohmEditor = ohmEditor;
+
 /* eslint-disable no-console */
 console.log(
   '%cOhm visualizer',
@@ -215,6 +215,8 @@ console.log(
     '- `ohmEditor` is editor object with',
     '  `.grammar` as the current grammar object (if the source is valid)',
     '  `.ui` containing the `inputEditor` and `grammarEditor`',
+    '',
+    `Ohm version ${ohm.version}`
   ].join('\n')
 );
 /* eslint-enable no-console */
