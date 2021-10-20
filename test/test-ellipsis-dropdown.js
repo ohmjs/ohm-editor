@@ -2,11 +2,12 @@
 
 'use strict';
 
-const { mount } = require('@vue/test-utils');
+const {mount} = require('@vue/test-utils');
 const Vue = require('vue').default || require('vue');
 
-// eslint-disable-next-line max-len
-const EllipsisDropdown = require('../src/components/ellipsis-dropdown.vue').default || require('../src/components/ellipsis-dropdown.vue');
+const EllipsisDropdown =
+  require('../src/components/ellipsis-dropdown.vue').default ||
+  require('../src/components/ellipsis-dropdown.vue');
 
 // Helpers
 // -------
@@ -18,7 +19,7 @@ function findEl(vm, query) {
 // Tests
 // -----
 
-test('showing and hiding the dropdown',  async () => {
+test('showing and hiding the dropdown', async () => {
   const counts = {Foo: 0, Bar: 0};
   const {vm} = mount(EllipsisDropdown, {
     propsData: {
@@ -58,10 +59,10 @@ test('showing and hiding the dropdown',  async () => {
   expect(vm.hidden).toEqual(true); // menu is hidden again
 
   const disabledItem = findEl(vm, '.disabled');
-  expect(disabledItem.textContent).toBe(links[1].textContent) // Bar item is disabled
+  expect(disabledItem.textContent).toBe(links[1].textContent); // Bar item is disabled
 
   button.click();
   links[1].click();
-  
-  expect(vm.hidden).toEqual(true) // hidden is false after clicking button
+
+  expect(vm.hidden).toEqual(true); // hidden is false after clicking button
 });

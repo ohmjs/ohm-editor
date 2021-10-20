@@ -33,8 +33,10 @@ const domUtil = require('../domUtil');
 const isLeaf = require('../traceUtil').isLeaf;
 const ohmEditor = require('../ohmEditor');
 
-const expandedInput = require('./expanded-input.vue').default || require('./expanded-input.vue');
-const parseResults = require('./parse-results.vue').default || require('./parse-results.vue');
+const expandedInput =
+  require('./expanded-input.vue').default || require('./expanded-input.vue');
+const parseResults =
+  require('./parse-results.vue').default || require('./parse-results.vue');
 
 const ANTICLOCKWISE_OPEN_CIRCLE_ARROW = '\u21BA';
 
@@ -42,8 +44,9 @@ let inputMark;
 let grammarMark;
 let defMark;
 
-// eslint-disable-next-line max-len
-const StepControls = Vue.extend(require('./step-controls.vue').default || require('./step-controls.vue'));
+const StepControls = Vue.extend(
+  require('./step-controls.vue').default || require('./step-controls.vue')
+);
 
 // Helpers
 // -------

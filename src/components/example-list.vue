@@ -64,9 +64,12 @@ function uniqueId() {
 module.exports = {
   name: 'example-list',
   components: {
-    'example-editor': require('./example-editor.vue').default || require('./example-editor.vue'),
-    // eslint-disable-next-line max-len
-    'thumbs-up-button': require('./thumbs-up-button.vue').default || require('./thumbs-up-button.vue'),
+    'example-editor':
+      require('./example-editor.vue').default ||
+      require('./example-editor.vue'),
+    'thumbs-up-button':
+      require('./thumbs-up-button.vue').default ||
+      require('./thumbs-up-button.vue'),
   },
   props: [],
   data() {

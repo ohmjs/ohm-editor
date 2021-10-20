@@ -14,8 +14,9 @@ parseTree.vue = new Vue({
   },
   el: '#visualizerContainer',
   components: {
-    // eslint-disable-next-line max-len
-    'parse-tree': require('./components/parse-tree.vue').default || require('./components/parse-tree.vue'),
+    'parse-tree':
+      require('./components/parse-tree.vue').default ||
+      require('./components/parse-tree.vue'),
   },
   template:
     '<div id="visualizerContainer">' +
@@ -40,7 +41,7 @@ parseTree.vue = new Vue({
   },
 });
 
-parseTree.setTraceElementCollapsed = function(el, collapsed, optDuration) {
+parseTree.setTraceElementCollapsed = function (el, collapsed, optDuration) {
   el.__vue__.setCollapsed(collapsed, optDuration);
 };
 parseTree.registerEvents({
@@ -55,7 +56,7 @@ parseTree.registerEvents({
   'collapse:traceElement': ['el'],
 
   // Emitted when the contextMenu for the trace element of `traceNode` is about to be shown.
-  'contextMenu': ['target', 'traceNode'],
+  contextMenu: ['target', 'traceNode'],
 
   // Emitted before start rendering the parse tree
   'render:parseTree': ['traceNode'],

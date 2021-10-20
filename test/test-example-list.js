@@ -3,7 +3,7 @@
 
 'use strict';
 
-const { mount } = require('@vue/test-utils');
+const {mount} = require('@vue/test-utils');
 const Vue = require('vue').default || require('vue');
 const assert = require('assert');
 const ohm = require('ohm-js');
@@ -25,25 +25,22 @@ const ohmEditor = require('../src/ohmEditor'); // Requires CodeMirror()
 let localStorageExamples;
 
 beforeAll(() => {
-  jest
-    .spyOn(Storage.prototype, 'getItem')
-    .mockImplementation(() => {
-      return '[]';
-    });
-  jest
-    .spyOn(Storage.prototype, 'setItem')
-    .mockImplementation((name, value) => {
-      assert.equal(name, 'examples');
-      localStorageExamples = JSON.parse(value);
-    })
+  jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    return '[]';
+  });
+  jest.spyOn(Storage.prototype, 'setItem').mockImplementation((name, value) => {
+    assert.equal(name, 'examples');
+    localStorageExamples = JSON.parse(value);
+  });
 });
 
 afterAll(() => {
   jest.restoreAllMocks();
-})
+});
 
-// eslint-disable-next-line max-len
-const ExampleList = require('../src/components/example-list.vue').default || require('../src/components/example-list.vue');
+const ExampleList =
+  require('../src/components/example-list.vue').default ||
+  require('../src/components/example-list.vue');
 
 // Helpers
 // -------
@@ -51,7 +48,7 @@ const ExampleList = require('../src/components/example-list.vue').default || req
 async function simulateGrammarEdit(source) {
   await ohmEditor.emit('change:grammar', source);
   await Vue.nextTick();
-  
+
   await ohmEditor.emit('parse:grammar', null, ohm.grammar(source), null);
   await flushQueue();
 }
@@ -77,7 +74,11 @@ test('adding and updating examples', () => {
 
   const id = vm.addExample();
   expect(vm.selectedId).toBe(id); // adding selects the new example
-  expect(vm.getSelected()).toEqual({text: '', startRule: '', shouldMatch: true});
+  expect(vm.getSelected()).toEqual({
+    text: '',
+    startRule: '',
+    shouldMatch: true,
+  });
 
   vm.setExample(id, 'woooo', 'Start');
   expect(vm.getSelected()).toEqual({
@@ -95,7 +96,11 @@ test('adding and updating examples', () => {
 
   const id2 = vm.addExample();
   expect(vm.selectedId).toEqual(id2);
-  expect(vm.getSelected()).toEqual({text: '', startRule: '', shouldMatch: true});
+  expect(vm.getSelected()).toEqual({
+    text: '',
+    startRule: '',
+    shouldMatch: true,
+  });
 });
 
 test('deleting', async () => {
@@ -121,7 +126,7 @@ test('deleting', async () => {
 
   await Vue.nextTick();
   vm.deleteExample(id2);
-  expect(vm.selectedId).toBe(id1) // after deleting it, the first example is selected
+  expect(vm.selectedId).toBe(id1); // after deleting it, the first example is selected
 
   // Now add one more example, and delete the first one.
   id2 = vm.addExample();
@@ -150,16 +155,17 @@ test('toggleShouldMatch', async () => {
   expect(example.shouldMatch).toBe(false);
 
   await Vue.nextTick();
-  expect(localStorageExamples).toEqual(
-    [{text: '', startRule: '', shouldMatch: false}]);
+  expect(localStorageExamples).toEqual([
+    {text: '', startRule: '', shouldMatch: false},
+  ]);
 
   vm.toggleShouldMatch(id); // Toggle it back.
   expect(example.shouldMatch).toBe(true);
 
   await Vue.nextTick();
-  expect(
-    localStorageExamples).toEqual(
-    [{text: '', startRule: '', shouldMatch: true}]);
+  expect(localStorageExamples).toEqual([
+    {text: '', startRule: '', shouldMatch: true},
+  ]);
 });
 
 test('pass/fail status', async () => {
@@ -240,7 +246,9 @@ test('start rule errors', async () => {
 
   simulateGrammarEdit('G {}');
   await flushQueue();
-  expect(findEl(vm, '.toolbar .errorIcon').title).toBe('Rule nein is not declared in grammar G');
+  expect(findEl(vm, '.toolbar .errorIcon').title).toBe(
+    'Rule nein is not declared in grammar G'
+  );
 
   simulateGrammarEdit('G { nein = }');
   await flushQueue();
@@ -248,7 +256,9 @@ test('start rule errors', async () => {
 
   vm.setExample(id, '', 'nope');
   await flushQueue();
-  expect(findEl(vm, '.toolbar .errorIcon').title).toBe('Rule nope is not declared in grammar G');
+  expect(findEl(vm, '.toolbar .errorIcon').title).toBe(
+    'Rule nope is not declared in grammar G'
+  );
 
   vm.setExample(id, '', '');
   await flushQueue();
@@ -270,7 +280,9 @@ test('example editing', async () => {
   expect(vm.getSelected().text).toBe(''); // example is not updated after 'change:inputEditor'
 
   // after editing, example is not passing or failing
-  expect(li.classList.contains('pass') || li.classList.contains('fail')).toBeFalsy();
+  expect(
+    li.classList.contains('pass') || li.classList.contains('fail')
+  ).toBeFalsy();
 
   ohmEditor.emit('change:input', 'asdf');
   await flushQueue();

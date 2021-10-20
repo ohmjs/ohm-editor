@@ -42,7 +42,8 @@ const $ = require('../domUtil').$;
 const cmUtil = require('../cmUtil');
 const isLeaf = require('../traceUtil').isLeaf;
 const ohmEditor = require('../ohmEditor');
-const traceLabel = require('./trace-label.vue').default || require('./trace-label.vue');
+const traceLabel =
+  require('./trace-label.vue').default || require('./trace-label.vue');
 
 let nextNodeId = 1; // Node 0 is always the root.
 
