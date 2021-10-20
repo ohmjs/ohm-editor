@@ -44,7 +44,6 @@ afterAll(() => {
 
 // eslint-disable-next-line max-len
 const ExampleList = require('../src/components/example-list.vue').default || require('../src/components/example-list.vue');
-const exp = require('constants');
 
 // Helpers
 // -------

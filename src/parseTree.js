@@ -14,6 +14,7 @@ parseTree.vue = new Vue({
   },
   el: '#visualizerContainer',
   components: {
+    // eslint-disable-next-line max-len
     'parse-tree': require('./components/parse-tree.vue').default || require('./components/parse-tree.vue'),
   },
   template:
@@ -32,14 +33,14 @@ parseTree.vue = new Vue({
 
     // Refresh the parse tree after attempting to parse the input.
     const self = this;
-    ohmEditor.addListener('parse:input', function (matchResult, trace) {
+    ohmEditor.addListener('parse:input', (matchResult, trace) => {
       self.parsing = false;
       self.trace = Object.freeze(trace);
     });
   },
 });
 
-parseTree.setTraceElementCollapsed = function (el, collapsed, optDuration) {
+parseTree.setTraceElementCollapsed = function(el, collapsed, optDuration) {
   el.__vue__.setCollapsed(collapsed, optDuration);
 };
 parseTree.registerEvents({
@@ -54,7 +55,7 @@ parseTree.registerEvents({
   'collapse:traceElement': ['el'],
 
   // Emitted when the contextMenu for the trace element of `traceNode` is about to be shown.
-  contextMenu: ['target', 'traceNode'],
+  'contextMenu': ['target', 'traceNode'],
 
   // Emitted before start rendering the parse tree
   'render:parseTree': ['traceNode'],

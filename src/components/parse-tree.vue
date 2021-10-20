@@ -42,6 +42,7 @@ let inputMark;
 let grammarMark;
 let defMark;
 
+// eslint-disable-next-line max-len
 const StepControls = Vue.extend(require('./step-controls.vue').default || require('./step-controls.vue'));
 
 // Helpers

@@ -8,6 +8,7 @@ const ohmEditor = require('./ohmEditor');
 const domUtil = require('./domUtil');
 
 const EllipsisDropdown = Vue.extend(
+  // eslint-disable-next-line max-len
   require('./components/ellipsis-dropdown.vue').default || require('./components/ellipsis-dropdown.vue')
 );
 

@@ -53,6 +53,7 @@ const ohmEditor = require('../ohmEditor');
 module.exports = {
   name: 'example-editor',
   components: {
+    // eslint-disable-next-line max-len
     'thumbs-up-button': require('./thumbs-up-button.vue').default || require('./thumbs-up-button.vue'),
   },
   props: {
