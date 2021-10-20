@@ -49,12 +49,12 @@ const exp = require('constants');
 // Helpers
 // -------
 
-function simulateGrammarEdit(source, cb) {
-  ohmEditor.emit('change:grammar', source);
-  Vue.nextTick(() => {
-    ohmEditor.emit('parse:grammar', null, ohm.grammar(source), null);
-    Vue.nextTick(cb);
-  });
+async function simulateGrammarEdit(source) {
+  await ohmEditor.emit('change:grammar', source);
+  await Vue.nextTick();
+  
+  await ohmEditor.emit('parse:grammar', null, ohm.grammar(source), null);
+  await flushQueue();
 }
 
 function findEl(vm, query) {
@@ -65,6 +65,8 @@ function getDropdownOptionValues(dropdown) {
   const options = dropdown.querySelectorAll('option');
   return Array.prototype.map.call(options, (opt) => opt.value);
 }
+
+const flushQueue = () => new Promise((cb) => setTimeout(cb, 0));
 
 // Tests
 // -----
@@ -161,197 +163,144 @@ test('toggleShouldMatch', async () => {
     [{text: '', startRule: '', shouldMatch: true}]);
 });
 
-// test('pass/fail status', () => {
-//   const {vm} = mount(ExampleList);
+test('pass/fail status', async () => {
+  const {vm} = mount(ExampleList);
 
-//   const id = vm.addExample();
-//   vm.setExample(id, 'abcdefg');
+  const id = vm.addExample();
+  vm.setExample(id, 'abcdefg');
+  await Vue.nextTick();
 
-//   Vue.nextTick(() => {
-//     t.equal(
-//       vm.exampleStatus[id],
-//       undefined,
-//       'status is undefined without a grammar'
-//     );
+  // status is undefined without a grammar
+  expect(vm.exampleStatus[id]).toBeUndefined();
 
-//     simulateGrammarEdit('G { start = letter+ }', () => {
-//       expect(vm.exampleStatus[id].className).toEqual('pass');
-//       vm.exampleValues[id].shouldMatch = false;
+  await simulateGrammarEdit('G { start = letter+ }');
+  expect(vm.exampleStatus[id].className).toBe('pass');
 
-//       Vue.nextTick(() => {
-//         t.equal(
-//           vm.exampleStatus[id].className,
-//           'fail',
-//           'fails now that shouldMatch is false'
-//         );
+  vm.exampleValues[id].shouldMatch = false;
+  await Vue.nextTick();
+  expect(vm.exampleStatus[id].className).toBe('fail');
 
-//         simulateGrammarEdit('G { start = digit+ }', () => {
-//           t.equal(
-//             vm.exampleStatus[id].className,
-//             'pass',
-//             'passes when example fails matching'
-//           );
+  await simulateGrammarEdit('G { start = digit+ }');
+  expect(vm.exampleStatus[id].className).toBe('pass');
 
-//           const id2 = vm.addExample();
-//           vm.setExample(id2, '123');
-//           Vue.nextTick(() => {
-//             expect(vm.exampleStatus[id2].className).toEqual('pass');
+  const id2 = vm.addExample();
+  vm.setExample(id2, '123');
+  await Vue.nextTick();
+  expect(vm.exampleStatus[id2].className).toBe('pass');
 
-//             ohmEditor.emit('change:grammar', '');
-//             Vue.nextTick(() => {
-//               for (const k of Object.keys(vm.exampleStatus)) {
-//                 expect(vm.exampleStatus[k]).toEqual(undefined);
-//               }
-//             });
-//           });
-//         });
-//       });
-//     });
-//   });
-// });
+  ohmEditor.emit('change:grammar', '');
 
-// test('start rule text', () => {
-//   const {vm} = mount(ExampleList);
+  await Vue.nextTick();
+  for (const k of Object.keys(vm.exampleStatus)) {
+    expect(vm.exampleStatus[k]).toBeUndefined();
+  }
+});
 
-//   const id = vm.addExample();
+test('start rule text', async () => {
+  const {vm} = mount(ExampleList);
 
-//   simulateGrammarEdit('G { start = letter }', () => {
-//     expect(findEl(vm, '.startRule').textContent).toEqual('');
+  const id = vm.addExample();
 
-//     vm.setExample(id, '', 'noSuchRule');
-//     Vue.nextTick(() => {
-//       expect(findEl(vm, '.startRule').textContent).toEqual('noSuchRule');
-//       vm.setExample(id, '', 'start');
+  await simulateGrammarEdit('G { start = letter }');
+  expect(findEl(vm, '.startRule').textContent).toBe('');
 
-//       Vue.nextTick(() => {
-//         expect(findEl(vm, '.startRule').textContent).toEqual('start');
-//       });
-//     });
-//   });
-// });
+  vm.setExample(id, '', 'noSuchRule');
+  await Vue.nextTick();
+  expect(findEl(vm, '.startRule').textContent).toBe('noSuchRule');
 
-// test('start rule dropdown', () => {
-//   const {vm} = mount(ExampleList);
+  vm.setExample(id, '', 'start');
+  await Vue.nextTick();
+  expect(findEl(vm, '.startRule').textContent).toBe('start');
+});
 
-//   const id = vm.addExample();
-//   expect(vm.selectedId).toEqual(id);
+test('start rule dropdown', async () => {
+  const {vm} = mount(ExampleList);
 
-//   Vue.nextTick(() => {
-//     let dropdown = findEl(vm, '#startRuleDropdown');
-//     expect(dropdown.value).toEqual('');
-//     t.deepEqual(getDropdownOptionValues(dropdown), ['']);
+  const id = vm.addExample();
+  expect(vm.selectedId).toBe(id);
 
-//     simulateGrammarEdit('G { start = letter }', () => {
-//       Vue.nextTick(() => {
-//         dropdown = findEl(vm, '#startRuleDropdown');
-//         expect(dropdown.value).toEqual('');
-//         t.deepEqual(getDropdownOptionValues(dropdown), ['', 'start']);
+  await Vue.nextTick();
+  let dropdown = findEl(vm, '#startRuleDropdown');
+  expect(dropdown.value).toBe('');
+  expect(getDropdownOptionValues(dropdown)).toEqual(['']);
 
-//         // TODO: Test that changes to the dropdown are reflected in the example value.
-//         // Not sure how to do that programatically, as `dropdown.value = ''` doesn't work.
-//       });
-//     });
-//   });
-// });
+  await simulateGrammarEdit('G { start = letter }');
+  dropdown = findEl(vm, '#startRuleDropdown');
+  expect(dropdown.value).toBe('');
+  expect(getDropdownOptionValues(dropdown)).toEqual(['', 'start']);
 
-// test('start rule errors', () => {
-//   const {vm} = mount(ExampleList);
+  // TODO: Test that changes to the dropdown are reflected in the example value.
+  // Not sure how to do that programatically, as `dropdown.value = ''` doesn't work.
+});
 
-//   const id = vm.addExample();
-//   vm.setExample(id, '', 'nein');
+test('start rule errors', async () => {
+  const {vm} = mount(ExampleList);
 
-//   simulateGrammarEdit('G {}', () => {
-//     t.equal(
-//       findEl(vm, '.toolbar .errorIcon').title,
-//       'Rule nein is not declared in grammar G'
-//     );
+  const id = vm.addExample();
+  vm.setExample(id, '', 'nein');
 
-//     simulateGrammarEdit('G { nein = }', () => {
-//       t.notOk(
-//         findEl(vm, '.toolbar .errorIcon'),
-//         'error disappears when rule exists'
-//       );
+  simulateGrammarEdit('G {}');
+  await flushQueue();
+  expect(findEl(vm, '.toolbar .errorIcon').title).toBe('Rule nein is not declared in grammar G');
 
-//       vm.setExample(id, '', 'nope');
-//       Vue.nextTick(() => {
-//         t.equal(
-//           findEl(vm, '.toolbar .errorIcon').title,
-//           'Rule nope is not declared in grammar G'
-//         );
+  simulateGrammarEdit('G { nein = }');
+  await flushQueue();
+  expect(findEl(vm, '.toolbar .errorIcon')).toBeFalsy(); // error disappears when rule exists
 
-//         vm.setExample(id, '', '');
-//         Vue.nextTick(() => {
-//           t.notOk(
-//             findEl(vm, '.toolbar .errorIcon'),
-//             'error disappears when example uses default start rule'
-//           );
-//         });
-//       });
-//     });
-//   });
-// });
+  vm.setExample(id, '', 'nope');
+  await flushQueue();
+  expect(findEl(vm, '.toolbar .errorIcon').title).toBe('Rule nope is not declared in grammar G');
 
-// test('example editing', () => {
-//   const {vm} = mount(ExampleList);
+  vm.setExample(id, '', '');
+  await flushQueue();
+  // error disappears when example uses default start rule
+  expect(findEl(vm, '.toolbar .errorIcon')).toBeFalsy();
+});
 
-//   vm.addExample();
-//   simulateGrammarEdit('G { start = letter* }', () => {
-//     const li = findEl(vm, 'li');
-//     t.ok(li.classList.contains('pass'));
+test('example editing', async () => {
+  const {vm} = mount(ExampleList);
 
-//     ohmEditor.emit('change:inputEditor', 'asdf');
-//     Vue.nextTick(() => {
-//       t.equal(
-//         vm.getSelected().text,
-//         '',
-//         "example is not updated after 'change:inputEditor'"
-//       );
-//       t.notOk(
-//         li.classList.contains('pass') || li.classList.contains('fail'),
-//         'after editing, example is not passing or failing'
-//       );
+  vm.addExample();
+  simulateGrammarEdit('G { start = letter* }');
+  await flushQueue();
+  const li = findEl(vm, 'li');
+  expect(li.classList.contains('pass')).toBeTruthy();
 
-//       ohmEditor.emit('change:input', 'asdf');
-//       Vue.nextTick(() => {
-//         t.equal(
-//           vm.getSelected().text,
-//           'asdf',
-//           "example is updated after 'change:input' event"
-//         );
-//         t.ok(li.classList.contains('pass'), 'test is shown as passing again');
-//       });
-//     });
-//   });
-// });
+  ohmEditor.emit('change:inputEditor', 'asdf');
+  await flushQueue();
+  expect(vm.getSelected().text).toBe(''); // example is not updated after 'change:inputEditor'
 
-// test('thumbs up button', () => {
-//   const {vm} = mount(ExampleList);
+  // after editing, example is not passing or failing
+  expect(li.classList.contains('pass') || li.classList.contains('fail')).toBeFalsy();
 
-//   const id = vm.addExample();
-//   simulateGrammarEdit('G { start = any }', () => {
-//     expect(vm.exampleStatus[id].className, 'fail').toEqual('initially fails');
+  ohmEditor.emit('change:input', 'asdf');
+  await flushQueue();
+  expect(vm.getSelected().text).toBe('asdf'); // example is updated after 'change:input' event
+  expect(li.classList.contains('pass')).toBeTruthy(); // test is shown as passing again
+});
 
-//     findEl(vm, '.thumbsUpButton').click(); // Fake a button click.
-//     Vue.nextTick(() => {
-//       expect(vm.exampleStatus[id].className, 'pass').toEqual(
-//         'passes after toggling'
-//       );
-//     });
-//   });
-// });
+test('thumbs up button', async () => {
+  const {vm} = mount(ExampleList);
 
-// test('editor - thumbs up button', () => {
-//   const {vm} = mount(ExampleList);
+  const id = vm.addExample();
+  simulateGrammarEdit('G { start = any }');
+  await flushQueue();
+  expect(vm.exampleStatus[id].className).toBe('fail'); // initially fails
 
-//   const id = vm.addExample();
-//   simulateGrammarEdit('G { start = any }', () => {
-//     expect(vm.exampleStatus[id].className, 'fail').toEqual('initially fails');
-//     findEl(vm, '#exampleEditor .thumbsUpButton').click(); // Fake a button click.
+  findEl(vm, '.thumbsUpButton').click(); // Fake a button click.
+  await flushQueue();
+  expect(vm.exampleStatus[id].className).toBe('pass'); // passes after toggling
+});
 
-//     Vue.nextTick(() => {
-//       expect(vm.exampleStatus[id].className, 'pass').toEqual(
-//         'passes after toggling'
-//       );
-//     });
-//   });
-// });
+test('editor - thumbs up button', async () => {
+  const {vm} = mount(ExampleList);
+
+  const id = vm.addExample();
+  simulateGrammarEdit('G { start = any }');
+  await flushQueue();
+  expect(vm.exampleStatus[id].className).toBe('fail'); // initially fails
+
+  findEl(vm, '#exampleEditor .thumbsUpButton').click(); // Fake a button click.
+  await flushQueue();
+  expect(vm.exampleStatus[id].className).toBe('pass'); // passes after toggling
+});
