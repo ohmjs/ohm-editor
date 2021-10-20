@@ -6,9 +6,7 @@
 </template>
 
 <script>
-'use strict';
-
-module.exports = {
+export default {
   name: 'thumbs-up-button',
   props: ['showThumbsUp'],
   computed: {

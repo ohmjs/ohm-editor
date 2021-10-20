@@ -45,9 +45,7 @@ button.ellipsis-btn:hover {
 </template>
 
 <script>
-'use strict';
-
-module.exports = {
+export default {
   name: 'ellipsis-dropdown',
   props: {
     // Specifies the menu items. Format is {<label>: <callback>, ...}

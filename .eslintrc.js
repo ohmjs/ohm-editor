@@ -5,6 +5,14 @@ module.exports = {
     ecmaVersion: 8,
     sourceType: 'script',
   },
+  overrides: [
+    {
+      files: ['src/**/*.vue'],
+      parserOptions: {
+        sourceType: 'module',
+      },
+    },
+  ],
 
   // To minimize dependencies on Node- or browser-specific features, leave the
   // env empty, and instead define globals as needed.

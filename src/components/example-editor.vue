@@ -45,12 +45,10 @@
 <script>
 /* global CodeMirror */
 
-'use strict';
+import domUtil from '../domUtil';
+import ohmEditor from '../ohmEditor';
 
-const domUtil = require('../domUtil');
-const ohmEditor = require('../ohmEditor');
-
-module.exports = {
+export default {
   name: 'example-editor',
   components: {
     'thumbs-up-button':

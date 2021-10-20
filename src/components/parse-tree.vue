@@ -24,19 +24,16 @@
 </template>
 
 <script>
-/* global window */
-'use strict';
+import Vue from 'vue';
+import cmUtil from '../cmUtil';
+import domUtil from '../domUtil';
+import {isLeaf} from '../traceUtil';
+import ohmEditor from '../ohmEditor';
 
-const Vue = require('vue').default;
-const cmUtil = require('../cmUtil');
-const domUtil = require('../domUtil');
-const isLeaf = require('../traceUtil').isLeaf;
-const ohmEditor = require('../ohmEditor');
+import expandedInput from './expanded-input.vue';
+import parseResults from './parse-results.vue';
 
-const expandedInput =
-  require('./expanded-input.vue').default || require('./expanded-input.vue');
-const parseResults =
-  require('./parse-results.vue').default || require('./parse-results.vue');
+import StepControlsBase from './step-controls.vue';
 
 const ANTICLOCKWISE_OPEN_CIRCLE_ARROW = '\u21BA';
 
@@ -44,9 +41,7 @@ let inputMark;
 let grammarMark;
 let defMark;
 
-const StepControls = Vue.extend(
-  require('./step-controls.vue').default || require('./step-controls.vue')
-);
+const StepControls = Vue.extend(StepControlsBase);
 
 // Helpers
 // -------
@@ -72,7 +67,7 @@ function clearMarks() {
 // Exports
 // -------
 
-module.exports = {
+export default {
   components: {
     'expanded-input': expandedInput,
     'parse-results': parseResults,
@@ -100,6 +95,7 @@ module.exports = {
       if (this.previewedZoomTrace) {
         return {node: this.previewedZoomTrace, class: 'zoomBorder'};
       }
+      return undefined;
     },
   },
   provide() {

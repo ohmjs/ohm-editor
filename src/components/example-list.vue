@@ -44,10 +44,8 @@
 </template>
 
 <script>
-'use strict';
-
-const ohmEditor = require('../ohmEditor');
-const domUtil = require('../domUtil');
+import ohmEditor from '../ohmEditor';
+import domUtil from '../domUtil';
 
 let idCounter = 0;
 
@@ -61,7 +59,7 @@ function uniqueId() {
 // Exports
 // -------
 
-module.exports = {
+export default {
   name: 'example-list',
   components: {
     'example-editor':

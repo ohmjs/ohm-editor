@@ -1,16 +1,13 @@
 <script>
-'use strict';
-
-const ohmEditor = require('../ohmEditor');
-const traceElement =
-  require('./trace-element.vue').default || require('./trace-element.vue');
+import ohmEditor from '../ohmEditor';
+import traceElement from './trace-element.vue';
 
 const EMPTY_LR_INFO = {};
 
 // Exports
 // -------
 
-module.exports = {
+export default {
   name: 'parse-results',
   props: {
     trace: {required: true},

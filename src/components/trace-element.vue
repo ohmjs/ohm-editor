@@ -36,14 +36,11 @@
 <script>
 /* global Node, d3, ohm */
 /* eslint-disable no-invalid-this */
-'use strict';
-
-const $ = require('../domUtil').$;
-const cmUtil = require('../cmUtil');
-const isLeaf = require('../traceUtil').isLeaf;
-const ohmEditor = require('../ohmEditor');
-const traceLabel =
-  require('./trace-label.vue').default || require('./trace-label.vue');
+import {$} from '../domUtil';
+import cmUtil from '../cmUtil';
+import {isLeaf} from '../traceUtil';
+import ohmEditor from '../ohmEditor';
+import traceLabel from './trace-label.vue';
 
 let nextNodeId = 1; // Node 0 is always the root.
 
@@ -153,7 +150,7 @@ function cloneObject(obj) {
 // Exports
 // -------
 
-module.exports = {
+export default {
   name: 'trace-element',
   components: {
     'trace-label': traceLabel,
@@ -351,6 +348,7 @@ module.exports = {
         }
         return true;
       }
+      return false;
     },
   },
   data() {

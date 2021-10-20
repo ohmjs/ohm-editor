@@ -71,9 +71,7 @@
 
 <script>
 /* eslint-disable no-invalid-this */
-'use strict';
-
-const TraceElementWalker = require('../TraceElementWalker');
+import TraceElementWalker from '../TraceElementWalker';
 
 const Position = {
   START: {},
@@ -87,7 +85,7 @@ function getVM(el) {
 // Exports
 // -------
 
-module.exports = {
+export default {
   name: 'step-controls',
   data() {
     return {

@@ -6,13 +6,7 @@
 </template>
 
 <script>
-/* global window */
-'use strict';
-
-const domUtil = require('../domUtil');
-
-const $ = domUtil.$;
-const ArrayProto = Array.prototype;
+import {$} from '../domUtil';
 
 // Helpers
 // -------
@@ -24,7 +18,7 @@ function isRectInViewport(rect) {
 // Exports
 // -------
 
-module.exports = {
+export default {
   name: 'expanded-input',
   computed: {
     canvasEl() {
@@ -74,7 +68,7 @@ module.exports = {
       }
 
       const root = $('.pexpr');
-      const firstFailedEl = domUtil.$(
+      const firstFailedEl = $(
         '#parseResults > .pexpr > .children > .pexpr.failed'
       );
 
@@ -121,8 +115,7 @@ module.exports = {
           }
 
           // Ask the subtrees to render.
-          const children = el.lastChild.childNodes;
-          ArrayProto.forEach.call(children, function (childEl) {
+          Array.from(el.lastChild.childNodes).forEach((childEl) => {
             renderInput(childEl, isAnimating || isAncestorAnimating);
           });
         }

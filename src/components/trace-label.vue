@@ -18,16 +18,14 @@
 
 <script>
 /* global window */
-'use strict';
-
-const isLRBaseCase = require('../traceUtil').isLRBaseCase;
+import {isLRBaseCase} from '../traceUtil';
 
 const HORIZONTAL_ELLIPSIS = '\u2026';
 
 // Exports
 // -------
 
-module.exports = {
+export default {
   name: 'trace-label',
   props: {
     traceNode: {type: Object, required: true},
@@ -38,6 +36,7 @@ module.exports = {
       if (isLRBaseCase(this.traceNode)) {
         return '[LR]';
       }
+      return undefined;
     },
     inlineRuleNameParts() {
       const ruleName = this.traceNode.expr.ruleName;
