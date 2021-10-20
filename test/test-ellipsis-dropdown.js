@@ -1,11 +1,13 @@
+/* eslint-env jest */
+
 'use strict';
 
-const Vue = require('vue');
-const test = require('tape');
+const {mount} = require('@vue/test-utils');
+const Vue = require('vue').default || require('vue');
 
-const EllipsisDropdown = Vue.extend(require('../src/components/ellipsis-dropdown.vue'));
-
-const ArrayProto = Array.prototype;
+const EllipsisDropdown =
+  require('../src/components/ellipsis-dropdown.vue').default ||
+  require('../src/components/ellipsis-dropdown.vue');
 
 // Helpers
 // -------
@@ -17,49 +19,50 @@ function findEl(vm, query) {
 // Tests
 // -----
 
-test('showing and hiding the dropdown', t => {
+test('showing and hiding the dropdown', async () => {
   const counts = {Foo: 0, Bar: 0};
-  const vm = new EllipsisDropdown({
+  const {vm} = mount(EllipsisDropdown, {
     propsData: {
       items: {
-        Foo() { counts.Foo++; },
-        Bar: null
-      }
-    }
+        Foo() {
+          counts.Foo++;
+        },
+        Bar: null,
+      },
+    },
   });
-  vm.$mount();
 
-  t.equal(vm.hidden, true);
+  expect(vm.hidden).toEqual(true);
 
   const button = findEl(vm, 'button');
   button.click();
 
-  t.equal(vm.hidden, false, 'hidden is false after clicking button');
-  Vue.nextTick(() => {
-    const links = ArrayProto.slice.call(vm.$el.querySelectorAll('li > a'));
+  expect(vm.hidden).toEqual(false); // hidden is false after clicking button
+  await Vue.nextTick();
 
-    const labels = links.map(el => el.textContent);
-    t.deepEqual(labels, ['Foo', 'Bar'], 'labels are correct');
+  const links = Array.from(vm.$el.querySelectorAll('li > a'));
 
-    links[0].click();
-    Vue.nextTick(() => {
-      t.equal(counts.Foo, 1, 'Foo callback ran');
-      t.equal(counts.Bar, 0);
-      t.equal(vm.hidden, true, 'click caused menu to hide');
+  const labels = links.map((el) => el.textContent);
+  expect(labels).toEqual(['Foo', 'Bar'], 'labels are correct');
 
-      button.click();
-      links[0].click();
-      t.equal(counts.Foo, 2, 'Foo callback ran again');
-      t.equal(vm.hidden, true, 'menu is hidden again');
+  links[0].click();
 
-      const disabledItem = findEl(vm, '.disabled');
-      t.equal(disabledItem.textContent, links[1].textContent, 'Bar item is disabled');
+  await Vue.nextTick();
 
-      button.click();
-      links[1].click();
-      t.equal(vm.hidden, true, 'menu is hidden when disabled item is clicked');
+  expect(counts.Foo).toEqual(1); // Foo callback ran
+  expect(counts.Bar).toEqual(0);
+  expect(vm.hidden).toEqual(true); // click caused menu to hide
 
-      t.end();
-    });
-  });
+  button.click();
+  links[0].click();
+  expect(counts.Foo).toEqual(2); // Foo callback ran again
+  expect(vm.hidden).toEqual(true); // menu is hidden again
+
+  const disabledItem = findEl(vm, '.disabled');
+  expect(disabledItem.textContent).toBe(links[1].textContent); // Bar item is disabled
+
+  button.click();
+  links[1].click();
+
+  expect(vm.hidden).toEqual(true); // hidden is false after clicking button
 });

@@ -2,19 +2,21 @@
 
 'use strict';
 
-var CheckedEmitter = require('checked-emitter');
-var Vue = require('vue');
-var ohmEditor = require('./ohmEditor');
+const CheckedEmitter = require('checked-emitter');
+const Vue = require('vue').default;
+const ohmEditor = require('./ohmEditor');
 
-var parseTree = ohmEditor.parseTree = new CheckedEmitter();
+const parseTree = (ohmEditor.parseTree = new CheckedEmitter());
 parseTree.vue = new Vue({
   data: {
     parsing: false,
-    trace: null
+    trace: null,
   },
   el: '#visualizerContainer',
   components: {
-    'parse-tree': require('./components/parse-tree.vue')
+    'parse-tree':
+      require('./components/parse-tree.vue').default ||
+      require('./components/parse-tree.vue'),
   },
   template:
     '<div id="visualizerContainer">' +
@@ -22,24 +24,24 @@ parseTree.vue = new Vue({
     '  <div v-show="parsing" class="overlay"></div>' +
     '</div>',
   methods: {
-    onEdit: function(cm) {
+    onEdit(cm) {
       this.parsing = true;
-    }
+    },
   },
-  mounted: function() {
+  mounted() {
     ohmEditor.addListener('change:inputEditor', this.onEdit);
     ohmEditor.addListener('change:grammarEditor', this.onEdit);
 
     // Refresh the parse tree after attempting to parse the input.
-    var self = this;
-    ohmEditor.addListener('parse:input', function(matchResult, trace) {
+    const self = this;
+    ohmEditor.addListener('parse:input', (matchResult, trace) => {
       self.parsing = false;
       self.trace = Object.freeze(trace);
     });
-  }
+  },
 });
 
-parseTree.setTraceElementCollapsed = function(el, collapsed, optDuration) {
+parseTree.setTraceElementCollapsed = function (el, collapsed, optDuration) {
   el.__vue__.setCollapsed(collapsed, optDuration);
 };
 parseTree.registerEvents({
@@ -54,11 +56,11 @@ parseTree.registerEvents({
   'collapse:traceElement': ['el'],
 
   // Emitted when the contextMenu for the trace element of `traceNode` is about to be shown.
-  'contextMenu': ['target', 'traceNode'],
+  contextMenu: ['target', 'traceNode'],
 
   // Emitted before start rendering the parse tree
   'render:parseTree': ['traceNode'],
 
   // Emitted after cmd/ctrl + 'click' on a label
-  'cmdOrCtrlClick:traceElement': ['wrapper']
+  'cmdOrCtrlClick:traceElement': ['wrapper'],
 });

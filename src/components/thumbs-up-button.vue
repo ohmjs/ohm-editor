@@ -6,15 +6,15 @@
 </template>
 
 <script>
-  'use strict';
+'use strict';
 
-  module.exports = {
-    name: 'thumbs-up-button',
-    props: ['showThumbsUp'],
-    computed: {
-      title: function() {
-        return 'Example should ' + (this.showThumbsUp ? 'match' : 'NOT match');
-      }
-    }
-  };
+module.exports = {
+  name: 'thumbs-up-button',
+  props: ['showThumbsUp'],
+  computed: {
+    title() {
+      return 'Example should ' + (this.showThumbsUp ? 'match' : 'NOT match');
+    },
+  },
+};
 </script>

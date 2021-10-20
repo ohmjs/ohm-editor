@@ -2,24 +2,24 @@
 
 'use strict';
 
-var domUtil = require('./domUtil');
-var ohmEditor = require('./ohmEditor');
+const domUtil = require('./domUtil');
+const ohmEditor = require('./ohmEditor');
 
-var parsingSteps;
+let parsingSteps;
 
 // Maps from a node ID (i.e., the `id` property of a trace element) to an object
 // {enter: Number, exit: Number}. The numbers are the indices in `parsingSteps` where
 // the enter and exit steps are found.
-var stepsByNodeId;
+let stepsByNodeId;
 
 // Maps from a Failure key to the parsing step for that failure.
-var stepsByFailureKey;
+let stepsByFailureKey;
 
-var matchResult;
-var oldStep;
-var slider = domUtil.$('#timeSlider');
+let matchResult;
+let oldStep;
+const slider = domUtil.$('#timeSlider');
 
-var timelineEnabled;
+let timelineEnabled;
 
 // Helpers
 // -------
@@ -35,7 +35,7 @@ function addParsingStep(obj) {
 function maybeRecordFailureStep(result, node) {
   if (result.failed() && !node.succeeded) {
     if (node.pos === result.getRightmostFailurePosition()) {
-      result.getRightmostFailures().find(function(f) {
+      result.getRightmostFailures().find(function (f) {
         if (f.pexpr === node.expr) {
           stepsByFailureKey[f.toKey()] = parsingSteps.length;
           return true;
@@ -48,10 +48,10 @@ function maybeRecordFailureStep(result, node) {
 
 function gotoTimestep(step) {
   slider.value = step;
-  for (var i = 0; i < parsingSteps.length; ++i) {
-    var cmd = parsingSteps[i];
-    var el = cmd.el;
-    var isStepComplete = i <= step;
+  for (let i = 0; i < parsingSteps.length; ++i) {
+    const cmd = parsingSteps[i];
+    const el = cmd.el;
+    const isStepComplete = i <= step;
 
     switch (cmd.type) {
       case 'enter':
@@ -70,12 +70,17 @@ function gotoTimestep(step) {
     }
   }
   // Highlight the currently-active step (unhighlighting the previous one first).
-  var stepEl = domUtil.$('.currentParseStep');
+  let stepEl = domUtil.$('.currentParseStep');
   if (stepEl) {
     stepEl.classList.remove('currentParseStep');
 
     // Re-collapse anything that was expanded just to make the current step visible.
-    while ((stepEl = domUtil.closestElementMatching('.pexpr.should-collapse', stepEl))) {
+    while (
+      (stepEl = domUtil.closestElementMatching(
+        '.pexpr.should-collapse',
+        stepEl
+      ))
+    ) {
       stepEl.classList.remove('should-collapse');
       ohmEditor.parseTree.setTraceElementCollapsed(stepEl, true, 0);
     }
@@ -85,7 +90,9 @@ function gotoTimestep(step) {
     stepEl.classList.add('currentParseStep');
 
     // Make sure the current step is not hidden in a collapsed tree.
-    while ((stepEl = domUtil.closestElementMatching('.pexpr.collapsed', stepEl))) {
+    while (
+      (stepEl = domUtil.closestElementMatching('.pexpr.collapsed', stepEl))
+    ) {
       stepEl.classList.add('should-collapse');
       ohmEditor.parseTree.setTraceElementCollapsed(stepEl, false, 0);
     }
@@ -97,11 +104,11 @@ function gotoTimestep(step) {
 
 // When the time slider is scrubbed, move backwards/forwards through the
 // individual parsing steps.
-slider.oninput = function(e) {
+slider.oninput = function (e) {
   gotoTimestep(parseInt(e.target.value, 10));
 };
 
-ohmEditor.parseTree.addListener('render:parseTree', function(trace) {
+ohmEditor.parseTree.addListener('render:parseTree', function (trace) {
   parsingSteps = [];
   stepsByNodeId = {};
   stepsByFailureKey = {};
@@ -115,43 +122,46 @@ ohmEditor.parseTree.addListener('render:parseTree', function(trace) {
   slider.value = slider.max = 1;
 });
 
-ohmEditor.parseTree.addListener('create:traceElement', function(el, traceNode) {
-  // If the node is labeled, record it as a distinct "step" in the parsing timeline.
-  if (timelineEnabled && !el.classList.contains('hidden')) {
-    maybeRecordFailureStep(matchResult, traceNode);
-    stepsByNodeId[el.id] = {enter: parsingSteps.length};
-    addParsingStep({
-      type: 'enter',
-      el: el,
-      node: traceNode,
-      collapsed: el.classList.contains('collapsed')
-    });
+ohmEditor.parseTree.addListener(
+  'create:traceElement',
+  function (el, traceNode) {
+    // If the node is labeled, record it as a distinct "step" in the parsing timeline.
+    if (timelineEnabled && !el.classList.contains('hidden')) {
+      maybeRecordFailureStep(matchResult, traceNode);
+      stepsByNodeId[el.id] = {enter: parsingSteps.length};
+      addParsingStep({
+        type: 'enter',
+        el,
+        node: traceNode,
+        collapsed: el.classList.contains('collapsed'),
+      });
+    }
   }
-});
+);
 
-ohmEditor.parseTree.addListener('exit:traceElement', function(el, traceNode) {
+ohmEditor.parseTree.addListener('exit:traceElement', function (el, traceNode) {
   if (timelineEnabled && el.id in stepsByNodeId) {
     // Attempt to record the failure step again, possibly overwriting the previous value.
     // This means that we prefer the 'exit' step over the 'enter' step.
     maybeRecordFailureStep(matchResult, traceNode);
     stepsByNodeId[el.id].exit = parsingSteps.length;
-    addParsingStep({type: 'exit', node: traceNode, el: el});
+    addParsingStep({type: 'exit', node: traceNode, el});
   }
 });
 
-ohmEditor.addListener('peek:failure', function(failure) {
+ohmEditor.addListener('peek:failure', function (failure) {
   oldStep = slider.value;
   gotoTimestep(stepsByFailureKey[failure.toKey()]);
 });
 
-ohmEditor.addListener('unpeek:failure', function() {
+ohmEditor.addListener('unpeek:failure', function () {
   if (oldStep !== -1) {
     gotoTimestep(oldStep);
     oldStep = -1;
   }
 });
 
-ohmEditor.addListener('goto:failure', function(failure) {
+ohmEditor.addListener('goto:failure', function (failure) {
   gotoTimestep(stepsByFailureKey[failure.toKey()]);
   oldStep = -1;
   slider.focus();

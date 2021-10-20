@@ -1,235 +1,218 @@
-/* global document */
+/* eslint-env jest */
+/** @jest-environment jsdom */
 
 'use strict';
 
 const TraceElementWalker = require('../src/TraceElementWalker');
-const test = require('tape');
 
 function createTestDiv() {
   const doc = document;
   const div = doc.body.appendChild(doc.createElement('div'));
-  div.innerHTML = [
-    '<p>',
-    '  <div id="node0" class="pexpr labeled" hidden>',
-    '    <p>',
-    '      <div class="pexpr">',
-    '        <div id="node1" class="pexpr labeled leaf"></div>',
-    '      </div>',
-    '      <div id="node2" class="pexpr labeled"></div>',
-    '    </p>',
-    '  </div>',
-    '  <div id="node4" class="pexpr labeled leaf"></div>',
-    '</p>'
-  ].join('');
-
+  div.innerHTML = `
+    <p>
+      <div id="node0" class="pexpr labeled" hidden>
+        <p>
+          <div class="pexpr">
+            <div id="node1" class="pexpr labeled leaf"></div>
+          </div>
+          <div id="node2" class="pexpr labeled"></div>
+        </p>
+      </div>
+      <div id="node4" class="pexpr labeled leaf"></div>
+    </p>
+  `;
   return div;
 }
 
-test('nextNode', t => {
+test('nextNode', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
   // Ensure that it does an in-order traversal of the tree, ignoring any nodes
   // that don't have the 'pexpr' and 'labeled' classes (but not their children).
-  t.equal(walker.nextNode(), div.querySelector('#node0'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.nextNode()).toEqual(div.querySelector('#node0'));
+  expect(walker.exitingCurrentNode).toBe(false);
 
-  t.equal(walker.nextNode(), div.querySelector('#node1'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.nextNode()).toEqual(div.querySelector('#node1'));
+  expect(walker.exitingCurrentNode).toBe(false);
 
   // Since node2 is not marked as a leaf, it should get visited twice: once on the way
   // in, and once on the way out.
-  t.equal(walker.nextNode(), div.querySelector('#node2'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.nextNode()).toEqual(div.querySelector('#node2'));
+  expect(walker.exitingCurrentNode).toBe(false);
 
-  t.equal(walker.nextNode(), div.querySelector('#node2'));
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.nextNode()).toEqual(div.querySelector('#node2'));
+  expect(walker.exitingCurrentNode).toBe(true);
 
-  t.equal(walker.nextNode(), div.querySelector('#node0'));
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.nextNode()).toEqual(div.querySelector('#node0'));
+  expect(walker.exitingCurrentNode).toBe(true);
 
-  t.equal(walker.nextNode(), div.querySelector('#node4'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.nextNode()).toEqual(div.querySelector('#node4'));
+  expect(walker.exitingCurrentNode).toBe(false);
 
-  t.equal(walker.nextNode(), null);
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.nextNode()).toEqual(null);
+  expect(walker.exitingCurrentNode).toBe(false);
 
   div.remove();
-
-  t.end();
 });
 
-test('previousNode', t => {
+test('previousNode', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
   while (walker.nextNode().id !== 'node4'); // Go to last node
-  t.equal(walker.currentNode, div.querySelector('#node4'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.currentNode).toEqual(div.querySelector('#node4'));
+  expect(walker.exitingCurrentNode).toEqual(false);
 
-  t.equal(walker.previousNode(), div.querySelector('#node0'));
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.previousNode()).toEqual(div.querySelector('#node0'));
+  expect(walker.exitingCurrentNode).toEqual(true);
 
-  t.equal(walker.previousNode(), div.querySelector('#node2'));
-  t.equal(walker.exitingCurrentNode, true);
-  t.equal(walker.previousNode(), div.querySelector('#node2'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.previousNode()).toEqual(div.querySelector('#node2'));
+  expect(walker.exitingCurrentNode).toEqual(true);
+  expect(walker.previousNode()).toEqual(div.querySelector('#node2'));
+  expect(walker.exitingCurrentNode).toEqual(false);
 
-  t.equal(walker.previousNode(), div.querySelector('#node1'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.previousNode()).toEqual(div.querySelector('#node1'));
+  expect(walker.exitingCurrentNode).toEqual(false);
 
-  t.equal(walker.previousNode(), div.querySelector('#node0'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.previousNode()).toEqual(div.querySelector('#node0'));
+  expect(walker.exitingCurrentNode).toEqual(false);
 
-  t.equal(walker.previousNode(), null);
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.previousNode()).toEqual(null);
+  expect(walker.exitingCurrentNode).toEqual(false);
 
   div.remove();
-
-  t.end();
 });
 
-test('mixing nextNode and previousNode', t => {
+test('mixing nextNode and previousNode', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
   walker.nextNode();
-  t.equal(walker.previousNode(), null);
+  expect(walker.previousNode()).toEqual(null);
 
   walker.nextNode();
   walker.nextNode();
-  t.equal(walker.previousNode().id, 'node0');
+  expect(walker.previousNode().id).toEqual('node0');
 
   walker.nextNode();
 
   // node2 gets visited twice (entering/leaving) because it doesn't have the 'leaf' class.
-  t.equal(walker.nextNode().id, 'node2');
-  t.equal(walker.exitingCurrentNode, false);
-  t.equal(walker.nextNode().id, 'node2');
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.nextNode().id).toEqual('node2');
+  expect(walker.exitingCurrentNode).toEqual(false);
+  expect(walker.nextNode().id).toEqual('node2');
+  expect(walker.exitingCurrentNode).toEqual(true);
 
-  t.equal(walker.previousNode().id, 'node2');
-  t.equal(walker.exitingCurrentNode, false);
-  t.equal(walker.nextNode().id, 'node2');
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.previousNode().id).toEqual('node2');
+  expect(walker.exitingCurrentNode).toEqual(false);
+  expect(walker.nextNode().id).toEqual('node2');
+  expect(walker.exitingCurrentNode).toEqual(true);
 
-  t.equal(walker.nextNode().id, 'node0');
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.nextNode().id).toEqual('node0');
+  expect(walker.exitingCurrentNode).toEqual(true);
 
-  t.equal(walker.nextNode().id, 'node4');
-  t.equal(walker.nextNode(), null);
+  expect(walker.nextNode().id).toEqual('node4');
+  expect(walker.nextNode()).toEqual(null);
 
   div.remove();
-
-  t.end();
 });
 
-test('startAtEnd option', t => {
+test('startAtEnd option', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div, {startAtEnd: true});
 
-  t.equal(walker.previousNode().id, 'node4');
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.previousNode().id).toEqual('node4');
+  expect(walker.exitingCurrentNode).toEqual(false);
 
-  t.equal(walker.nextNode(), null);
-  t.equal(walker.previousNode().id, 'node4');
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.nextNode()).toEqual(null);
+  expect(walker.previousNode().id).toEqual('node4');
+  expect(walker.exitingCurrentNode).toEqual(false);
 
   div.querySelector('#node4').remove();
 
   const walker2 = new TraceElementWalker(div, {startAtEnd: true});
-  t.equal(walker2.previousNode().id, 'node0');
-  t.equal(walker2.exitingCurrentNode, true);
-  t.equal(walker2.nextNode(), null);
-  t.equal(walker2.previousNode().id, 'node0');
-  t.equal(walker2.exitingCurrentNode, true);
+  expect(walker2.previousNode().id).toEqual('node0');
+  expect(walker2.exitingCurrentNode).toEqual(true);
+  expect(walker2.nextNode()).toEqual(null);
+  expect(walker2.previousNode().id).toEqual('node0');
+  expect(walker2.exitingCurrentNode).toEqual(true);
 
   div.remove();
-
-  t.end();
 });
 
-test('going backwards from end', t => {
+test('going backwards from end', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
   while (walker.nextNode());
-  t.equal(walker.previousNode(), div.querySelector('#node4'));
+  expect(walker.previousNode()).toEqual(div.querySelector('#node4'));
 
   walker.nextNode();
   walker.nextNode();
-  t.equal(walker.previousNode(), div.querySelector('#node4'), "can't go past end");
-  t.equal(walker.previousNode(), div.querySelector('#node0'));
+  expect(walker.previousNode()).toBe(div.querySelector('#node4'));
+  expect(walker.previousNode()).toEqual(div.querySelector('#node0'));
 
   div.remove();
-
-  t.end();
 });
 
-test('step into', t => {
+test('step into', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
-  const $ = sel => div.querySelector(sel);
+  const $ = (sel) => div.querySelector(sel);
 
   walker.stepInto($('#node0'));
-  t.equal(walker.previousNode(), null);
+  expect(walker.previousNode()).toEqual(null);
 
   walker.stepInto($('#node0'));
-  t.equal(walker.currentNode.id, 'node0');
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.currentNode.id).toEqual('node0');
+  expect(walker.exitingCurrentNode).toEqual(false);
 
-  t.equal(walker.nextNode().id, 'node1');
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.nextNode().id).toEqual('node1');
+  expect(walker.exitingCurrentNode).toEqual(false);
 
-  t.equal(walker.nextNode().id, 'node2');
-  t.equal(walker.exitingCurrentNode, false);
-  t.equal(walker.nextNode().id, 'node2');
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.nextNode().id).toEqual('node2');
+  expect(walker.exitingCurrentNode).toEqual(false);
+  expect(walker.nextNode().id).toEqual('node2');
+  expect(walker.exitingCurrentNode).toEqual(true);
 
   walker.stepInto($('#node1'));
-  t.equal(walker.exitingCurrentNode, false);
-  t.equal(walker.nextNode().id, 'node2');
+  expect(walker.exitingCurrentNode).toEqual(false);
+  expect(walker.nextNode().id).toEqual('node2');
 
   div.remove();
-
-  t.end();
 });
 
-test('step into from end', t => {
+test('step into from end', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div, {startAtEnd: true});
 
-  const $ = sel => div.querySelector(sel);
+  const $ = (sel) => div.querySelector(sel);
 
   walker.stepInto($('#node0'));
-  t.equal(walker.isAtEnd, false);
+  expect(walker.isAtEnd).toEqual(false);
 
   div.remove();
-
-  t.end();
 });
 
-test('step out', t => {
+test('step out', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
-  const $ = sel => div.querySelector(sel);
+  const $ = (sel) => div.querySelector(sel);
 
   walker.stepOut($('#node0'));
-  t.equal(walker.currentNode, $('#node0'));
-  t.equal(walker.previousNode(), $('#node2'));
+  expect(walker.currentNode).toEqual($('#node0'));
+  expect(walker.previousNode()).toEqual($('#node2'));
 
   walker.stepOut($('#node2'));
-  t.equal(walker.currentNode, $('#node2'));
-  t.equal(walker.exitingCurrentNode, true);
+  expect(walker.currentNode).toEqual($('#node2'));
+  expect(walker.exitingCurrentNode).toEqual(true);
 
   // node2 gets visited twice, so after stepping out, we are still on node2, but
   // not exiting this time.
-  t.equal(walker.previousNode(), $('#node2'));
-  t.equal(walker.exitingCurrentNode, false);
+  expect(walker.previousNode()).toEqual($('#node2'));
+  expect(walker.exitingCurrentNode).toEqual(false);
 
   div.remove();
-
-  t.end();
 });
