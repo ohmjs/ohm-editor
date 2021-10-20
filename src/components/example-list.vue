@@ -48,7 +48,6 @@
 
 const ohmEditor = require('../ohmEditor');
 const domUtil = require('../domUtil');
-const localStorage = require('global/window').localStorage;
 
 let idCounter = 0;
 
@@ -65,8 +64,9 @@ function uniqueId() {
 module.exports = {
   name: 'example-list',
   components: {
-    'example-editor': require('./example-editor.vue').default,
-    'thumbs-up-button': require('./thumbs-up-button.vue').default,
+    'example-editor': require('./example-editor.vue').default || require('./example-editor.vue'),
+    // eslint-disable-next-line max-len
+    'thumbs-up-button': require('./thumbs-up-button.vue').default || require('./thumbs-up-button.vue'),
   },
   props: [],
   data() {

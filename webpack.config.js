@@ -3,7 +3,7 @@
 'use strict';
 
 const path = require('path');
-const VueLoaderPlugin = require('vue-loader').VueLoaderPlugin;
+const {VueLoaderPlugin} = require('vue-loader');
 const webpack = require('webpack');
 
 module.exports = {

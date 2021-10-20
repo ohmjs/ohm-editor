@@ -2,7 +2,7 @@
 'use strict';
 
 const ohmEditor = require('../ohmEditor');
-const traceElement = require('./trace-element.vue').default;
+const traceElement = require('./trace-element.vue').default || require('./trace-element.vue');
 
 const EMPTY_LR_INFO = {};
 

@@ -14,7 +14,7 @@ parseTree.vue = new Vue({
   },
   el: '#visualizerContainer',
   components: {
-    'parse-tree': require('./components/parse-tree.vue').default,
+    'parse-tree': require('./components/parse-tree.vue').default || require('./components/parse-tree.vue'),
   },
   template:
     '<div id="visualizerContainer">' +
