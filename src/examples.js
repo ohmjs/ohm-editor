@@ -2,14 +2,17 @@
 
 'use strict';
 
-var Vue = require('vue');
-var ohmEditor = require('./ohmEditor');
+const Vue = require('vue').default;
+const ohmEditor = require('./ohmEditor');
 
-var ExampleList = Vue.extend(require('./components/example-list.vue'));
+const ExampleList = Vue.extend(
+  require('./components/example-list.vue').default ||
+    require('./components/example-list.vue')
+);
 
-var exampleList = new ExampleList({
+const exampleList = new ExampleList({
   el: '#exampleContainer',
-  propsData: {}
+  propsData: {},
 });
 
 Object.assign(ohmEditor.examples, {
@@ -20,5 +23,5 @@ Object.assign(ohmEditor.examples, {
   getSelected: exampleList.getSelected,
   setSelected: exampleList.setSelected,
   saveExamples: exampleList.saveExamples,
-  restoreExamples: exampleList.restoreExamples
+  restoreExamples: exampleList.restoreExamples,
 });

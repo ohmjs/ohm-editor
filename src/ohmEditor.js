@@ -3,9 +3,9 @@
 
 'use strict';
 
-var CheckedEmitter = require('checked-emitter');
+const CheckedEmitter = require('checked-emitter');
 
-var ohmEditor = new CheckedEmitter();
+const ohmEditor = new CheckedEmitter();
 
 ohmEditor.registerEvents({
   // Emitted when the CodeMirror instances for the input and grammar have been initialized.
@@ -28,7 +28,7 @@ ohmEditor.registerEvents({
   // Emitted when the user indicates they want to preview contextual information about a
   // Failure, e.g. when hovering over the failure message.
   'peek:failure': ['failure'],
-  'unpeek:failure': [],  // Ends the preview.
+  'unpeek:failure': [], // Ends the preview.
 
   // Emitted when the user indicates they want jump to a location relevant to a Failure.
   // Usually comes after a 'peek:failure' event, and if so, it implies that there will be
@@ -38,10 +38,10 @@ ohmEditor.registerEvents({
   // Emitted when the user indicates they want to preview a rule definition, e.g. when
   // hovering over a node in the visualizer.
   'peek:ruleDefinition': ['ruleName'],
-  'unpeek:ruleDefinition': [],  // Ends the preview.
+  'unpeek:ruleDefinition': [], // Ends the preview.
 
   // Emitted when the user checks or unchecks one of the option checkboxes.
-  'change:option': ['optionName']
+  'change:option': ['optionName'],
 });
 
 ohmEditor.grammar = null;
@@ -60,7 +60,7 @@ ohmEditor.semantics.registerEvents({
   'save:action': ['operation', 'key', 'args', 'body'],
 
   // Emitted when user want to add a new semantic editor
-  'add:semanticEditor': ['type', 'name']
+  'add:semanticEditor': ['type', 'name'],
 });
 
 ohmEditor.examples = new CheckedEmitter();
@@ -68,12 +68,14 @@ ohmEditor.examples.registerEvents({
   'add:example': ['id'],
   'set:example': ['id', 'oldValue', 'newValue'],
   'set:selected': ['id'],
-  'remove:example': ['id']
+  'remove:example': ['id'],
 });
 
 ohmEditor.ui = {
-  inputEditor: null,  // Initialized in example-list.vue.
-  grammarEditor: CodeMirror(document.querySelector('#grammarContainer .editorWrapper'))
+  inputEditor: null, // Initialized in example-list.vue.
+  grammarEditor: CodeMirror(
+    document.querySelector('#grammarContainer .editorWrapper')
+  ),
 };
 
 ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);

@@ -1,48 +1,46 @@
+/* eslint-env node */
+
 'use strict';
 
-var path = require('path');
-var webpack = require('webpack');
-
-/* eslint-disable quote-props */
+const path = require('path');
+const {VueLoaderPlugin} = require('vue-loader');
+const webpack = require('webpack');
 
 module.exports = {
   module: {
-    loaders: [
-      {test: /\.vue$/, loader: 'vue'},
-      {test: /\.(?:jpg|gif|png)$/, loader: 'file'}
-    ]
+    rules: [
+      {test: /\.(?:jpg|gif|png)$/, type: 'asset/resource'},
+      {test: /\.vue$/, loader: 'vue-loader'},
+      {
+        test: /\.css$/,
+        use: ['vue-style-loader', 'css-loader'],
+      },
+    ],
   },
   entry: {
-    visualizer: './src/index.js'
+    visualizer: './src/index.js',
   },
   resolve: {
     // Use the standalone version of Vue that includes the template compiler.
-    alias: {'vue$': 'vue/dist/vue.common.js'}  // eslint-disable-line quote-props
+    alias: {vue$: 'vue/dist/vue.esm.js'}, // eslint-disable-line quote-props
+    fallback: {fs: false},
   },
   output: {
     path: path.join(__dirname, 'build'),
     publicPath: 'assets/',
-    filename: '[name]-bundle.js'
+    filename: '[name]-bundle.js',
   },
   plugins: [
     new webpack.DefinePlugin({
       // Ensure this processes's NODE_ENV is exposed to the built scripts.
-      'process.env': {NODE_ENV: process.env.NODE_ENV}
-    })
+      'process.env': {NODE_ENV: process.env.NODE_ENV},
+    }),
+    new VueLoaderPlugin(),
   ],
-  node: {
-    fs: 'empty'
-  },
   devServer: {
     contentBase: path.join(__dirname, 'src'),
     inline: true,
     port: 8080,
-    publicPath: '/assets/'
+    publicPath: '/assets/',
   },
-  vue: {
-    esModule: false
-  },
-  'file-loader': {
-    useRelativePath: true
-  }
 };

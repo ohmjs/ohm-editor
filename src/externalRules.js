@@ -3,23 +3,23 @@
 
 'use strict';
 
-var domUtil = require('./domUtil');
-var isPrimitiveRule = require('./traceUtil').isPrimitiveRule;
-var ohmEditor = require('./ohmEditor');
+const domUtil = require('./domUtil');
+const isPrimitiveRule = require('./traceUtil').isPrimitiveRule;
+const ohmEditor = require('./ohmEditor');
 
-var $ = domUtil.$;
-var $$ = domUtil.$$;
+const $ = domUtil.$;
+const $$ = domUtil.$$;
 
-var ohmGrammar = ohm.ohmGrammar;
-var builtInRules = ohm.grammar('G {}').superGrammar;
+const ohmGrammar = ohm.ohmGrammar;
+const builtInRules = ohm.grammar('G {}').superGrammar;
 
 function extend(origin, add) {
   if (!add || typeof add !== 'object') {
     return origin;
   }
 
-  var keys = Object.keys(add);
-  var i = keys.length;
+  const keys = Object.keys(add);
+  let i = keys.length;
   while (i--) {
     origin[keys[i]] = add[keys[i]];
   }
@@ -27,48 +27,48 @@ function extend(origin, add) {
 }
 
 function combineChildResults(attr) {
-  return function(children) {
-    return children.reduce(function(acc, child) {
+  return function (...children) {
+    return children.reduce(function (acc, child) {
       return extend(acc, child[attr]);
     }, {});
   };
 }
 
-var semantics = ohmGrammar.createSemantics();
+const semantics = ohmGrammar.createSemantics();
 
 // An attribute for collecting all of the rule names referenced within a grammar.
 // Returns an object whose own properties represent all the referenced rule names.
 semantics.addAttribute('referencedRules', {
-  Base_application: function(ident, args) {
-    var ans = {};
+  Base_application(ident, args) {
+    const ans = {};
     ans[ident.sourceString] = true;
     return extend(ans, args.referencedRules);
   },
   _iter: combineChildResults('referencedRules'),
   _nonterminal: combineChildResults('referencedRules'),
-  _terminal: function() {
+  _terminal() {
     return {};
-  }
+  },
 });
 
 // An attribute for collecting all of the identifiers found in a (possibly invalid) grammar.
 // Returns an object whose own properties represent all the identifiers found in the source.
 semantics.addAttribute('identifiers', {
-  ident: function(_) {
-    var ans = {};
+  ident(_) {
+    const ans = {};
     ans[this.sourceString] = true;
     return ans;
   },
   _iter: combineChildResults('identifiers'),
   _nonterminal: combineChildResults('identifiers'),
-  _terminal: function() {
+  _terminal() {
     return {};
-  }
+  },
 });
 
 function getBuiltInRuleDefinition(ruleName) {
-  var ruleInfo = builtInRules.rules[ruleName];
-  var ans = ruleName;
+  const ruleInfo = builtInRules.rules[ruleName];
+  let ans = ruleName;
 
   if (ruleInfo.formals.length > 0) {
     ans += '<' + ruleInfo.formals.join(', ') + '>';
@@ -82,7 +82,7 @@ function getBuiltInRuleDefinition(ruleName) {
   if (isPrimitiveRule(builtInRules, ruleName)) {
     ans += '/* primitive rule */';
   } else {
-    var body = ruleInfo.body;
+    const body = ruleInfo.body;
     ans += body.source ? body.source.contents : body.toString();
   }
 
@@ -92,17 +92,17 @@ function getBuiltInRuleDefinition(ruleName) {
 // Returns an object whose keys represent all externally-defined rules which
 // are referenced in the Ohm grammar represented by `matchResult`.
 function getExternalRules(rulesObj) {
-  var ans = {};
-  var ruleNames = Object.keys(rulesObj);
+  const ans = {};
+  const ruleNames = Object.keys(rulesObj);
 
   // Always include `space` and `spaces` when the "Show spaces" option is enabled.
   if (ohmEditor.options.showSpaces) {
     ruleNames.push('space');
     ruleNames.push('spaces');
   }
-  ruleNames.sort();  // Sort to ensure a stable order.
+  ruleNames.sort(); // Sort to ensure a stable order.
 
-  ruleNames.forEach(function(name) {
+  ruleNames.forEach(function (name) {
     if (name in builtInRules.rules) {
       ans[name] = getBuiltInRuleDefinition(name);
     }
@@ -125,14 +125,14 @@ function LastLineWidget(editor) {
   this._placeWidget(null);
 }
 
-LastLineWidget.prototype._placeWidget = function() {
+LastLineWidget.prototype._placeWidget = function () {
   if (this.widget) {
     this.clear();
   }
-  var cm = this.editor;
+  const cm = this.editor;
 
   // Add the widget on the current last line.
-  var lineHandle = this.lineHandle = cm.getLineHandle(cm.lastLine());
+  const lineHandle = (this.lineHandle = cm.getLineHandle(cm.lastLine()));
   this.widget = cm.addLineWidget(lineHandle, this.node);
 
   // Register for change/delete events on the line.
@@ -143,71 +143,74 @@ LastLineWidget.prototype._placeWidget = function() {
   lineHandle.on('delete', this.placeWidget);
 };
 
-LastLineWidget.prototype.clear = function() {
+LastLineWidget.prototype.clear = function () {
   this.widget.clear();
   this.lineHandle.off('change', this.placeWidget);
   this.lineHandle.off('delete', this.placeWidget);
 };
 
-LastLineWidget.prototype.update = function(cm, matchResult, grammar) {
+LastLineWidget.prototype.update = function (cm, matchResult, grammar) {
   if (grammar) {
     this._rules = getExternalRules(semantics(matchResult).referencedRules);
   } else {
-    var lenientResult = ohmGrammar.match(cm.getValue(), 'tokens');
+    const lenientResult = ohmGrammar.match(cm.getValue(), 'tokens');
     this._rules = getExternalRules(semantics(lenientResult).identifiers);
   }
 
-  var container = this.node.querySelector('.content');
+  const container = this.node.querySelector('.content');
   container.textContent = '';
 
-  for (var ruleName in this._rules) {
-    var pre = document.createElement('pre');
+  // eslint-disable-next-line guard-for-in
+  for (const ruleName in this._rules) {
+    const pre = document.createElement('pre');
     pre.id = 'externalRules-' + ruleName;
     pre.textContent = this._rules[ruleName] + '\n';
     container.appendChild(pre);
   }
 };
 
-var grammarEditor = ohmEditor.ui.grammarEditor;
+const grammarEditor = ohmEditor.ui.grammarEditor;
 
 // Singletons associated with the current grammar (ok since there's only one grammar editor).
-var widget;
-var grammarState = {
+let widget;
+const grammarState = {
   matchResult: null,
-  grammar: null
+  grammar: null,
 };
 
 function updateExternalRules() {
   widget.update(grammarEditor, grammarState.matchResult, grammarState.grammar);
 }
 
-grammarEditor.on('swapDoc', function(cm) {
+grammarEditor.on('swapDoc', function (cm) {
   widget = new LastLineWidget(cm);
 });
 
-ohmEditor.addListener('parse:grammar', function(matchResult, grammar, err) {
+ohmEditor.addListener('parse:grammar', function (matchResult, grammar, err) {
   grammarState.matchResult = matchResult;
   grammarState.grammar = grammar;
   updateExternalRules();
 });
 
-ohmEditor.addListener('change:option', function(name) {
+ohmEditor.addListener('change:option', function (name) {
   if (name === 'showSpaces') {
     updateExternalRules(grammarState.grammarMatchResult, grammarState.grammar);
   }
 });
 
-ohmEditor.addListener('peek:ruleDefinition', function(ruleName) {
-  if (!ohmEditor.grammar.rules.hasOwnProperty(ruleName)) {
-    var elem = $('#externalRules-' + ruleName);
+ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
+  if (
+    !Object.prototype.hasOwnProperty.call(ohmEditor.grammar.rules, ruleName)
+  ) {
+    const elem = $('#externalRules-' + ruleName);
     if (elem) {
       elem.classList.add('active-definition');
     }
   }
 });
 
-ohmEditor.addListener('unpeek:ruleDefinition', function() {
-  $$('.externalRules pre').forEach(function(elem) {
+ohmEditor.addListener('unpeek:ruleDefinition', function () {
+  $$('.externalRules pre').forEach(function (elem) {
     elem.classList.remove('active-definition');
   });
 });

@@ -41,7 +41,7 @@
 }
 
 #exampleList .example.pass code {
-  border-left: 4px solid #58B958;
+  border-left: 4px solid #58b958;
 }
 
 #exampleList .example.pendingUpdate code {
@@ -65,7 +65,7 @@
 }
 
 #exampleList .example:not(.selected) .thumbsUpButton:not(:hover) {
-  filter: grayscale(1.0);
+  filter: grayscale(1);
   opacity: 0.6;
 }
 
@@ -84,7 +84,7 @@
   color: #666;
 }
 
-@media screen and (min-color-index:0) and(-webkit-min-device-pixel-ratio:0) {
+@media screen and (min-color-index: 0) and(-webkit-min-device-pixel-ratio:0) {
   @media {
     /* Safari 6.1+ ONLY */
     #exampleList .example .thumbsUpButton {
@@ -94,7 +94,8 @@
 }
 
 /* Firefox 1+ only */
-#exampleList .example .thumbsUpButton, x:-moz-any-link {
+#exampleList .example .thumbsUpButton,
+x:-moz-any-link {
   font-size: 16px;
 }
 
@@ -103,7 +104,7 @@
 }
 
 #exampleList code:empty::before {
-  content: '\a0';  /* Insert &nbsp; to keep the correct height. */
+  content: '\a0'; /* Insert &nbsp; to keep the correct height. */
 }
 
 .startRule {
@@ -121,7 +122,7 @@
   border-top: 1px solid #ddd;
   flex: 1;
   overflow: auto;
-  position: relative;  /* For positioning #exampleEditor */
+  position: relative; /* For positioning #exampleEditor */
 }
 
 #editorOverlay {
@@ -207,7 +208,7 @@
 }
 
 #exampleEditor .CodeMirror-lines {
-  padding-bottom: 12px;  
+  padding-bottom: 12px;
   padding-top: 12px;
 }
 
@@ -223,9 +224,11 @@
   display: none;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .25s
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s;
 }
-.fade-enter, .fade-leave-to {
-  opacity: 0
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }

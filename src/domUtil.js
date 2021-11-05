@@ -2,24 +2,24 @@
 
 'use strict';
 
-var KeyCode = {
+const KeyCode = {
   ENTER: 13,
-  ESC: 27
+  ESC: 27,
 };
 
 // Hide the context menus when Esc or Enter is pressed, any click happens, or another
 // context menu is brought up.
 document.addEventListener('click', hideContextMenus);
 document.addEventListener('contextmenu', hideContextMenus);
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
   if (e.keyCode === KeyCode.ESC || e.keyCode === KeyCode.ENTER) {
     hideContextMenus();
   }
 });
 
 function hideContextMenus() {
-  var menus = document.querySelectorAll('.contextMenu');
-  Array.prototype.forEach.call(menus, function(menu) {
+  const menus = document.querySelectorAll('.contextMenu');
+  Array.prototype.forEach.call(menus, function (menu) {
     menu.hidden = true;
   });
 }
@@ -34,27 +34,31 @@ function assert(cond, msg) {
 // -------
 
 module.exports = {
-  $: function(sel) { return document.querySelector(sel); },
+  $(sel) {
+    return document.querySelector(sel);
+  },
 
-  $$: function(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); },
+  $$(sel) {
+    return Array.prototype.slice.call(document.querySelectorAll(sel));
+  },
 
-  clearAll: function(classSelector) {
+  clearAll(classSelector) {
     assert(classSelector[0] === '.', "Expected a selector beginning with '.'");
-    var className = classSelector.slice(1);
-    var nodes = document.querySelectorAll(classSelector);
-    for (var i = 0; i < nodes.length; i++) {
+    const className = classSelector.slice(1);
+    const nodes = document.querySelectorAll(classSelector);
+    for (let i = 0; i < nodes.length; i++) {
       nodes[i].classList.remove(className);
     }
   },
 
-  createElement: function(sel, optContent) {
-    var parts = sel.split('.');
-    var tagName = parts[0];
+  createElement(sel, optContent) {
+    const parts = sel.split('.');
+    let tagName = parts[0];
     if (tagName.length === 0) {
       tagName = 'div';
     }
 
-    var el = document.createElement(tagName);
+    const el = document.createElement(tagName);
     el.className = parts.slice(1).join(' ');
     if (optContent) {
       el.textContent = optContent;
@@ -62,8 +66,8 @@ module.exports = {
     return el;
   },
 
-  closestElementMatching: function(sel, startEl) {
-    var el = startEl;
+  closestElementMatching(sel, startEl) {
+    let el = startEl;
     while (el != null) {
       if (el.matches(sel)) {
         return el;
@@ -73,16 +77,16 @@ module.exports = {
   },
 
   // Add an event handler to `el` that is removed right after it runs.
-  once: function(el, eventType, cb) {
+  once(el, eventType, cb) {
     el.addEventListener(eventType, function handler(e) {
       cb(e);
       el.removeEventListener(eventType, handler);
     });
   },
 
-  toggleClasses: function(el, map) {
-    for (var k in map) {
-      if (map.hasOwnProperty(k)) {
+  toggleClasses(el, map) {
+    for (const k in map) {
+      if (Object.prototype.hasOwnProperty.call(map, k)) {
         el.classList.toggle(k, !!map[k]);
       }
     }
@@ -95,9 +99,9 @@ module.exports = {
   // `onClick` is a function to use as the onclick handler for the item.
   // If an item with the same id was already added, then the old item will be updated
   // with the new values from `label`, `enabled`, and `onClick`.
-  addMenuItem: function(menuId, id, label, enabled, onClick) {
-    var itemList = document.querySelector('#' + menuId + ' ul');
-    var li = itemList.querySelector('#' + id);
+  addMenuItem(menuId, id, label, enabled, onClick) {
+    const itemList = document.querySelector('#' + menuId + ' ul');
+    let li = itemList.querySelector('#' + id);
     if (!li) {
       li = itemList.appendChild(this.createElement('li'));
       li.id = id;
@@ -111,5 +115,5 @@ module.exports = {
       li.onclick = onClick;
     }
     return li;
-  }
+  },
 };
