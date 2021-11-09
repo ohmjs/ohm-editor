@@ -28,6 +28,41 @@ let grammarMatcher = ohm.ohmGrammar.matcher();
 // Helpers
 // -------
 
+/* Available Grammar Selection */
+
+function updateAvailableGrammars(parsedGrammars) {
+  const availableGrammars = document.querySelector('#availableGrammars');
+
+  const idx = availableGrammars.options.selectedIndex;
+  let currentKey;
+  if (idx !== -1) {
+    currentKey = availableGrammars.options[availableGrammars.options.selectedIndex].value;
+  }
+
+  availableGrammars.required = true;
+  availableGrammars.options.length = 0;
+
+  const keys = Object.keys(parsedGrammars);
+  let newIdx = -1;
+  for (let i = 0; i < keys.length; i++) {
+    const option = document.createElement('option');
+    option.text = option.value = keys[i];
+    availableGrammars.appendChild(option);
+    if (option.value === currentKey) {
+      newIdx = i;
+    }
+  }
+  if (newIdx !== -1) {
+    availableGrammars.options.selectedIndex = newIdx;
+  }
+}
+
+const availableGrammars = document.querySelector('#availableGrammars');
+availableGrammars.addEventListener('change', function(e) {
+  grammarChanged = true;
+  refresh();
+});
+
 function parseGrammar() {
   const matchResult = grammarMatcher.match();
 
@@ -38,9 +73,26 @@ function parseGrammar() {
     const ns = {};
     try {
       ohm._buildGrammar(matchResult, ns);
-      const firstProp = Object.keys(ns)[0];
-      if (firstProp) {
-        grammar = ns[firstProp];
+      // Update available grammars
+      updateAvailableGrammars(ns);
+      const availableGrammars = document.querySelector('#availableGrammars');
+      const idx = availableGrammars.options.selectedIndex;
+      let tmpGrammar;
+      if (idx !== -1) {
+        const currentKey = availableGrammars.options[availableGrammars.options.selectedIndex].value;
+        tmpGrammar = ns[currentKey];
+        if (tmpGrammar) {
+          grammar = tmpGrammar;
+        }
+      }
+      // If grammar is still not set and we have at least one grammar
+      if (!grammar) {
+        tmpGrammar = ns[Object.keys(ns)[0]];
+        if (tmpGrammar) {
+          grammar = tmpGrammar;
+        } else {
+          console.error('Error: No grammar found');
+        }
       }
     } catch (ex) {
       err = ex;

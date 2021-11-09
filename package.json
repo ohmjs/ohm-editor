@@ -16,7 +16,6 @@
     "test-watch": "karma start --auto-watch"
   },
   "main": "index.js",
-  "dependencies": {},
   "devDependencies": {
     "@vue/cli": "^5.0.0-beta.6",
     "@vue/cli-plugin-unit-jest": "^5.0.0-beta.6",
@@ -45,7 +44,7 @@
     "vue-template-compiler": "^2.6.14",
     "webpack": "^5.58.1",
     "webpack-cli": "^4.9.0",
-    "webpack-dev-server": "^4.3.1"
+    "webpack-dev-server": "^4.4.0"
   },
   "prettier": {
     "bracketSpacing": false,
