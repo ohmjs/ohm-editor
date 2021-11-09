@@ -4,7 +4,6 @@
 
 const path = require('path');
 const {VueLoaderPlugin} = require('vue-loader');
-const webpack = require('webpack');
 
 module.exports = {
   module: {
@@ -27,20 +26,14 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'build'),
-    publicPath: 'assets/',
+    publicPath: '/assets/',
     filename: '[name]-bundle.js',
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      // Ensure this processes's NODE_ENV is exposed to the built scripts.
-      'process.env': {NODE_ENV: process.env.NODE_ENV},
-    }),
-    new VueLoaderPlugin(),
-  ],
+  plugins: [new VueLoaderPlugin()],
   devServer: {
-    contentBase: path.join(__dirname, 'src'),
-    inline: true,
+    static: {
+      directory: path.join(__dirname, 'src'),
+    },
     port: 8080,
-    publicPath: '/assets/',
   },
 };
