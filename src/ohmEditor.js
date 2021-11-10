@@ -21,8 +21,8 @@ ohmEditor.registerEvents({
   'change:grammar': ['grammarSource'],
   'change:input': ['inputSource'],
 
-  // Emitted after attempting to parse the grammar and the input, respectively.
-  'parse:grammar': ['matchResult', 'grammar', 'err'],
+  // Emitted after attempting to parse the grammar(s) and the input, respectively.
+  'parse:grammars': ['matchResult', 'grammars', 'err'],
   'parse:input': ['matchResult', 'trace'],
 
   // Emitted when the user indicates they want to preview contextual information about a

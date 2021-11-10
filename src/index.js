@@ -28,20 +28,13 @@ let grammarMatcher = ohm.ohmGrammar.matcher();
 // Helpers
 // -------
 
-function parseGrammar() {
-  const matchResult = grammarMatcher.match();
-
-  let grammar;
+function parseGrammars() {
   let err;
-
+  const grammars = {};
+  const matchResult = grammarMatcher.match();
   if (matchResult.succeeded()) {
-    const ns = {};
     try {
-      ohm._buildGrammar(matchResult, ns);
-      const firstProp = Object.keys(ns)[0];
-      if (firstProp) {
-        grammar = ns[firstProp];
-      }
+      ohm._buildGrammar(matchResult, grammars);
     } catch (ex) {
       err = ex;
     }
@@ -54,8 +47,8 @@ function parseGrammar() {
   }
   return {
     matchResult,
-    grammar,
-    error: err,
+    grammars,
+    err,
   };
 }
 
@@ -99,14 +92,9 @@ function refresh() {
     grammarChanged = false;
     ohmEditor.emit('change:grammar', grammarSource);
 
-    const result = parseGrammar();
-    ohmEditor.grammar = result.grammar;
-    ohmEditor.emit(
-      'parse:grammar',
-      result.matchResult,
-      result.grammar,
-      result.error
-    );
+    const {matchResult, grammars, err} = parseGrammars();
+    ohmEditor.grammar = grammars ? Object.values(grammars)[0] : undefined;
+    ohmEditor.emit('parse:grammars', matchResult, grammars, err);
   }
 
   if (ohmEditor.grammar) {
@@ -216,7 +204,7 @@ console.log(
     '  `.grammar` as the current grammar object (if the source is valid)',
     '  `.ui` containing the `inputEditor` and `grammarEditor`',
     '',
-    `Ohm version ${ohm.version}`
+    `Ohm version ${ohm.version}`,
   ].join('\n')
 );
 /* eslint-enable no-console */

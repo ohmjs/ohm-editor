@@ -91,7 +91,7 @@ ohmEditor.addListener('change:grammar', function (source) {
   hideError('input', ohmEditor.ui.inputEditor);
 });
 
-ohmEditor.addListener('parse:grammar', function (matchResult, grammar, err) {
+ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
   if (err) {
     const editor = ohmEditor.ui.grammarEditor;
     setError('grammar', editor, err.interval, err.shortMessage || err.message);

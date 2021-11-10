@@ -186,9 +186,9 @@ grammarEditor.on('swapDoc', function (cm) {
   widget = new LastLineWidget(cm);
 });
 
-ohmEditor.addListener('parse:grammar', function (matchResult, grammar, err) {
+ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
   grammarState.matchResult = matchResult;
-  grammarState.grammar = grammar;
+  grammarState.grammar = grammars ? Object.values(grammars)[0] : undefined;
   updateExternalRules();
 });
 

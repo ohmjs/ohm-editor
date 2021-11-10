@@ -352,9 +352,9 @@ export default {
       self.setGrammar(null);
     });
     ohmEditor.addListener(
-      'parse:grammar',
-      function (matchResult, grammar, err) {
-        self.setGrammar(grammar);
+      'parse:grammars',
+      function (matchResult, grammars, err) {
+        self.setGrammar(grammars ? Object.values(grammars)[0] : undefined);
       }
     );
     ohmEditor.addListener('change:inputEditor', function (source) {
