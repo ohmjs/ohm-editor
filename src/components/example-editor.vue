@@ -12,15 +12,18 @@
         <div class="toolbar">
           <div class="contents flex-row">
             <label>Start rule:</label>
-            <select id="startRuleDropdown" v-model="startRule">
-              <option
-                v-for="option in startRuleOptions()"
-                :key="option.value"
-                :value="option.value"
-                :class="{needed: false /* TODO */}"
-              >
-                {{ option.text }}
-              </option>
+            <select id="startRuleDropdown" v-model="startGrammarAndRule">
+              <optgroup
+                v-for="grammarOpt in grammarOptions()"
+                :key="grammarOpt.value"
+                :label="grammarOpt.text">
+                <option
+                  v-for="ruleOpt in startRuleOptions(grammarOpt.value)"
+                  :key="ruleOpt.value"
+                  :value="ruleOpt.value"
+                  :class="{needed: false /* TODO */}"
+                >{{ ruleOpt.text }}</option>
+              </optgroup>
             </select>
             <div
               v-if="startRuleError"
@@ -58,7 +61,7 @@ export default {
   props: {
     example: {type: Object, required: true},
     status: {type: Object},
-    grammar: {type: Object},
+    grammars: {type: Object},
   },
   data() {
     return {
@@ -72,24 +75,16 @@ export default {
       // Hide parse errors while the placeholder text is visible.
       return this.showPlaceholder ? 'hideInputErrors' : '';
     },
-    commonStartRuleOptions() {
-      const options = [{text: '(default)', value: ''}];
-      if (this.grammar) {
-        Object.keys(this.grammar.rules).forEach(function (ruleName) {
-          options.push({text: ruleName, value: ruleName});
-        });
-      }
-      return options;
-    },
     startRuleError() {
       return this.status && this.status.err && this.status.err.message;
     },
-    startRule: {
+    startGrammarAndRule: {
       get() {
-        return this.example.startRule;
+        const { selectedGrammar, startRule } = this.example;
+        return selectedGrammar ? `${selectedGrammar}.${startRule}` : '';
       },
       set(newVal) {
-        this.$emit('setStartRule', newVal);
+        this.$emit('setStartGrammarAndRule', newVal);
       },
     },
   },
@@ -141,19 +136,29 @@ export default {
     stopEditing() {
       this.editing = false;
     },
+    grammarOptions() {
+      return Object.keys(this.grammars || {}).map(name => {
+        return { text: name, value: name}
+      });
+    },
     // An array of objects representing the options to show in #startRuleDropdown.
-    startRuleOptions() {
-      const ex = this.example;
-      const options = this.commonStartRuleOptions;
+    startRuleOptions(grammarName) {
+      let options = [{text: '(default)', value: `${grammarName}.`}];
 
-      // Ensure the example's start rule always appears in the dropdown, even if the
-      // rule no longer appears in the grammar.
-      for (let i = 0; i < options.length; ++i) {
-        if (options[i].value === ex.startRule) {
-          return options;
+      const g = this.grammars[grammarName];
+      if (g) {
+        for (const ruleName of Object.keys(g.rules)) {
+          options.push({text: ruleName, value: `${grammarName}.${ruleName}` });
         }
       }
-      return [{text: ex.startRule, value: ex.startRule}].concat(options);
+      // Make sure an option exists that matches the currently selected start rule.
+      const { selectedGrammar, startRule } = this.example;
+      if (selectedGrammar && selectedGrammar === grammarName) {
+        if (!options.some(({ value }) => value === this.startGrammarAndRule)) {
+          options = [{text: startRule, value: this.startGrammarAndRule}, ...options];
+        }
+      }
+      return options;
     },
   },
 };

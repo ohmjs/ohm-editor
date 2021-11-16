@@ -321,7 +321,7 @@ function doSaveAs() {
       document.title = 'Ohm';
     }
 
-    ohmEditor.once('change:grammar', function (_) {
+    ohmEditor.once('change:grammars', function (_) {
       saveButton.disabled = true;
     });
     if (examples) {
@@ -410,7 +410,7 @@ function doSaveAs() {
     },
   });
 
-  ohmEditor.addListener('change:grammar', function (source) {
+  ohmEditor.addListener('change:grammars', function (source) {
     const grammar = grammarList.options[grammarList.selectedIndex].value;
     if (grammar === '') {
       // local storage

@@ -46,7 +46,7 @@ const ExampleList =
 // -------
 
 async function simulateGrammarEdit(source) {
-  await ohmEditor.emit('change:grammar', source);
+  await ohmEditor.emit('change:grammars', source);
   await Vue.nextTick();
 
   await ohmEditor.emit('parse:grammars', null, ohm.grammars(source), null);
@@ -193,7 +193,7 @@ test('pass/fail status', async () => {
   await Vue.nextTick();
   expect(vm.exampleStatus[id2].className).toBe('pass');
 
-  ohmEditor.emit('change:grammar', '');
+  ohmEditor.emit('change:grammars', '');
 
   await Vue.nextTick();
   for (const k of Object.keys(vm.exampleStatus)) {

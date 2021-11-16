@@ -13,12 +13,12 @@ ohmEditor.registerEvents({
   'init:grammarEditor': ['codeMirror'],
 
   // Emitted as soon as the user has made a change in the respective editor. Any listeners which
-  // may be long running should use 'change:input' or 'change:grammar' instead.
+  // may be long running should use 'change:input' or 'change:grammars' instead.
   'change:inputEditor': ['codeMirror'],
   'change:grammarEditor': ['codeMirror'],
 
   // Emitted after a short delay when one or more editor change events have occurred.
-  'change:grammar': ['grammarSource'],
+  'change:grammars': ['grammarSource'],
   'change:input': ['inputSource'],
 
   // Emitted after attempting to parse the grammar(s) and the input, respectively.
@@ -45,7 +45,6 @@ ohmEditor.registerEvents({
 });
 
 ohmEditor.grammar = null;
-ohmEditor.startRule = null;
 ohmEditor.options = {};
 
 ohmEditor.semantics = new CheckedEmitter();

@@ -87,7 +87,7 @@ ohmEditor.addListener('change:inputEditor', function (cm) {
 });
 
 // Hide the input error when the grammar is about to be reparsed.
-ohmEditor.addListener('change:grammar', function (source) {
+ohmEditor.addListener('change:grammars', function (source) {
   hideError('input', ohmEditor.ui.inputEditor);
 });
 

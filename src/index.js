@@ -24,6 +24,8 @@ const $ = domUtil.$;
 const $$ = domUtil.$$;
 
 let grammarMatcher = ohm.ohmGrammar.matcher();
+let currentGrammar;
+let currentStartRule;
 
 // Helpers
 // -------
@@ -70,7 +72,6 @@ function refresh() {
 
   const grammarSource = grammarEditor.getValue();
   const inputSource = inputEditor.getValue();
-
   ohmEditor.saveState(inputEditor, 'input');
 
   // Refresh the option values.
@@ -90,7 +91,7 @@ function refresh() {
 
   if (grammarChanged) {
     grammarChanged = false;
-    ohmEditor.emit('change:grammar', grammarSource);
+    ohmEditor.emit('change:grammars', grammarSource);
 
     const {matchResult, grammars, err} = parseGrammars();
     ohmEditor.grammar = grammars ? Object.values(grammars)[0] : undefined;
