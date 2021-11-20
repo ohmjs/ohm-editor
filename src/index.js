@@ -24,8 +24,6 @@ const $ = domUtil.$;
 const $$ = domUtil.$$;
 
 let grammarMatcher = ohm.ohmGrammar.matcher();
-let currentGrammar;
-let currentStartRule;
 
 // Helpers
 // -------
@@ -56,9 +54,9 @@ function parseGrammars() {
 
 // Return the name of a valid start rule for grammar, or null if `optRuleName` is
 // not valid and the grammar has no default starting rule.
-function getValidStartRule(grammar, optRuleName) {
-  if (optRuleName && optRuleName in grammar.rules) {
-    return optRuleName;
+function getValidStartRule(grammar, ruleName = '') {
+  if (ruleName && ruleName in grammar.rules) {
+    return ruleName;
   }
   if (grammar.defaultStartRule) {
     return grammar.defaultStartRule;
@@ -94,14 +92,14 @@ function refresh() {
     ohmEditor.emit('change:grammars', grammarSource);
 
     const {matchResult, grammars, err} = parseGrammars();
-    ohmEditor.grammar = grammars ? Object.values(grammars)[0] : undefined;
     ohmEditor.emit('parse:grammars', matchResult, grammars, err);
   }
 
-  if (ohmEditor.grammar) {
-    const startRule = getValidStartRule(ohmEditor.grammar, ohmEditor.startRule);
+  const {currentGrammar} = ohmEditor;
+  if (currentGrammar) {
+    const startRule = getValidStartRule(currentGrammar, ohmEditor.startRule);
     if (startRule) {
-      const trace = ohmEditor.grammar.trace(inputSource, startRule);
+      const trace = currentGrammar.trace(inputSource, startRule);
 
       // When the input fails to parse, turn on "show failures" automatically.
       if (showFailuresImplicitly) {
@@ -189,6 +187,10 @@ ohmEditor.ui.grammarEditor.on('swapDoc', function (cm) {
   grammarChanged = true;
   ohmEditor.emit('change:grammarEditor', cm);
   triggerRefresh(250);
+});
+
+ohmEditor.addListener('set:currentGrammar', (ruleName) => {
+  triggerRefresh();
 });
 
 window.ohmEditor = ohmEditor;

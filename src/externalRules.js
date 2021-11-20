@@ -195,9 +195,8 @@ ohmEditor.addListener('change:option', function (name) {
 });
 
 ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
-  if (
-    !Object.prototype.hasOwnProperty.call(ohmEditor.grammar.rules, ruleName)
-  ) {
+  const g = ohmEditor.grammars ? Object.values(ohmEditor.grammars)[0] : null;
+  if (!Object.prototype.hasOwnProperty.call(g.rules, ruleName)) {
     const elem = $('#externalRules-' + ruleName);
     if (elem) {
       elem.classList.add('active-definition');

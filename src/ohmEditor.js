@@ -25,6 +25,10 @@ ohmEditor.registerEvents({
   'parse:grammars': ['matchResult', 'grammars', 'err'],
   'parse:input': ['matchResult', 'trace'],
 
+  // The "current" grammar is determined by (a) the contents of the grammar editor, and
+  // (b) the currently-selected example. This is emitted if either one changes.
+  'set:currentGrammar': ['grammar'],
+
   // Emitted when the user indicates they want to preview contextual information about a
   // Failure, e.g. when hovering over the failure message.
   'peek:failure': ['failure'],
@@ -44,8 +48,11 @@ ohmEditor.registerEvents({
   'change:option': ['optionName'],
 });
 
-ohmEditor.grammar = null;
+ohmEditor.grammars = null;
 ohmEditor.options = {};
+
+ohmEditor.currentGrammar = null;
+ohmEditor.startRule = '';
 
 ohmEditor.semantics = new CheckedEmitter();
 ohmEditor.semantics.registerEvents({
@@ -76,6 +83,48 @@ ohmEditor.ui = {
     document.querySelector('#grammarContainer .editorWrapper')
   ),
 };
+
+ohmEditor.defaultGrammar = () => {
+  if (ohmEditor.grammars) {
+    // Return the last grammar that was defined.
+    const grammarArray = Object.values(ohmEditor.grammars);
+    return grammarArray[grammarArray.length - 1];
+  }
+};
+
+function updateCurrentGrammarAndStartRule() {
+  const {grammars} = ohmEditor;
+  const example = ohmEditor.examples.getSelected();
+
+  let currentGrammar = null;
+  if (example && grammars && Object.values(grammars).length > 0) {
+    const {selectedGrammar} = example;
+    currentGrammar = selectedGrammar
+      ? grammars[selectedGrammar]
+      : ohmEditor.defaultGrammar();
+  }
+
+  if (ohmEditor.currentGrammar !== currentGrammar) {
+    ohmEditor.currentGrammar = currentGrammar;
+    ohmEditor.emit('set:currentGrammar', ohmEditor.currentGrammar);
+  }
+
+  if (example) {
+    ohmEditor.startRule = example.startRule;
+  }
+}
+
+ohmEditor.examples.addListener('set:selected', (id) => {
+  updateCurrentGrammarAndStartRule();
+});
+ohmEditor.examples.addListener('set:example', (id, oldValue, newValue) => {
+  updateCurrentGrammarAndStartRule();
+});
+
+ohmEditor.addListener('parse:grammars', (result, grammars, err) => {
+  ohmEditor.grammars = grammars;
+  updateCurrentGrammarAndStartRule();
+});
 
 ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
 

@@ -8,7 +8,9 @@
 <script>
 export default {
   name: 'thumbs-up-button',
-  props: ['showThumbsUp'],
+  props: {
+    showThumbsUp: {type: Boolean, required: true},
+  },
   computed: {
     title() {
       return 'Example should ' + (this.showThumbsUp ? 'match' : 'NOT match');

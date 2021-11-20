@@ -33,10 +33,9 @@ parseTree.vue = new Vue({
     ohmEditor.addListener('change:grammarEditor', this.onEdit);
 
     // Refresh the parse tree after attempting to parse the input.
-    const self = this;
     ohmEditor.addListener('parse:input', (matchResult, trace) => {
-      self.parsing = false;
-      self.trace = Object.freeze(trace);
+      this.parsing = false;
+      this.trace = Object.freeze(trace);
     });
   },
 });

@@ -224,7 +224,8 @@ function save() {
 
   const description = option.label;
   const grammarName =
-    (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
+    (ohmEditor.defaultGrammar() && ohmEditor.defaultGrammar().name) ||
+    'grammar';
   const grammarText = ohmEditor.ui.grammarEditor.getValue();
   const examples = ohmEditor.examples.getExamples();
 
@@ -292,7 +293,8 @@ function doSaveAs() {
     const description = $('#newGrammarName').value;
     $('#newGrammarName').value = '';
     const grammarName =
-      (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
+      (ohmEditor.defaultGrammar() && ohmEditor.defaultGrammar().name) ||
+      'grammar';
     const grammarText = ohmEditor.ui.grammarEditor.getValue();
     const examples = ohmEditor.examples.getExamples();
 

@@ -12,18 +12,27 @@
         <div class="toolbar">
           <div class="contents flex-row">
             <label>Start rule:</label>
-            <select id="startRuleDropdown" v-model="startGrammarAndRule">
-              <optgroup
-                v-for="grammarOpt in grammarOptions()"
-                :key="grammarOpt.value"
-                :label="grammarOpt.text">
-                <option
-                  v-for="ruleOpt in startRuleOptions(grammarOpt.value)"
-                  :key="ruleOpt.value"
-                  :value="ruleOpt.value"
-                  :class="{needed: false /* TODO */}"
-                >{{ ruleOpt.text }}</option>
-              </optgroup>
+            <select
+              id="startRuleDropdown"
+              v-model="startGrammarAndRule"
+              :key="startRuleDropdownKey"
+            >
+              <template v-for="item in startRuleOptions">
+                <optgroup
+                  v-if="item.options"
+                  :key="item.value"
+                  :label="item.text"
+                >
+                  <!-- prettier-ignore -->
+                  <option
+                    v-for="opt in item.options"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >{{ opt.text}}</option>
+                </optgroup>
+                <!-- prettier-ignore -->
+                <option v-else :key="item.value" :value="item.value">{{ item.text }}</option>
+              </template>
             </select>
             <div
               v-if="startRuleError"
@@ -51,6 +60,8 @@
 import domUtil from '../domUtil';
 import ohmEditor from '../ohmEditor';
 
+const toOptValue = (grammarName, startRule) => `${grammarName}.${startRule}`;
+
 export default {
   name: 'example-editor',
   components: {
@@ -68,6 +79,7 @@ export default {
       editing: false,
       editMode: '',
       showPlaceholder: false,
+      startRuleDropdownKey: 0,
     };
   },
   computed: {
@@ -80,12 +92,60 @@ export default {
     },
     startGrammarAndRule: {
       get() {
-        const { selectedGrammar, startRule } = this.example;
-        return selectedGrammar ? `${selectedGrammar}.${startRule}` : '';
+        const {selectedGrammar, startRule} = this.example;
+        return toOptValue(selectedGrammar, startRule);
       },
       set(newVal) {
-        this.$emit('setStartGrammarAndRule', newVal);
+        // Strip off any trailing '!', which can be added to avoid value collisions.
+        const value = newVal.endsWith('!') ? newVal.slice(0, -1) : newVal;
+
+        const [grammarName, startRule] = value.split('.');
+        this.$emit('setGrammarAndStartRule', grammarName, startRule);
+
+        // Ensure the start rule dropdown is re-rendered. We need to force this for
+        // the case where the top-level option is shows "MyGrammar > MyStartRule",
+        // and the user selects "MyStartRule" in the dropdown. Since that doesn't
+        // change the value, it results in the closed <select> button showing
+        // "MyStartRule", but we want it to show "MyGrammar > MyStartRule"
+        this.startRuleDropdownKey += 1;
       },
+    },
+    // Returns the text and value for a top-level <option> element (not nested inside an
+    // <optgroup>).
+    // The top-level option has two main purposes:
+    // - it lets us represent both the optgroup and option text (e.g. 'MyGrammar ▸ AddExp')
+    //   in a single, selected option.
+    // - it gives us a place to show the currently-selected grammar / start rule, even if
+    //   they are longer present in the grammar pane.
+    // If the top-level option is present, it's always selected and disabled.
+    topLevelOption() {
+      const {selectedGrammar, startRule} = this.example;
+      const ruleLabel = startRule || `(default)`;
+      return {
+        text: selectedGrammar ? `${selectedGrammar} ▸ ${ruleLabel}` : ruleLabel,
+        value: toOptValue(selectedGrammar, startRule),
+      };
+    },
+    startRuleOptions() {
+      const grammarNames = Object.keys(this.grammars || {});
+      const optgroups = grammarNames.map((name) => ({
+        text: name,
+        value: name,
+        options: this.startRuleOptionsForGrammar(name),
+      }));
+
+      const {topLevelOption} = this;
+
+      // To avoid colliding with the `topLevelOption.value`, append '!'
+      // to the value, which is detected and removed by the change handler.
+      optgroups.forEach(({options}) =>
+        options.forEach((opt) => {
+          if (opt.value === topLevelOption.value) {
+            opt.value = `${opt.value}!`;
+          }
+        })
+      );
+      return [topLevelOption, ...optgroups];
     },
   },
   watch: {
@@ -136,26 +196,17 @@ export default {
     stopEditing() {
       this.editing = false;
     },
-    grammarOptions() {
-      return Object.keys(this.grammars || {}).map(name => {
-        return { text: name, value: name}
-      });
-    },
     // An array of objects representing the options to show in #startRuleDropdown.
-    startRuleOptions(grammarName) {
-      let options = [{text: '(default)', value: `${grammarName}.`}];
+    startRuleOptionsForGrammar(grammarName) {
+      const options = [{text: '(default)', value: toOptValue(grammarName, '')}];
 
       const g = this.grammars[grammarName];
       if (g) {
         for (const ruleName of Object.keys(g.rules)) {
-          options.push({text: ruleName, value: `${grammarName}.${ruleName}` });
-        }
-      }
-      // Make sure an option exists that matches the currently selected start rule.
-      const { selectedGrammar, startRule } = this.example;
-      if (selectedGrammar && selectedGrammar === grammarName) {
-        if (!options.some(({ value }) => value === this.startGrammarAndRule)) {
-          options = [{text: startRule, value: this.startGrammarAndRule}, ...options];
+          options.push({
+            text: ruleName,
+            value: toOptValue(grammarName, ruleName),
+          });
         }
       }
       return options;
@@ -163,3 +214,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#startRuleDropdown {
+  min-width: 85px;
+}
+</style>
