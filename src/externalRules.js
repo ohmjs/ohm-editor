@@ -149,8 +149,8 @@ LastLineWidget.prototype.clear = function () {
   this.lineHandle.off('delete', this.placeWidget);
 };
 
-LastLineWidget.prototype.update = function (cm, matchResult, grammar) {
-  if (grammar) {
+LastLineWidget.prototype.update = function (cm, matchResult) {
+  if (matchResult.succeeded()) {
     this._rules = getExternalRules(semantics(matchResult).referencedRules);
   } else {
     const lenientResult = ohmGrammar.match(cm.getValue(), 'tokens');
@@ -173,35 +173,30 @@ const grammarEditor = ohmEditor.ui.grammarEditor;
 
 // Singletons associated with the current grammar (ok since there's only one grammar editor).
 let widget;
-const grammarState = {
-  matchResult: null,
-  grammar: null,
-};
+let grammarMatchResult;
 
 function updateExternalRules() {
-  widget.update(grammarEditor, grammarState.matchResult, grammarState.grammar);
+  widget.update(grammarEditor, grammarMatchResult);
 }
 
 grammarEditor.on('swapDoc', function (cm) {
   widget = new LastLineWidget(cm);
 });
 
-ohmEditor.addListener('parse:grammar', function (matchResult, grammar, err) {
-  grammarState.matchResult = matchResult;
-  grammarState.grammar = grammar;
+ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
+  grammarMatchResult = matchResult;
   updateExternalRules();
 });
 
 ohmEditor.addListener('change:option', function (name) {
   if (name === 'showSpaces') {
-    updateExternalRules(grammarState.grammarMatchResult, grammarState.grammar);
+    updateExternalRules();
   }
 });
 
 ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
-  if (
-    !Object.prototype.hasOwnProperty.call(ohmEditor.grammar.rules, ruleName)
-  ) {
+  const g = ohmEditor.grammars ? Object.values(ohmEditor.grammars)[0] : null;
+  if (!Object.prototype.hasOwnProperty.call(g.rules, ruleName)) {
     const elem = $('#externalRules-' + ruleName);
     if (elem) {
       elem.classList.add('active-definition');

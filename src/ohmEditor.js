@@ -13,17 +13,22 @@ ohmEditor.registerEvents({
   'init:grammarEditor': ['codeMirror'],
 
   // Emitted as soon as the user has made a change in the respective editor. Any listeners which
-  // may be long running should use 'change:input' or 'change:grammar' instead.
+  // may be long running should use 'change:input' or 'change:grammars' instead.
   'change:inputEditor': ['codeMirror'],
   'change:grammarEditor': ['codeMirror'],
 
   // Emitted after a short delay when one or more editor change events have occurred.
-  'change:grammar': ['grammarSource'],
+  'change:grammars': ['grammarSource'],
   'change:input': ['inputSource'],
 
-  // Emitted after attempting to parse the grammar and the input, respectively.
-  'parse:grammar': ['matchResult', 'grammar', 'err'],
+  // Emitted after attempting to parse the grammar(s) and the input, respectively.
+  'parse:grammars': ['matchResult', 'grammars', 'err'],
   'parse:input': ['matchResult', 'trace'],
+
+  // The "current" grammar is determined by (a) the contents of the grammar editor, and
+  // (b) the currently-selected example. This is emitted if either one changes.
+  'set:currentGrammar': ['grammar'],
+  'set:startRule': ['startRule'],
 
   // Emitted when the user indicates they want to preview contextual information about a
   // Failure, e.g. when hovering over the failure message.
@@ -44,9 +49,11 @@ ohmEditor.registerEvents({
   'change:option': ['optionName'],
 });
 
-ohmEditor.grammar = null;
-ohmEditor.startRule = null;
+ohmEditor.grammars = null;
 ohmEditor.options = {};
+
+ohmEditor.currentGrammar = null;
+ohmEditor.startRule = '';
 
 ohmEditor.semantics = new CheckedEmitter();
 ohmEditor.semantics.registerEvents({
@@ -77,6 +84,49 @@ ohmEditor.ui = {
     document.querySelector('#grammarContainer .editorWrapper')
   ),
 };
+
+ohmEditor.defaultGrammar = () => {
+  if (ohmEditor.grammars) {
+    // Return the last grammar that was defined.
+    const grammarArray = Object.values(ohmEditor.grammars);
+    return grammarArray[grammarArray.length - 1];
+  }
+};
+
+function updateCurrentGrammarAndStartRule() {
+  const {grammars} = ohmEditor;
+  const example = ohmEditor.examples.getSelected();
+
+  let currentGrammar = null;
+  if (example && grammars && Object.values(grammars).length > 0) {
+    const {selectedGrammar} = example;
+    currentGrammar = selectedGrammar
+      ? grammars[selectedGrammar]
+      : ohmEditor.defaultGrammar();
+  }
+
+  if (ohmEditor.currentGrammar !== currentGrammar) {
+    ohmEditor.currentGrammar = currentGrammar;
+    ohmEditor.emit('set:currentGrammar', ohmEditor.currentGrammar);
+  }
+
+  if (example) {
+    ohmEditor.startRule = example.startRule;
+    ohmEditor.emit('set:startRule', ohmEditor.startRule);
+  }
+}
+
+ohmEditor.examples.addListener('set:selected', (id) => {
+  updateCurrentGrammarAndStartRule();
+});
+ohmEditor.examples.addListener('set:example', (id, oldValue, newValue) => {
+  updateCurrentGrammarAndStartRule();
+});
+
+ohmEditor.addListener('parse:grammars', (result, grammars, err) => {
+  ohmEditor.grammars = grammars;
+  updateCurrentGrammarAndStartRule();
+});
 
 ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
 

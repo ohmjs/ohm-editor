@@ -224,7 +224,8 @@ function save() {
 
   const description = option.label;
   const grammarName =
-    (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
+    (ohmEditor.defaultGrammar() && ohmEditor.defaultGrammar().name) ||
+    'grammar';
   const grammarText = ohmEditor.ui.grammarEditor.getValue();
   const examples = ohmEditor.examples.getExamples();
 
@@ -292,7 +293,8 @@ function doSaveAs() {
     const description = $('#newGrammarName').value;
     $('#newGrammarName').value = '';
     const grammarName =
-      (ohmEditor.grammar && ohmEditor.grammar.name) || 'grammar';
+      (ohmEditor.defaultGrammar() && ohmEditor.defaultGrammar().name) ||
+      'grammar';
     const grammarText = ohmEditor.ui.grammarEditor.getValue();
     const examples = ohmEditor.examples.getExamples();
 
@@ -321,11 +323,11 @@ function doSaveAs() {
       document.title = 'Ohm';
     }
 
-    ohmEditor.once('change:grammar', function (_) {
+    ohmEditor.once('change:grammars', function (_) {
       saveButton.disabled = true;
     });
     if (examples) {
-      ohmEditor.once('parse:grammar', function (matchResult, grammar, err) {
+      ohmEditor.once('parse:grammars', function (matchResult, grammars, err) {
         ohmEditor.examples.restoreExamples(examples);
       });
     }
@@ -410,7 +412,7 @@ function doSaveAs() {
     },
   });
 
-  ohmEditor.addListener('change:grammar', function (source) {
+  ohmEditor.addListener('change:grammars', function (source) {
     const grammar = grammarList.options[grammarList.selectedIndex].value;
     if (grammar === '') {
       // local storage

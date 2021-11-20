@@ -28,20 +28,13 @@ let grammarMatcher = ohm.ohmGrammar.matcher();
 // Helpers
 // -------
 
-function parseGrammar() {
-  const matchResult = grammarMatcher.match();
-
-  let grammar;
+function parseGrammars() {
   let err;
-
+  const grammars = {};
+  const matchResult = grammarMatcher.match();
   if (matchResult.succeeded()) {
-    const ns = {};
     try {
-      ohm._buildGrammar(matchResult, ns);
-      const firstProp = Object.keys(ns)[0];
-      if (firstProp) {
-        grammar = ns[firstProp];
-      }
+      ohm._buildGrammar(matchResult, grammars);
     } catch (ex) {
       err = ex;
     }
@@ -54,16 +47,16 @@ function parseGrammar() {
   }
   return {
     matchResult,
-    grammar,
-    error: err,
+    grammars,
+    err,
   };
 }
 
 // Return the name of a valid start rule for grammar, or null if `optRuleName` is
 // not valid and the grammar has no default starting rule.
-function getValidStartRule(grammar, optRuleName) {
-  if (optRuleName && optRuleName in grammar.rules) {
-    return optRuleName;
+function getValidStartRule(grammar, ruleName = '') {
+  if (ruleName && ruleName in grammar.rules) {
+    return ruleName;
   }
   if (grammar.defaultStartRule) {
     return grammar.defaultStartRule;
@@ -77,7 +70,6 @@ function refresh() {
 
   const grammarSource = grammarEditor.getValue();
   const inputSource = inputEditor.getValue();
-
   ohmEditor.saveState(inputEditor, 'input');
 
   // Refresh the option values.
@@ -97,22 +89,16 @@ function refresh() {
 
   if (grammarChanged) {
     grammarChanged = false;
-    ohmEditor.emit('change:grammar', grammarSource);
+    ohmEditor.emit('change:grammars', grammarSource);
 
-    const result = parseGrammar();
-    ohmEditor.grammar = result.grammar;
-    ohmEditor.emit(
-      'parse:grammar',
-      result.matchResult,
-      result.grammar,
-      result.error
-    );
+    const {matchResult, grammars, err} = parseGrammars();
+    ohmEditor.emit('parse:grammars', matchResult, grammars, err);
   }
-
-  if (ohmEditor.grammar) {
-    const startRule = getValidStartRule(ohmEditor.grammar, ohmEditor.startRule);
+  const {currentGrammar} = ohmEditor;
+  if (currentGrammar) {
+    const startRule = getValidStartRule(currentGrammar, ohmEditor.startRule);
     if (startRule) {
-      const trace = ohmEditor.grammar.trace(inputSource, startRule);
+      const trace = currentGrammar.trace(inputSource, startRule);
 
       // When the input fails to parse, turn on "show failures" automatically.
       if (showFailuresImplicitly) {
@@ -202,6 +188,13 @@ ohmEditor.ui.grammarEditor.on('swapDoc', function (cm) {
   triggerRefresh(250);
 });
 
+ohmEditor.addListener('set:currentGrammar', (grammar) => {
+  triggerRefresh();
+});
+ohmEditor.addListener('set:startRule', (ruleName) => {
+  triggerRefresh();
+});
+
 window.ohmEditor = ohmEditor;
 
 /* eslint-disable no-console */
@@ -216,7 +209,7 @@ console.log(
     '  `.grammar` as the current grammar object (if the source is valid)',
     '  `.ui` containing the `inputEditor` and `grammarEditor`',
     '',
-    `Ohm version ${ohm.version}`
+    `Ohm version ${ohm.version}`,
   ].join('\n')
 );
 /* eslint-enable no-console */

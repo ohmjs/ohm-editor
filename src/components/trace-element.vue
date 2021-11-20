@@ -180,7 +180,7 @@ export default {
       );
     },
     isLeaf() {
-      let leaf = isLeaf(ohmEditor.grammar, this.traceNode);
+      let leaf = isLeaf(ohmEditor.currentGrammar, this.traceNode);
       if (this.traceNode.isMemoized) {
         const memoKey = this.traceNode.expr.toMemoKey();
         const stack = this.currentLR[memoKey];
@@ -206,7 +206,7 @@ export default {
       // Collapse if the rule body has no source (e.g. anything from ProtoBuiltInRules).
       const pexpr = this.traceNode.expr;
       if (pexpr instanceof ohm.pexprs.Apply) {
-        const body = ohmEditor.grammar.rules[pexpr.ruleName].body;
+        const body = ohmEditor.currentGrammar.rules[pexpr.ruleName].body;
         if (!body.source) {
           return true;
         }
@@ -277,6 +277,7 @@ export default {
         lrObj[memoKey] = stack;
         stack.push(this.traceNode.pos);
         children.push({
+          id: getFreshNodeId(),
           traceNode: this.traceNode.terminatingLREntry,
           context: this.context,
           isInVBox: true,
@@ -430,7 +431,7 @@ export default {
       } else if (modifier === 'cmd') {
         // cmd/ctrl + click to open or close semantic editor
         ohmEditor.parseTree.emit('cmdOrCtrlClick:traceElement', this.$el);
-      } else if (!isLeaf(ohmEditor.grammar, this.traceNode)) {
+      } else if (!isLeaf(ohmEditor.currentGrammar, this.traceNode)) {
         this.toggleCollapsed();
       }
     },

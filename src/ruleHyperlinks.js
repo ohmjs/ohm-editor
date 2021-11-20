@@ -124,12 +124,12 @@ function registerListeners(editor) {
   });
 }
 
-ohmEditor.addListener('parse:grammar', function (matchResult, g, err) {
+ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
   if (!grammarEditor) {
     grammarEditor = ohmEditor.ui.grammarEditor;
     registerListeners(grammarEditor);
   }
-  grammar = g;
+  grammar = grammars ? Object.values(grammars)[0] : undefined;
   grammarMemoTable = matchResult.succeeded()
     ? matchResult.matcher.memoTable
     : null;

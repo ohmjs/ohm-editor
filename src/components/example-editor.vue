@@ -12,15 +12,29 @@
         <div class="toolbar">
           <div class="contents flex-row">
             <label>Start rule:</label>
-            <select id="startRuleDropdown" v-model="startRule">
-              <option
-                v-for="option in startRuleOptions()"
-                :key="option.value"
-                :value="option.value"
-                :class="{needed: false /* TODO */}"
-              >
-                {{ option.text }}
-              </option>
+            <select
+              id="startRuleDropdown"
+              :value="startGrammarAndRule"
+              :key="startRuleDropdownKey"
+              @change="handleStartRuleDropdownChange"
+            >
+              <template v-for="item in startRuleOptions">
+                <optgroup
+                  v-if="item.options"
+                  :key="item.value"
+                  :label="item.text"
+                >
+                  <!-- prettier-ignore -->
+                  <option
+                    v-for="opt in item.options"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >{{ opt.text}}</option>
+                </optgroup>
+                <!-- prettier-ignore -->
+                <option v-else :key="item.value" :value="item.value" selected
+                  >{{ item.text }}</option>
+              </template>
             </select>
             <div
               v-if="startRuleError"
@@ -48,6 +62,9 @@
 import domUtil from '../domUtil';
 import ohmEditor from '../ohmEditor';
 
+const toOptValue = (grammarName, startRule) =>
+  `${grammarName || ''}.${startRule || ''}`;
+
 export default {
   name: 'example-editor',
   components: {
@@ -58,13 +75,14 @@ export default {
   props: {
     example: {type: Object, required: true},
     status: {type: Object},
-    grammar: {type: Object},
+    grammars: {type: Object},
   },
   data() {
     return {
       editing: false,
       editMode: '',
       showPlaceholder: false,
+      startRuleDropdownKey: 0,
     };
   },
   computed: {
@@ -72,25 +90,50 @@ export default {
       // Hide parse errors while the placeholder text is visible.
       return this.showPlaceholder ? 'hideInputErrors' : '';
     },
-    commonStartRuleOptions() {
-      const options = [{text: '(default)', value: ''}];
-      if (this.grammar) {
-        Object.keys(this.grammar.rules).forEach(function (ruleName) {
-          options.push({text: ruleName, value: ruleName});
-        });
-      }
-      return options;
-    },
     startRuleError() {
       return this.status && this.status.err && this.status.err.message;
     },
-    startRule: {
-      get() {
-        return this.example.startRule;
-      },
-      set(newVal) {
-        this.$emit('setStartRule', newVal);
-      },
+    startGrammarAndRule() {
+      const {selectedGrammar, startRule} = this.example;
+      const ans = toOptValue(selectedGrammar || '', startRule || '');
+      return ans;
+    },
+    // Returns the text and value for a top-level <option> element (not nested inside an
+    // <optgroup>).
+    // The top-level option has two main purposes:
+    // - it lets us represent both the optgroup and option text (e.g. 'MyGrammar ▸ AddExp')
+    //   in a single, selected option.
+    // - it gives us a place to show the currently-selected grammar / start rule, even if
+    //   they are longer present in the grammar pane.
+    // If the top-level option is present, it's always selected and disabled.
+    topLevelOption() {
+      const {selectedGrammar, startRule} = this.example;
+      const ruleLabel = startRule || `(default)`;
+      return {
+        text: selectedGrammar ? `${selectedGrammar} ▸ ${ruleLabel}` : ruleLabel,
+        value: toOptValue(selectedGrammar, startRule),
+      };
+    },
+    startRuleOptions() {
+      const grammarNames = Object.keys(this.grammars || {});
+      const optgroups = grammarNames.map((name) => ({
+        text: name,
+        value: name,
+        options: this.startRuleOptionsForGrammar(name),
+      }));
+
+      const {topLevelOption} = this;
+
+      // To avoid colliding with the `topLevelOption.value`, append '!'
+      // to the value, which is detected and removed by the change handler.
+      optgroups.forEach(({options}) =>
+        options.forEach((opt) => {
+          if (opt.value === topLevelOption.value) {
+            opt.value = `${opt.value}!`;
+          }
+        })
+      );
+      return [topLevelOption, ...optgroups];
     },
   },
   watch: {
@@ -114,6 +157,24 @@ export default {
     ohmEditor.emit('init:inputEditor', editor);
   },
   methods: {
+    handleStartRuleDropdownChange(e) {
+      let {value} = e.target;
+
+      // Strip off any trailing '!', which can be added to avoid value collisions.
+      if (value.endsWith('!')) {
+        value = value.slice(0, -1);
+      }
+
+      const [grammarName, startRule] = value.split('.');
+      this.$emit('setGrammarAndStartRule', grammarName, startRule);
+
+      // Ensure the start rule dropdown is re-rendered. We need to force this for
+      // the case where the top-level option is shows "MyGrammar > MyStartRule",
+      // and the user selects "MyStartRule" in the dropdown. Since that doesn't
+      // change the value, it results in the closed <select> button showing
+      // "MyStartRule", but we want it to show "MyGrammar > MyStartRule"
+      this.startRuleDropdownKey += 1;
+    },
     startEditing(optMode) {
       this.editing = true;
       this.editMode = optMode || 'Edit';
@@ -142,18 +203,19 @@ export default {
       this.editing = false;
     },
     // An array of objects representing the options to show in #startRuleDropdown.
-    startRuleOptions() {
-      const ex = this.example;
-      const options = this.commonStartRuleOptions;
+    startRuleOptionsForGrammar(grammarName) {
+      const options = [{text: '(default)', value: toOptValue(grammarName, '')}];
 
-      // Ensure the example's start rule always appears in the dropdown, even if the
-      // rule no longer appears in the grammar.
-      for (let i = 0; i < options.length; ++i) {
-        if (options[i].value === ex.startRule) {
-          return options;
+      const g = this.grammars[grammarName];
+      if (g) {
+        for (const ruleName of Object.keys(g.rules)) {
+          options.push({
+            text: ruleName,
+            value: toOptValue(grammarName, ruleName),
+          });
         }
       }
-      return [{text: ex.startRule, value: ex.startRule}].concat(options);
+      return options;
     },
   },
 };

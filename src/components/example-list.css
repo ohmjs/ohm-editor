@@ -108,14 +108,19 @@ x:-moz-any-link {
 }
 
 .startRule {
-  color: hsl(0, 0%, 85%);
+  cursor: default;
+  color: hsl(0, 0%, 75%);
   font-family: inherit;
   font-size: 12px;
   margin-right: 4px;
 }
 
 .selected .startRule {
-  color: hsl(0, 0%, 75%);
+  color: hsl(0, 0%, 65%);
+}
+
+#startRuleDropdown {
+  min-width: 85px;
 }
 
 #userExampleContainer > .contents {
@@ -183,6 +188,7 @@ x:-moz-any-link {
 
 #exampleEditor .toolbar .errorIcon {
   cursor: help;
+  font-family: sans-serif; /* Ensures the emoji is shown in color. */
   font-size: 13px;
   margin: 0 4px;
   position: relative;

@@ -82,16 +82,15 @@ function createErrorEl(result, pos) {
 ohmEditor.addListener('change:grammarEditor', function (cm) {
   hideError('grammar', cm);
 });
-ohmEditor.addListener('change:inputEditor', function (cm) {
-  hideError('input', cm);
-});
 
-// Hide the input error when the grammar is about to be reparsed.
-ohmEditor.addListener('change:grammar', function (source) {
-  hideError('input', ohmEditor.ui.inputEditor);
-});
+const hideInputError = (_) => hideError('input', ohmEditor.ui.inputEditor);
 
-ohmEditor.addListener('parse:grammar', function (matchResult, grammar, err) {
+// Hide errors in the input in all cases where the input will be reparsed.
+ohmEditor.addListener('change:inputEditor', hideInputError);
+ohmEditor.addListener('change:grammars', hideInputError);
+ohmEditor.addListener('set:startRule', hideInputError);
+
+ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
   if (err) {
     const editor = ohmEditor.ui.grammarEditor;
     setError('grammar', editor, err.interval, err.shortMessage || err.message);

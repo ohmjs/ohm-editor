@@ -19,7 +19,7 @@
             @dblclick="handleDblClick"
           >
             <code>{{ ex.text }}</code>
-            <div class="startRule">{{ ex.startRule }}</div>
+            <div class="startRule">{{ getStartRuleLabel(ex) }}</div>
             <thumbs-up-button
               :showThumbsUp="ex.shouldMatch"
               @click.native="toggleShouldMatch(id)"
@@ -31,10 +31,10 @@
         </ul>
         <example-editor
           ref="exampleEditor"
-          :grammar="grammar()"
+          :grammars="grammars()"
           :example="selectedExampleOrEmpty"
           :status="selectedExampleStatus"
-          @setStartRule="handleSetStartRule"
+          @setGrammarAndStartRule="handleSetGrammarAndStartRule"
           @thumbClick="handleEditorThumbClick"
         >
         </example-editor>
@@ -55,6 +55,13 @@ let idCounter = 0;
 function uniqueId() {
   return 'example' + idCounter++;
 }
+
+const EXAMPLE_DEFAULTS = {
+  text: '',
+  startRule: '',
+  selectedGrammar: '',
+  shouldMatch: true,
+};
 
 // Exports
 // -------
@@ -90,7 +97,7 @@ export default {
     },
     selectedExampleOrEmpty() {
       const ex = this.getSelected();
-      return ex || {text: '', startRule: '', shouldMatch: true};
+      return ex || {...EXAMPLE_DEFAULTS};
     },
   },
   watch: {
@@ -116,11 +123,12 @@ export default {
     },
   },
   methods: {
-    grammar() {
-      return this._grammar;
+    grammars() {
+      return this._grammars;
     },
-    setGrammar(newVal) {
-      this._grammar = newVal;
+    setGrammars(newVal) {
+      // Use `freeze` to prevent Vue from deeply observing the value.
+      this._grammars = Object.freeze(newVal);
 
       // Re-check all the examples.
       Object.keys(this.exampleValues).forEach(this.updateExampleStatus);
@@ -166,8 +174,15 @@ export default {
     },
 
     // Emitted from the example editor when the user chooses a start rule.
-    handleSetStartRule(newVal) {
-      this.setStartRule(this.selectedId, newVal);
+    handleSetGrammarAndStartRule(grammarName, startRule) {
+      const {text, shouldMatch} = this.getSelected();
+      this.setExample(
+        this.selectedId,
+        text,
+        grammarName,
+        startRule,
+        shouldMatch
+      );
     },
     handleEditorThumbClick() {
       this.toggleShouldMatch(this.selectedId);
@@ -181,16 +196,13 @@ export default {
     // Every example added to the list must go through this function!
     addExample(optData) {
       const id = uniqueId();
-      this.$set(this.exampleValues, id, {
-        text: '',
-        startRule: '',
-        shouldMatch: true,
-      });
+      this.$set(this.exampleValues, id, {...EXAMPLE_DEFAULTS});
 
       this._watchExample(id, this.updateExampleStatus);
       this.selectedId = id;
 
       ohmEditor.examples.emit('add:example', id);
+      this.updateExampleStatus(id);
 
       return id;
     },
@@ -220,7 +232,7 @@ export default {
     },
 
     // Set the contents of an example with the given id to `value`.
-    setExample(id, text, optStartRule, optShouldMatch) {
+    setExample(id, text, grammar = '', startRule = '', shouldMatch = true) {
       if (!(id in this.exampleValues)) {
         throw new Error(id + ' is not a valid example id');
       }
@@ -229,10 +241,10 @@ export default {
       const oldValue = Object.assign({}, example);
       const newValue = {
         text,
-        startRule: optStartRule || '',
-        shouldMatch: optShouldMatch == null ? true : optShouldMatch,
+        selectedGrammar: grammar,
+        startRule,
+        shouldMatch,
       };
-
       Object.assign(example, newValue);
       ohmEditor.examples.emit('set:example', id, oldValue, newValue);
     },
@@ -253,10 +265,6 @@ export default {
       this.selectedId = id;
     },
 
-    setStartRule(id, ruleName) {
-      this.exampleValues[id].startRule = ruleName;
-    },
-
     // Restore the examples from localStorage or the given object.
     restoreExamples(key /* orExamples */) {
       let examples = [];
@@ -265,8 +273,11 @@ export default {
         if (value) {
           examples = JSON.parse(value);
         } else {
-          examples = domUtil.$$('#sampleExamples pre').map(function (elem) {
-            return {text: elem.textContent, startRule: '', shouldMatch: true};
+          examples = domUtil.$$('#sampleExamples pre').map((elem) => {
+            return {
+              ...EXAMPLE_DEFAULTS,
+              text: elem.textContent,
+            };
           });
         }
       } else {
@@ -275,14 +286,15 @@ export default {
 
       const newExampleValues = {};
 
-      const self = this;
-      examples.forEach(function (ex) {
-        const id = self.addExample();
-        if (!Object.prototype.hasOwnProperty.call(ex, 'shouldMatch')) {
-          ex.shouldMatch = true;
-        }
-        newExampleValues[id] = ex;
-      });
+      for (const ex of examples) {
+        const id = this.addExample();
+        // Some examples from localStorage may be missing keys, since the format has changed.
+        // So we include default values here.
+        newExampleValues[id] = {
+          ...EXAMPLE_DEFAULTS(),
+          ...ex,
+        };
+      }
       this.exampleValues = newExampleValues;
 
       // Select the first example.
@@ -305,23 +317,36 @@ export default {
         this.$delete(this.exampleStatus, id);
         return;
       }
-      if (this._grammar) {
-        const example = this.getExample(id);
+      if (this._grammars) {
         let status;
-        try {
-          const matched = this._grammar
-            .match(example.text, example.startRule)
-            .succeeded();
+        const {text, selectedGrammar, startRule, shouldMatch} =
+          this.getExample(id);
+        const g = selectedGrammar
+          ? this._grammars[selectedGrammar]
+          : ohmEditor.defaultGrammar();
+        if (g) {
+          try {
+            const matched = g.match(text, startRule).succeeded();
+            status = {className: matched === shouldMatch ? 'pass' : 'fail'};
+          } catch (e) {
+            status = {className: 'fail', err: e};
+          }
+        } else {
           status = {
-            className: matched === example.shouldMatch ? 'pass' : 'fail',
+            className: 'fail',
+            err: {message: `Unknown grammar '${selectedGrammar}'`},
           };
-        } catch (e) {
-          status = {className: 'fail', err: e};
         }
         this.$set(this.exampleStatus, id, status);
       } else {
         this.$delete(this.exampleStatus, id);
       }
+    },
+    getStartRuleLabel(example) {
+      const {selectedGrammar, startRule} = example;
+      return selectedGrammar
+        ? `${selectedGrammar} ▸ ${startRule || '(default)'}`
+        : startRule;
     },
 
     // Watch for changes to the example with the given id. When any of its data changes,
@@ -348,13 +373,13 @@ export default {
     this.restoreExamples('examples');
 
     const self = this;
-    ohmEditor.addListener('change:grammar', function (source) {
-      self.setGrammar(null);
+    ohmEditor.addListener('change:grammars', function (source) {
+      self.setGrammars(null);
     });
     ohmEditor.addListener(
-      'parse:grammar',
-      function (matchResult, grammar, err) {
-        self.setGrammar(grammar);
+      'parse:grammars',
+      function (matchResult, grammars, err) {
+        self.setGrammars(grammars);
       }
     );
     ohmEditor.addListener('change:inputEditor', function (source) {

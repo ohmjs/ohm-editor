@@ -2,7 +2,7 @@
 
 module.exports = {
   parserOptions: {
-    ecmaVersion: 8,
+    ecmaVersion: 2018,
     sourceType: 'script',
   },
   overrides: [
@@ -38,6 +38,8 @@ module.exports = {
     'camelcase-ohm/camelcase-ohm': 2,
 
     'max-len': ['error', {code: 100, ignoreUrls: true}],
+
+    'no-console': 2,
 
     // Don't allow require() statements to include the '.js' extension.
     'no-extension-in-require/main': 2,
