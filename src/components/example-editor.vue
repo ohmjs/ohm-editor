@@ -158,9 +158,12 @@ export default {
   },
   methods: {
     handleStartRuleDropdownChange(e) {
-      const newVal = e.target.value;
+      let {value} = e.target;
+
       // Strip off any trailing '!', which can be added to avoid value collisions.
-      const value = newVal.endsWith('!') ? newVal.slice(0, -1) : newVal;
+      if (value.endsWith('!')) {
+        value = value.slice(0, -1);
+      }
 
       const [grammarName, startRule] = value.split('.');
       this.$emit('setGrammarAndStartRule', grammarName, startRule);
