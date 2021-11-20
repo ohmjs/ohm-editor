@@ -109,7 +109,6 @@ export default {
     topLevelOption() {
       const {selectedGrammar, startRule} = this.example;
       const ruleLabel = startRule || `(default)`;
-      this.startRuleDropdownKey;
       return {
         text: selectedGrammar ? `${selectedGrammar} ▸ ${ruleLabel}` : ruleLabel,
         value: toOptValue(selectedGrammar, startRule),
