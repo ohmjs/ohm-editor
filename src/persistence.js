@@ -327,7 +327,7 @@ function doSaveAs() {
       saveButton.disabled = true;
     });
     if (examples) {
-      ohmEditor.once('parse:grammar', function (matchResult, grammar, err) {
+      ohmEditor.once('parse:grammars', function (matchResult, grammars, err) {
         ohmEditor.examples.restoreExamples(examples);
       });
     }

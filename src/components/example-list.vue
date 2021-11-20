@@ -291,10 +291,14 @@ export default {
       const self = this;
       examples.forEach(function (ex) {
         const id = self.addExample();
-        if (!Object.prototype.hasOwnProperty.call(ex, 'shouldMatch')) {
-          ex.shouldMatch = true;
-        }
-        newExampleValues[id] = ex;
+        // Some examples from localStorage may be missing keys, since the format has changed.
+        // So we include default values here.
+        newExampleValues[id] = {
+          selectedGrammar: '',
+          startRule: '',
+          shouldMatch: true,
+          ...ex,
+        };
       });
       this.exampleValues = newExampleValues;
 
@@ -335,7 +339,7 @@ export default {
         } else {
           status = {
             className: 'fail',
-            err: `No grammar named '${selectedGrammar}'`,
+            err: {message: `Unknown grammar '${selectedGrammar}'`},
           };
         }
         this.$set(this.exampleStatus, id, status);

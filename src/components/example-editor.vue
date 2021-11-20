@@ -14,8 +14,9 @@
             <label>Start rule:</label>
             <select
               id="startRuleDropdown"
-              v-model="startGrammarAndRule"
+              :value="startGrammarAndRule"
               :key="startRuleDropdownKey"
+              @change="handleStartRuleDropdownChange"
             >
               <template v-for="item in startRuleOptions">
                 <optgroup
@@ -31,7 +32,8 @@
                   >{{ opt.text}}</option>
                 </optgroup>
                 <!-- prettier-ignore -->
-                <option v-else :key="item.value" :value="item.value">{{ item.text }}</option>
+                <option v-else :key="item.value" :value="item.value" selected
+                  >{{ item.text }}</option>
               </template>
             </select>
             <div
@@ -60,7 +62,7 @@
 import domUtil from '../domUtil';
 import ohmEditor from '../ohmEditor';
 
-const toOptValue = (grammarName, startRule) => `${grammarName}.${startRule}`;
+const toOptValue = (grammarName, startRule) => `${grammarName || ''}.${startRule || ''}`;
 
 export default {
   name: 'example-editor',
@@ -90,25 +92,10 @@ export default {
     startRuleError() {
       return this.status && this.status.err && this.status.err.message;
     },
-    startGrammarAndRule: {
-      get() {
-        const {selectedGrammar, startRule} = this.example;
-        return toOptValue(selectedGrammar, startRule);
-      },
-      set(newVal) {
-        // Strip off any trailing '!', which can be added to avoid value collisions.
-        const value = newVal.endsWith('!') ? newVal.slice(0, -1) : newVal;
-
-        const [grammarName, startRule] = value.split('.');
-        this.$emit('setGrammarAndStartRule', grammarName, startRule);
-
-        // Ensure the start rule dropdown is re-rendered. We need to force this for
-        // the case where the top-level option is shows "MyGrammar > MyStartRule",
-        // and the user selects "MyStartRule" in the dropdown. Since that doesn't
-        // change the value, it results in the closed <select> button showing
-        // "MyStartRule", but we want it to show "MyGrammar > MyStartRule"
-        this.startRuleDropdownKey += 1;
-      },
+    startGrammarAndRule() {
+      const {selectedGrammar, startRule} = this.example;
+      const ans = toOptValue(selectedGrammar || '', startRule || '');
+      return ans;
     },
     // Returns the text and value for a top-level <option> element (not nested inside an
     // <optgroup>).
@@ -121,6 +108,7 @@ export default {
     topLevelOption() {
       const {selectedGrammar, startRule} = this.example;
       const ruleLabel = startRule || `(default)`;
+      this.startRuleDropdownKey;
       return {
         text: selectedGrammar ? `${selectedGrammar} ▸ ${ruleLabel}` : ruleLabel,
         value: toOptValue(selectedGrammar, startRule),
@@ -169,6 +157,22 @@ export default {
     ohmEditor.emit('init:inputEditor', editor);
   },
   methods: {
+    handleStartRuleDropdownChange(e) {
+      const newVal = e.target.value;
+      // Strip off any trailing '!', which can be added to avoid value collisions.
+      const value = newVal.endsWith('!') ? newVal.slice(0, -1) : newVal;
+
+      const [grammarName, startRule] = value.split('.');
+      console.log('setting', grammarName, startRule);
+      this.$emit('setGrammarAndStartRule', grammarName, startRule);
+
+      // Ensure the start rule dropdown is re-rendered. We need to force this for
+      // the case where the top-level option is shows "MyGrammar > MyStartRule",
+      // and the user selects "MyStartRule" in the dropdown. Since that doesn't
+      // change the value, it results in the closed <select> button showing
+      // "MyStartRule", but we want it to show "MyGrammar > MyStartRule"
+      this.startRuleDropdownKey += 1;
+    },
     startEditing(optMode) {
       this.editing = true;
       this.editMode = optMode || 'Edit';
@@ -214,9 +218,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-#startRuleDropdown {
-  min-width: 85px;
-}
-</style>
