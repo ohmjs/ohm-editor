@@ -222,9 +222,9 @@ test('start rule text', async () => {
   await Vue.nextTick();
   expect(findEl(vm, '.startRule').textContent).toBe('noSuchRule');
 
-  vm.setExample(id, '', '', 'start');
+  vm.setExample(id, '', 'MyGrammar', 'start');
   await Vue.nextTick();
-  expect(findEl(vm, '.startRule').textContent).toBe('start');
+  expect(findEl(vm, '.startRule').textContent).toBe('MyGrammar ▸ start');
 });
 
 test('start rule dropdown', async () => {

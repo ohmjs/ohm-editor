@@ -19,7 +19,7 @@
             @dblclick="handleDblClick"
           >
             <code>{{ ex.text }}</code>
-            <div class="startRule">{{ ex.startRule }}</div>
+            <div class="startRule">{{ getStartRuleLabel(ex) }}</div>
             <thumbs-up-button
               :showThumbsUp="ex.shouldMatch"
               @click.native="toggleShouldMatch(id)"
@@ -346,6 +346,10 @@ export default {
       } else {
         this.$delete(this.exampleStatus, id);
       }
+    },
+    getStartRuleLabel(example) {
+      const {selectedGrammar, startRule} = example;
+      return selectedGrammar ? `${selectedGrammar} ▸ ${startRule || '(default)'}` : startRule;
     },
 
     // Watch for changes to the example with the given id. When any of its data changes,
