@@ -56,12 +56,12 @@ function uniqueId() {
   return 'example' + idCounter++;
 }
 
-const defaultExampleValue = () => ({
+const EXAMPLE_DEFAULTS = {
   text: '',
   startRule: '',
   selectedGrammar: '',
   shouldMatch: true,
-});
+};
 
 // Exports
 // -------
@@ -97,7 +97,7 @@ export default {
     },
     selectedExampleOrEmpty() {
       const ex = this.getSelected();
-      return ex || defaultExampleValue();
+      return ex || {...EXAMPLE_DEFAULTS};
     },
   },
   watch: {
@@ -196,7 +196,7 @@ export default {
     // Every example added to the list must go through this function!
     addExample(optData) {
       const id = uniqueId();
-      this.$set(this.exampleValues, id, defaultExampleValue());
+      this.$set(this.exampleValues, id, {...EXAMPLE_DEFAULTS});
 
       this._watchExample(id, this.updateExampleStatus);
       this.selectedId = id;
@@ -275,7 +275,7 @@ export default {
         } else {
           examples = domUtil.$$('#sampleExamples pre').map((elem) => {
             return {
-              ...defaultExampleValue(),
+              ...EXAMPLE_DEFAULTS,
               text: elem.textContent,
             };
           });
@@ -291,7 +291,7 @@ export default {
         // Some examples from localStorage may be missing keys, since the format has changed.
         // So we include default values here.
         newExampleValues[id] = {
-          ...defaultExampleValue(),
+          ...EXAMPLE_DEFAULTS(),
           ...ex,
         };
       }
