@@ -259,11 +259,6 @@ test('start rule dropdown', async () => {
 
   // ...but the unselected options should be updated.
   expect(getDropdownOptionValues(dropdown)).toEqual(['G.', 'G2.', 'G2.start']);
-
-  /*
-    Other problems:
-    - examples in the list should show "G > AddExp" rather than just "AddExp"
-   */
 });
 
 test('start rule errors', async () => {

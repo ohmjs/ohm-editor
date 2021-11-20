@@ -349,7 +349,9 @@ export default {
     },
     getStartRuleLabel(example) {
       const {selectedGrammar, startRule} = example;
-      return selectedGrammar ? `${selectedGrammar} ▸ ${startRule || '(default)'}` : startRule;
+      return selectedGrammar
+        ? `${selectedGrammar} ▸ ${startRule || '(default)'}`
+        : startRule;
     },
 
     // Watch for changes to the example with the given id. When any of its data changes,
