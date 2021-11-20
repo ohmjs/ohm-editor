@@ -263,7 +263,6 @@ test('start rule dropdown', async () => {
   /*
     Other problems:
     - examples in the list should show "G > AddExp" rather than just "AddExp"
-    - text in editor should be reparsed (it's not)
    */
 });
 

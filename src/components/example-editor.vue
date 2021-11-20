@@ -62,7 +62,8 @@
 import domUtil from '../domUtil';
 import ohmEditor from '../ohmEditor';
 
-const toOptValue = (grammarName, startRule) => `${grammarName || ''}.${startRule || ''}`;
+const toOptValue = (grammarName, startRule) =>
+  `${grammarName || ''}.${startRule || ''}`;
 
 export default {
   name: 'example-editor',
@@ -163,7 +164,6 @@ export default {
       const value = newVal.endsWith('!') ? newVal.slice(0, -1) : newVal;
 
       const [grammarName, startRule] = value.split('.');
-      console.log('setting', grammarName, startRule);
       this.$emit('setGrammarAndStartRule', grammarName, startRule);
 
       // Ensure the start rule dropdown is re-rendered. We need to force this for

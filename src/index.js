@@ -94,7 +94,6 @@ function refresh() {
     const {matchResult, grammars, err} = parseGrammars();
     ohmEditor.emit('parse:grammars', matchResult, grammars, err);
   }
-
   const {currentGrammar} = ohmEditor;
   if (currentGrammar) {
     const startRule = getValidStartRule(currentGrammar, ohmEditor.startRule);
@@ -189,7 +188,10 @@ ohmEditor.ui.grammarEditor.on('swapDoc', function (cm) {
   triggerRefresh(250);
 });
 
-ohmEditor.addListener('set:currentGrammar', (ruleName) => {
+ohmEditor.addListener('set:currentGrammar', (grammar) => {
+  triggerRefresh();
+});
+ohmEditor.addListener('set:startRule', (ruleName) => {
   triggerRefresh();
 });
 

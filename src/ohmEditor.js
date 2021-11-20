@@ -28,6 +28,7 @@ ohmEditor.registerEvents({
   // The "current" grammar is determined by (a) the contents of the grammar editor, and
   // (b) the currently-selected example. This is emitted if either one changes.
   'set:currentGrammar': ['grammar'],
+  'set:startRule': ['startRule'],
 
   // Emitted when the user indicates they want to preview contextual information about a
   // Failure, e.g. when hovering over the failure message.
@@ -111,6 +112,7 @@ function updateCurrentGrammarAndStartRule() {
 
   if (example) {
     ohmEditor.startRule = example.startRule;
+    ohmEditor.emit('set:startRule', ohmEditor.startRule);
   }
 }
 

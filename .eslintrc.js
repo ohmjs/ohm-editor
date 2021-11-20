@@ -39,6 +39,8 @@ module.exports = {
 
     'max-len': ['error', {code: 100, ignoreUrls: true}],
 
+    'no-console': 2,
+
     // Don't allow require() statements to include the '.js' extension.
     'no-extension-in-require/main': 2,
 
