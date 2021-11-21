@@ -42,6 +42,11 @@ function markBlock(cm, startLine, endLine, className) {
 // -------
 
 module.exports = {
+  containsInterval(cm, interval) {
+    const startPos = cm.posFromIndex(interval.startIdx);
+    const endPos = cm.posFromIndex(interval.endIdx);
+    return cm.getRange(startPos, endPos) === interval.contents;
+  },
   markInterval(cm, interval, className, canHighlightBlocks) {
     const startPos = cm.posFromIndex(interval.startIdx);
     const endPos = cm.posFromIndex(interval.endIdx);

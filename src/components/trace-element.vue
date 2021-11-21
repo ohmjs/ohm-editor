@@ -417,7 +417,11 @@ export default {
       }
       const ruleName = pexpr.ruleName;
       if (ruleName) {
-        ohmEditor.emit('peek:ruleDefinition', ruleName);
+        ohmEditor.emit(
+          'peek:ruleDefinition',
+          ohmEditor.currentGrammar,
+          ruleName
+        );
       }
       this.eventHandlers.hover();
     },

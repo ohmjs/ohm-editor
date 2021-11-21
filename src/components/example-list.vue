@@ -291,7 +291,7 @@ export default {
         // Some examples from localStorage may be missing keys, since the format has changed.
         // So we include default values here.
         newExampleValues[id] = {
-          ...EXAMPLE_DEFAULTS(),
+          ...EXAMPLE_DEFAULTS,
           ...ex,
         };
       }

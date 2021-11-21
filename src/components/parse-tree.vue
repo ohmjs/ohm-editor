@@ -109,21 +109,20 @@ export default {
   mounted() {
     window.addEventListener('resize', this.$refs.expandedInput.update);
 
-    ohmEditor.addListener('peek:ruleDefinition', function (ruleName) {
-      if (
-        Object.prototype.hasOwnProperty.call(ohmEditor.grammar.rules, ruleName)
-      ) {
-        const defInterval = ohmEditor.grammar.rules[ruleName].source;
-        if (defInterval) {
-          const grammarEditor = ohmEditor.ui.grammarEditor;
-          defMark = cmUtil.markInterval(
-            grammarEditor,
-            defInterval,
-            'active-definition',
-            true
-          );
-          cmUtil.scrollToInterval(grammarEditor, defInterval);
-        }
+    ohmEditor.addListener('peek:ruleDefinition', function (grammar, ruleName) {
+      const cm = ohmEditor.ui.grammarEditor;
+      const defInterval = grammar.rules[ruleName].source;
+
+      // If the text in the grammar editor doesn't match the interval contents, then it's
+      // an external rule, and this handler should ignore it.
+      if (defInterval && cmUtil.containsInterval(cm, defInterval)) {
+        defMark = cmUtil.markInterval(
+          cm,
+          defInterval,
+          'active-definition',
+          true
+        );
+        cmUtil.scrollToInterval(cm, defInterval);
       }
     });
     ohmEditor.addListener('unpeek:ruleDefinition', clearMarks);
