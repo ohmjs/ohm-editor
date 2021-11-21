@@ -5,7 +5,6 @@
 const cmUtil = require('./cmUtil');
 const ohmEditor = require('./ohmEditor');
 
-let grammar;
 let grammarEditor;
 let grammarMemoTable;
 let mouseCoords;
@@ -50,6 +49,7 @@ function getWordUnderPoint(cm, x, y) {
   const wordPos = cm.findWordAt(pos);
   return {
     startIdx: cm.indexFromPos(wordPos.anchor),
+    endIdx: cm.indexFromPos(wordPos.head),
     startPos: wordPos.anchor,
     endPos: wordPos.head,
     value: cm.getRange(wordPos.anchor, wordPos.head).trim(),
@@ -70,9 +70,18 @@ function isRuleApplication(wordInfo) {
   return false;
 }
 
-function goToRuleDefinition(ruleName) {
+function findContainingGrammar(wordInfo) {
+  if (ohmEditor.grammars) {
+    const {startIdx, endIdx} = wordInfo;
+    return Object.values(ohmEditor.grammars).find(
+      (g) => startIdx >= g.source.startIdx && endIdx <= g.source.endIdx
+    );
+  }
+}
+
+function goToRuleDefinition(grammar, ruleName) {
   const interval = grammar.rules[ruleName].source;
-  if (interval) {
+  if (interval && cmUtil.containsInterval(grammarEditor, interval)) {
     const defMark = cmUtil.markInterval(
       grammarEditor,
       interval,
@@ -118,7 +127,8 @@ function registerListeners(editor) {
     if (markWordInfo) {
       const wordInfo = getWordUnderPoint(editor, e.clientX, e.clientY);
       if (isSameWord(editor, wordInfo, markWordInfo)) {
-        goToRuleDefinition(markWordInfo.value);
+        const grammar = findContainingGrammar(wordInfo);
+        goToRuleDefinition(grammar, markWordInfo.value);
       }
     }
   });
@@ -129,7 +139,6 @@ ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
     grammarEditor = ohmEditor.ui.grammarEditor;
     registerListeners(grammarEditor);
   }
-  grammar = grammars ? Object.values(grammars)[0] : undefined;
   grammarMemoTable = matchResult.succeeded()
     ? matchResult.matcher.memoTable
     : null;
