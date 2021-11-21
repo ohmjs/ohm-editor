@@ -42,7 +42,7 @@ ohmEditor.registerEvents({
 
   // Emitted when the user indicates they want to preview a rule definition, e.g. when
   // hovering over a node in the visualizer.
-  'peek:ruleDefinition': ['ruleName'],
+  'peek:ruleDefinition': ['grammar', 'ruleName'],
   'unpeek:ruleDefinition': [], // Ends the preview.
 
   // Emitted when the user checks or unchecks one of the option checkboxes.
