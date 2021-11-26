@@ -33,7 +33,7 @@ function addParsingStep(obj) {
 function maybeRecordFailureStep(result, node) {
   if (result.failed() && !node.succeeded) {
     if (node.pos === result.getRightmostFailurePosition()) {
-      result.getRightmostFailures().find(function (f) {
+      result.getRightmostFailures().find(f => {
         if (f.pexpr === node.expr) {
           stepsByFailureKey[f.toKey()] = parsingSteps.length;
           return true;
@@ -48,7 +48,7 @@ function gotoTimestep(step) {
   slider.value = step;
   for (let i = 0; i < parsingSteps.length; ++i) {
     const cmd = parsingSteps[i];
-    const el = cmd.el;
+    const {el} = cmd;
     const isStepComplete = i <= step;
 
     switch (cmd.type) {
@@ -106,7 +106,7 @@ slider.oninput = function (e) {
   gotoTimestep(parseInt(e.target.value, 10));
 };
 
-ohmEditor.parseTree.addListener('render:parseTree', function (trace) {
+ohmEditor.parseTree.addListener('render:parseTree', trace => {
   parsingSteps = [];
   stepsByNodeId = {};
   stepsByFailureKey = {};
@@ -120,24 +120,21 @@ ohmEditor.parseTree.addListener('render:parseTree', function (trace) {
   slider.value = slider.max = 1;
 });
 
-ohmEditor.parseTree.addListener(
-  'create:traceElement',
-  function (el, traceNode) {
-    // If the node is labeled, record it as a distinct "step" in the parsing timeline.
-    if (timelineEnabled && !el.classList.contains('hidden')) {
-      maybeRecordFailureStep(matchResult, traceNode);
-      stepsByNodeId[el.id] = {enter: parsingSteps.length};
-      addParsingStep({
-        type: 'enter',
-        el,
-        node: traceNode,
-        collapsed: el.classList.contains('collapsed'),
-      });
-    }
+ohmEditor.parseTree.addListener('create:traceElement', (el, traceNode) => {
+  // If the node is labeled, record it as a distinct "step" in the parsing timeline.
+  if (timelineEnabled && !el.classList.contains('hidden')) {
+    maybeRecordFailureStep(matchResult, traceNode);
+    stepsByNodeId[el.id] = {enter: parsingSteps.length};
+    addParsingStep({
+      type: 'enter',
+      el,
+      node: traceNode,
+      collapsed: el.classList.contains('collapsed'),
+    });
   }
-);
+});
 
-ohmEditor.parseTree.addListener('exit:traceElement', function (el, traceNode) {
+ohmEditor.parseTree.addListener('exit:traceElement', (el, traceNode) => {
   if (timelineEnabled && el.id in stepsByNodeId) {
     // Attempt to record the failure step again, possibly overwriting the previous value.
     // This means that we prefer the 'exit' step over the 'enter' step.
@@ -147,19 +144,19 @@ ohmEditor.parseTree.addListener('exit:traceElement', function (el, traceNode) {
   }
 });
 
-ohmEditor.addListener('peek:failure', function (failure) {
+ohmEditor.addListener('peek:failure', failure => {
   oldStep = slider.value;
   gotoTimestep(stepsByFailureKey[failure.toKey()]);
 });
 
-ohmEditor.addListener('unpeek:failure', function () {
+ohmEditor.addListener('unpeek:failure', () => {
   if (oldStep !== -1) {
     gotoTimestep(oldStep);
     oldStep = -1;
   }
 });
 
-ohmEditor.addListener('goto:failure', function (failure) {
+ohmEditor.addListener('goto:failure', failure => {
   gotoTimestep(stepsByFailureKey[failure.toKey()]);
   oldStep = -1;
   slider.focus();

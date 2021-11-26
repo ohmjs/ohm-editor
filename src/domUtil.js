@@ -9,7 +9,7 @@ const KeyCode = {
 // context menu is brought up.
 document.addEventListener('click', hideContextMenus);
 document.addEventListener('contextmenu', hideContextMenus);
-document.addEventListener('keydown', function (e) {
+document.addEventListener('keydown', e => {
   if (e.keyCode === KeyCode.ESC || e.keyCode === KeyCode.ENTER) {
     hideContextMenus();
   }
@@ -17,7 +17,7 @@ document.addEventListener('keydown', function (e) {
 
 function hideContextMenus() {
   const menus = document.querySelectorAll('.contextMenu');
-  Array.prototype.forEach.call(menus, function (menu) {
+  Array.prototype.forEach.call(menus, menu => {
     menu.hidden = true;
   });
 }

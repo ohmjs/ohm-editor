@@ -60,7 +60,7 @@ function isRuleApplication(wordInfo) {
     grammarMemoTable &&
     grammarMemoTable[wordInfo.startIdx]
   ) {
-    const memo = grammarMemoTable[wordInfo.startIdx].memo;
+    const {memo} = grammarMemoTable[wordInfo.startIdx];
     if (memo && memo.Base_application && memo.Base_application.value) {
       return true;
     }
@@ -72,7 +72,7 @@ function findContainingGrammar(wordInfo) {
   if (ohmEditor.grammars) {
     const {startIdx, endIdx} = wordInfo;
     return Object.values(ohmEditor.grammars).find(
-      (g) => startIdx >= g.source.startIdx && endIdx <= g.source.endIdx
+      g => startIdx >= g.source.startIdx && endIdx <= g.source.endIdx
     );
   }
 }
@@ -109,7 +109,7 @@ function registerListeners(editor) {
   // cursor at the clicked location. This must be done during the capture phase.
   editor.on(
     'mousedown',
-    function (cm, e) {
+    (cm, e) => {
       isMouseDown = true;
       if (areLinksEnabled(e)) {
         e.preventDefault();
@@ -120,7 +120,7 @@ function registerListeners(editor) {
 
   // It's not possible to capture `click` events inside the editor window, so do link
   // navigation on mouseup.
-  editor.getWrapperElement().addEventListener('mouseup', function (e) {
+  editor.getWrapperElement().addEventListener('mouseup', e => {
     isMouseDown = false;
     if (markWordInfo) {
       const wordInfo = getWordUnderPoint(editor, e.clientX, e.clientY);
@@ -132,9 +132,9 @@ function registerListeners(editor) {
   });
 }
 
-ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
+ohmEditor.addListener('parse:grammars', (matchResult, grammars, err) => {
   if (!grammarEditor) {
-    grammarEditor = ohmEditor.ui.grammarEditor;
+    grammarEditor = ohmEditor.ui.grammarEditor; // eslint-disable-line prefer-destructuring
     registerListeners(grammarEditor);
   }
   grammarMemoTable = matchResult.succeeded()

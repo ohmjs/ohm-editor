@@ -109,7 +109,7 @@ export default {
   mounted() {
     window.addEventListener('resize', this.$refs.expandedInput.update);
 
-    ohmEditor.addListener('peek:ruleDefinition', function (grammar, ruleName) {
+    ohmEditor.addListener('peek:ruleDefinition', (grammar, ruleName) => {
       const cm = ohmEditor.ui.grammarEditor;
       const defInterval = grammar.rules[ruleName].source;
 
@@ -162,7 +162,7 @@ export default {
         'stepInItem',
         'Step Into',
         true,
-        function () {
+        () => {
           self._stepControls.stepInto(data.el);
         }
       );
@@ -171,7 +171,7 @@ export default {
         'stepOutItem',
         'Step Out',
         true,
-        function () {
+        () => {
           self._stepControls.stepOut(data.el);
         }
       );
@@ -180,7 +180,7 @@ export default {
         'zoomItem',
         'Zoom to Node',
         zoomEnabled,
-        function () {
+        () => {
           self.zoom(data.traceNode);
         }
       );

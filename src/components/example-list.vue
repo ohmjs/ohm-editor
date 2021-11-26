@@ -107,7 +107,7 @@ export default {
       ohmEditor.ui.inputEditor.setValue(example ? example.text : '');
       this._isSelectionChanging = false;
 
-      this.$nextTick(function () {
+      this.$nextTick(() => {
         ohmEditor.ui.inputEditor.focus();
       });
 
@@ -154,7 +154,7 @@ export default {
       e.preventDefault();
     },
     handleSignClick(e) {
-      const id = e.target.closest('li.example').id;
+      const {id} = e.target.closest('li.example');
       this.toggleShouldMatch(id);
     },
     handleDblClick(e) {
@@ -275,7 +275,7 @@ export default {
         if (value) {
           examples = JSON.parse(value);
         } else {
-          examples = domUtil.$$('#sampleExamples pre').map((elem) => {
+          examples = domUtil.$$('#sampleExamples pre').map(elem => {
             return {
               ...EXAMPLE_DEFAULTS,
               text: elem.textContent,
@@ -360,7 +360,7 @@ export default {
       const opts = {deep: true};
       const unwatch = this.$watch(
         'exampleValues.' + id,
-        function (newVal, oldVal) {
+        (newVal, oldVal) => {
           callback(id);
           if (newVal == null) {
             unwatch();
@@ -378,22 +378,19 @@ export default {
     this.restoreExamples('examples');
 
     const self = this;
-    ohmEditor.addListener('change:grammars', function (source) {
+    ohmEditor.addListener('change:grammars', source => {
       self.setGrammars(null);
     });
-    ohmEditor.addListener(
-      'parse:grammars',
-      function (matchResult, grammars, err) {
-        self.setGrammars(grammars);
-      }
-    );
-    ohmEditor.addListener('change:inputEditor', function (source) {
+    ohmEditor.addListener('parse:grammars', (matchResult, grammars, err) => {
+      self.setGrammars(grammars);
+    });
+    ohmEditor.addListener('change:inputEditor', source => {
       // Don't indicate that input is pending if the user just changed the selected example.
       if (!self._isSelectionChanging) {
         self.isInputPending = true;
       }
     });
-    ohmEditor.addListener('change:input', function (source) {
+    ohmEditor.addListener('change:input', source => {
       self.isInputPending = false;
       const ex = self.getSelected();
       if (ex) {

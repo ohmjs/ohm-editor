@@ -22,7 +22,7 @@ let gitHub = new GitHub();
 
 function showPrompt(dialogId, optMessage) {
   $('#promptScreen').style.display = 'block';
-  $$('#promptScreen > *').forEach(function (dialog) {
+  $$('#promptScreen > *').forEach(dialog => {
     dialog.hidden = true;
   });
   const messageField = $('#' + dialogId + 'Message');
@@ -36,7 +36,7 @@ function showPrompt(dialogId, optMessage) {
 
 function hidePrompt() {
   $('#promptScreen').style.display = 'none';
-  $$('#promptScreen > *').forEach(function (dialog) {
+  $$('#promptScreen > *').forEach(dialog => {
     dialog.hidden = true;
   });
 }
@@ -49,7 +49,7 @@ const saveButton = $('#saveGrammar');
 
 function loadFromGist(gistHash, cb) {
   const gist = gitHub.getGist(gistHash);
-  gist.read(function (err, res, req) {
+  gist.read((err, res, req) => {
     if (err) {
       if (grammarList.selectedOptions[0].classList.contains('shared')) {
         // delete option and select local storage
@@ -60,12 +60,12 @@ function loadFromGist(gistHash, cb) {
     }
 
     const grammarFilename = Object.getOwnPropertyNames(res.files).find(
-      function (filename) {
+      filename => {
         return filename.slice(-4) === '.ohm';
       }
     );
     const exampleFilename = Object.getOwnPropertyNames(res.files).find(
-      function (filename) {
+      filename => {
         return filename.slice(-5) === '.json';
       }
     );
@@ -93,14 +93,14 @@ function addGrammarGroup(list, label, grammars, beforeElem) {
     grammars = [];
   }
 
-  grammars.forEach(function (grammarHash) {
+  grammars.forEach(grammarHash => {
     let option = list.querySelector('.shared[value="' + grammarHash + '"]');
     if (!option) {
       option = document.createElement('option');
     }
     option.value = grammarHash;
     const gist = gitHub.getGist(grammarHash);
-    gist.read(function (err, res) {
+    gist.read((err, res) => {
       if (err) {
         console.warn('Could not load Gist ' + grammarHash); // eslint-disable-line no-console
         return;
@@ -118,26 +118,26 @@ function addGrammarGroup(list, label, grammars, beforeElem) {
 }
 
 function loadUserGrammars(ghUser) {
-  ghUser.listGists(function (err, res) {
+  ghUser.listGists((err, res) => {
     if (err) {
       // login incorrect or other network problems
       return;
     }
     const grammars = res
-      .filter(function (gist) {
+      .filter(gist => {
         const filenames = Object.getOwnPropertyNames(gist.files);
-        const hasJSON = filenames.find(function (filename) {
+        const hasJSON = filenames.find(filename => {
           return filename.toLowerCase().slice(-5) === '.json';
         });
-        const hasOhm = filenames.find(function (filename) {
+        const hasOhm = filenames.find(filename => {
           return filename.toLowerCase().slice(-4) === '.ohm';
         });
         return hasJSON && hasOhm;
       })
-      .sort(function (a, b) {
+      .sort((a, b) => {
         return a.description < b.description;
       })
-      .map(function (gist) {
+      .map(gist => {
         return gist.id;
       });
 
@@ -177,7 +177,7 @@ function saveToGist(
   };
   gistData.files[grammarName + '.json'] = {
     content: JSON.stringify(
-      Object.keys(examples).map(function (key) {
+      Object.keys(examples).map(key => {
         return examples[key];
       }),
       null,
@@ -186,7 +186,7 @@ function saveToGist(
     type: 'application/json',
   };
 
-  gist[gistIdOrNull ? 'update' : 'create'](gistData, function (err, res) {
+  gist[gistIdOrNull ? 'update' : 'create'](gistData, (err, res) => {
     if (err) {
       // could not save grammar, potential network problem
       console.warn('Could not save Gist:', gistData); // eslint-disable-line no-console
@@ -242,7 +242,7 @@ function doSaveAs() {
   saveButton.textContent = 'Save';
   saveButton.disabled = true;
 
-  $$('#promptScreen .close').forEach(function (close) {
+  $$('#promptScreen .close').forEach(close => {
     close.addEventListener('click', hidePrompt);
   });
 
@@ -262,7 +262,7 @@ function doSaveAs() {
     group.appendChild(option);
   }
 
-  $('#gitHubForm').addEventListener('submit', function (e) {
+  $('#gitHubForm').addEventListener('submit', e => {
     hidePrompt();
 
     const username = $('#username').value;
@@ -281,7 +281,7 @@ function doSaveAs() {
 
   saveButton.addEventListener('click', save);
 
-  $('#newGrammarForm').addEventListener('submit', function (e) {
+  $('#newGrammarForm').addEventListener('submit', e => {
     hidePrompt();
 
     const description = $('#newGrammarName').value;
@@ -297,7 +297,7 @@ function doSaveAs() {
     e.preventDefault();
     return false;
   });
-  $('#newGrammarForm').addEventListener('reset', function (e) {
+  $('#newGrammarForm').addEventListener('reset', e => {
     hidePrompt();
   });
 
@@ -305,7 +305,7 @@ function doSaveAs() {
   // -----------------
 
   let prevSelection;
-  grammarList.addEventListener('click', function (e) {
+  grammarList.addEventListener('click', e => {
     prevSelection = grammarList.selectedIndex;
   });
 
@@ -317,11 +317,11 @@ function doSaveAs() {
       document.title = 'Ohm';
     }
 
-    ohmEditor.once('change:grammars', function (_) {
+    ohmEditor.once('change:grammars', _ => {
       saveButton.disabled = true;
     });
     if (examples) {
-      ohmEditor.once('parse:grammars', function (matchResult, grammars, err) {
+      ohmEditor.once('parse:grammars', (matchResult, grammars, err) => {
         ohmEditor.examples.restoreExamples(examples);
       });
     }
@@ -330,7 +330,7 @@ function doSaveAs() {
     ohmEditor.setGrammar(grammar);
   }
 
-  grammarList.addEventListener('change', function (e) {
+  grammarList.addEventListener('change', e => {
     const grammarHash = grammarList.options[grammarList.selectedIndex].value;
 
     if (grammarHash === '!login') {
@@ -365,7 +365,7 @@ function doSaveAs() {
 
     let options = Array.prototype.slice.apply(grammarList.options);
     options.reverse(); // to match my grammars first
-    let option = options.find(function (option) {
+    let option = options.find(option => {
       return option.value === grammarHash;
     });
     if (!option) {
@@ -406,7 +406,7 @@ function doSaveAs() {
     },
   });
 
-  ohmEditor.addListener('change:grammars', function (source) {
+  ohmEditor.addListener('change:grammars', source => {
     const grammar = grammarList.options[grammarList.selectedIndex].value;
     if (grammar === '') {
       // local storage

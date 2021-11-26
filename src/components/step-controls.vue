@@ -183,7 +183,7 @@ export default {
         // When returning to a node that was expanded for stepping, re-collapse it.
         this._maybeRecollapse(curr);
       }
-      const isAtEnd = this._treeWalker.isAtEnd;
+      const {isAtEnd} = this._treeWalker;
       this.stepState.currentParseStep = curr ? curr.id : '';
       this.stepState.isAtEnd = isAtEnd;
       this.stepState.exiting = this._treeWalker.exitingCurrentNode;

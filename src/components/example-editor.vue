@@ -107,7 +107,7 @@ export default {
     // If the top-level option is present, it's always selected and disabled.
     topLevelOption() {
       const {selectedGrammar, startRule} = this.example;
-      const ruleLabel = startRule || `(default)`;
+      const ruleLabel = startRule || '(default)';
       return {
         text: selectedGrammar ? `${selectedGrammar} ▸ ${ruleLabel}` : ruleLabel,
         value: toOptValue(selectedGrammar, startRule),
@@ -115,7 +115,7 @@ export default {
     },
     startRuleOptions() {
       const grammarNames = Object.keys(this.grammars || {});
-      const optgroups = grammarNames.map((name) => ({
+      const optgroups = grammarNames.map(name => ({
         text: name,
         value: name,
         options: this.startRuleOptionsForGrammar(name),
@@ -126,7 +126,7 @@ export default {
       // To avoid colliding with the `topLevelOption.value`, append '!'
       // to the value, which is detected and removed by the change handler.
       optgroups.forEach(({options}) =>
-        options.forEach((opt) => {
+        options.forEach(opt => {
           if (opt.value === topLevelOption.value) {
             opt.value = `${opt.value}!`;
           }
@@ -191,7 +191,7 @@ export default {
       }
 
       // Focus the editor and set the cursor to the end.
-      this.$nextTick(function () {
+      this.$nextTick(() => {
         const cm = ohmEditor.ui.inputEditor;
         cm.focus();
         cm.setCursor(cm.lineCount(), 0);

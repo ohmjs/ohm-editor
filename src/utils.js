@@ -1,5 +1,5 @@
 function objectForEach(obj, func) {
-  Object.keys(obj).forEach(function (key) {
+  Object.keys(obj).forEach(key => {
     return func(key, obj[key], obj);
   });
 }
@@ -7,7 +7,7 @@ function objectForEach(obj, func) {
 module.exports = {
   objectForEach,
   objectMap(obj, func) {
-    return Object.keys(obj).map(function (key) {
+    return Object.keys(obj).map(key => {
       return func(key, obj[key], obj);
     });
   },
@@ -36,7 +36,7 @@ module.exports = {
 
   // same as a\b
   difference(a, b) {
-    return a.filter(function (item) {
+    return a.filter(item => {
       return b.indexOf(item) === -1;
     });
   },

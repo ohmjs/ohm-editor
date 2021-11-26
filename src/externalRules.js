@@ -6,7 +6,7 @@ import {$, $$} from './domUtil';
 import ohmEditor from './ohmEditor';
 import {isPrimitiveRule} from './traceUtil';
 
-const ohmGrammar = ohm.ohmGrammar;
+const {ohmGrammar} = ohm;
 const builtInRules = ohm.grammar('G {}').superGrammar;
 
 function extend(origin, add) {
@@ -24,7 +24,7 @@ function extend(origin, add) {
 
 function combineChildResults(attr) {
   return function (...children) {
-    return children.reduce(function (acc, child) {
+    return children.reduce((acc, child) => {
       return extend(acc, child[attr]);
     }, {});
   };
@@ -78,7 +78,7 @@ function getBuiltInRuleDefinition(ruleName) {
   if (isPrimitiveRule(builtInRules, ruleName)) {
     ans += '/* primitive rule */';
   } else {
-    const body = ruleInfo.body;
+    const {body} = ruleInfo;
     ans += body.source ? body.source.contents : body.toString();
   }
 
@@ -98,7 +98,7 @@ function getExternalRules(rulesObj) {
   }
   ruleNames.sort(); // Sort to ensure a stable order.
 
-  ruleNames.forEach(function (name) {
+  ruleNames.forEach(name => {
     if (name in builtInRules.rules) {
       ans[name] = getBuiltInRuleDefinition(name);
     }
@@ -165,7 +165,7 @@ LastLineWidget.prototype.update = function (cm, matchResult) {
   }
 };
 
-const grammarEditor = ohmEditor.ui.grammarEditor;
+const {grammarEditor} = ohmEditor.ui;
 
 // Singletons associated with the current grammar (ok since there's only one grammar editor).
 let widget;
@@ -175,22 +175,22 @@ function updateExternalRules() {
   widget.update(grammarEditor, grammarMatchResult);
 }
 
-grammarEditor.on('swapDoc', function (cm) {
+grammarEditor.on('swapDoc', cm => {
   widget = new LastLineWidget(cm);
 });
 
-ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
+ohmEditor.addListener('parse:grammars', (matchResult, grammars, err) => {
   grammarMatchResult = matchResult;
   updateExternalRules();
 });
 
-ohmEditor.addListener('change:option', function (name) {
+ohmEditor.addListener('change:option', name => {
   if (name === 'showSpaces') {
     updateExternalRules();
   }
 });
 
-ohmEditor.addListener('peek:ruleDefinition', function (grammar, ruleName) {
+ohmEditor.addListener('peek:ruleDefinition', (grammar, ruleName) => {
   const cm = ohmEditor.ui.grammarEditor;
   const defInterval = grammar.rules[ruleName].source;
   if (defInterval && !containsInterval(cm, defInterval)) {
@@ -201,8 +201,8 @@ ohmEditor.addListener('peek:ruleDefinition', function (grammar, ruleName) {
   }
 });
 
-ohmEditor.addListener('unpeek:ruleDefinition', function () {
-  $$('.externalRules pre').forEach(function (elem) {
+ohmEditor.addListener('unpeek:ruleDefinition', () => {
+  $$('.externalRules pre').forEach(elem => {
     elem.classList.remove('active-definition');
   });
 });

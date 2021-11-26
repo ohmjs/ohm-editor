@@ -73,7 +73,7 @@ function tweenWithCallback(endValue, cb) {
 }
 
 function shouldNodeBeLabeled(traceNode) {
-  const expr = traceNode.expr;
+  const {expr} = traceNode;
 
   // Don't label Seq and Alt nodes.
   if (expr instanceof ohm.pexprs.Seq || expr instanceof ohm.pexprs.Alt) {
@@ -125,7 +125,7 @@ function isSyntactic(expr) {
 function hasVisibleChoice(traceNode) {
   if (isAlt(traceNode.expr) && ohmEditor.options.showFailures) {
     // If there's any failed child, we need to show multiple children.
-    return traceNode.children.some(function (c) {
+    return traceNode.children.some(c => {
       return !c.succeeded;
     });
   }
@@ -141,7 +141,7 @@ function cloneObject(obj) {
   if (!obj) {
     return newObj;
   }
-  Object.keys(obj).forEach(function (key) {
+  Object.keys(obj).forEach(key => {
     newObj[key] = Array.prototype.slice.call(obj[key]);
   });
   return newObj;
@@ -206,7 +206,7 @@ export default {
       // Collapse if the rule body has no source (e.g. anything from ProtoBuiltInRules).
       const pexpr = this.traceNode.expr;
       if (pexpr instanceof ohm.pexprs.Apply) {
-        const body = ohmEditor.currentGrammar.rules[pexpr.ruleName].body;
+        const {body} = ohmEditor.currentGrammar.rules[pexpr.ruleName];
         if (!body.source) {
           return true;
         }
@@ -219,7 +219,7 @@ export default {
       const obj = {
         disclosure: this.labeled && this.isInVBox,
       };
-      const ctorName = this.traceNode.ctorName;
+      const {ctorName} = this.traceNode;
       if (ctorName) {
         obj[ctorName.toLowerCase()] = true;
       }
@@ -243,7 +243,7 @@ export default {
       const children = [];
       const self = this;
 
-      this.traceNode.children.forEach(function (node) {
+      this.traceNode.children.forEach(node => {
         // Don't show or recurse into nodes that failed, unless "Explain parse" is enabled.
         if (
           (!node.succeeded && !ohmEditor.options.showFailures) ||
@@ -379,7 +379,7 @@ export default {
 
     if (!this.isLeaf) {
       // On the next tick, children will be mounted.
-      this.$nextTick(function () {
+      this.$nextTick(() => {
         ohmEditor.parseTree.emit('exit:traceElement', el, el._traceNode);
       });
     }
@@ -399,10 +399,10 @@ export default {
       this.hasUserToggledCollapsedState = false;
     },
     onHover() {
-      const grammarEditor = ohmEditor.ui.grammarEditor;
-      const inputEditor = ohmEditor.ui.inputEditor;
+      const {grammarEditor} = ohmEditor.ui;
+      const {inputEditor} = ohmEditor.ui;
 
-      const source = this.traceNode.source;
+      const {source} = this.traceNode;
       const pexpr = this.traceNode.expr;
 
       // TODO: Can `source` ever be undefined/null here?
@@ -415,7 +415,7 @@ export default {
         grammarEditor.getWrapperElement().classList.add('highlighting');
         scrollToInterval(grammarEditor, pexpr.source);
       }
-      const ruleName = pexpr.ruleName;
+      const {ruleName} = pexpr;
       if (ruleName) {
         ohmEditor.emit(
           'peek:ruleDefinition',
@@ -472,7 +472,7 @@ export default {
       // Caution: direct DOM manipulation here!
       // TODO: Consider using Vue.js <transition> wrapper element.
       const self = this;
-      this.$nextTick(function () {
+      this.$nextTick(() => {
         // Temporarily toggle the visibility of the children, which is the pre-transition state.
         el.lastChild.hidden = !el.lastChild.hidden;
 
@@ -485,7 +485,7 @@ export default {
           .duration(duration)
           .styleTween(
             'width',
-            tweenWithCallback(newWidth + 'px', function (t) {
+            tweenWithCallback(newWidth + 'px', t => {
               self.eventHandlers.updateExpandedInput(el, collapse, t);
             })
           )

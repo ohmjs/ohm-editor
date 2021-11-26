@@ -17,32 +17,47 @@ module.exports = {
     module: true,
     require: true,
   },
-  plugins: ['camelcase-ohm', 'html', 'node', 'no-extension-in-require', 'tape'],
+  plugins: ['camelcase-ohm', 'html', 'node', 'no-extension-in-require'],
   settings: {},
   rules: {
-    // ----- Custom settings for this project -----
+    // ----- Exceptions to the configs we extend -----
+
+    'arrow-parens': ['error', 'as-needed'],
+
+    // We follow the old Google style guide here.
+    // The default was changed in https://github.com/google/eslint-config-google/pull/23.
+    'block-spacing': ['error', 'always'], // google
+
+    'new-cap': ['error', {capIsNew: false}], // google: 'error'
+    'no-constant-condition': ['error', {checkLoops: false}], // eslint:recommended: 'error'
+    'no-invalid-this': 'off', // google
+    'no-redeclare': 'off', // eslint:recommended
+    quotes: ['error', 'single', {avoidEscape: true}], // google
+    'require-jsdoc': 'off', // google
+
+    // ----- Extra things we enforce in Ohm -----
 
     // Turn off the regular camelcase rule, and use a custom rule which
     // allows semantic actions to be named like `RuleName_caseName`.
     camelcase: 0,
-    'camelcase-ohm/camelcase-ohm': 2,
+    'camelcase-ohm/camelcase-ohm': 'error',
 
+    eqeqeq: ['error', 'allow-null'],
     'max-len': ['error', {code: 100, ignoreUrls: true}],
-
+    'max-statements-per-line': ['error', {max: 2}],
     'no-console': 2,
-
-    // Don't allow require() statements to include the '.js' extension.
     'no-extension-in-require/main': 2,
-
     'no-warning-comments': ['error', {terms: ['xxx', 'fixme']}],
     strict: ['error', 'global'],
-    'tape/no-only-test': 2,
 
-    // ----- Exceptions to eslint:recommended -----
+    // ------ Prefer newer language features -----
 
-    // Don't require `new` when calling functions whose name starts with a capital letter.
-    'new-cap': ['error', {capIsNew: false}],
-    'no-redeclare': 0,
-    'require-jsdoc': 0,
+    // Object shorthand is allowed by Google style; we are more opinionated.
+    // https://google.github.io/styleguide/jsguide.html#features-objects-method-shorthand
+    'object-shorthand': ['error', 'always'],
+
+    'prefer-arrow-callback': 'error',
+    'prefer-const': 'error',
+    'prefer-destructuring': ['error', {object: true, array: false}],
   },
 };

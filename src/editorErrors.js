@@ -41,7 +41,7 @@ function showError(category, editor, interval, messageOrNode) {
   } else {
     errorEl.appendChild(messageOrNode);
   }
-  const line = editor.posFromIndex(interval.endIdx).line;
+  const {line} = editor.posFromIndex(interval.endIdx);
   errorMarks[category].widget = editor.addLineWidget(line, errorEl, {
     insertAt: 0,
   });
@@ -54,7 +54,7 @@ function createErrorEl(result, pos) {
   const sep = ', ';
   const lastSep = failures.length >= 3 ? ', or ' : ' or '; // Oxford comma.
 
-  failures.forEach(function (f, i) {
+  failures.forEach((f, i) => {
     let prefix = '';
     if (i > 0) {
       prefix = i === failures.length - 1 ? lastSep : sep;
@@ -75,24 +75,24 @@ function createErrorEl(result, pos) {
 }
 
 // Hide errors in the editors as soon as the user starts typing again.
-ohmEditor.addListener('change:grammarEditor', function (cm) {
+ohmEditor.addListener('change:grammarEditor', cm => {
   hideError('grammar', cm);
 });
 
-const hideInputError = (_) => hideError('input', ohmEditor.ui.inputEditor);
+const hideInputError = _ => hideError('input', ohmEditor.ui.inputEditor);
 
 // Hide errors in the input in all cases where the input will be reparsed.
 ohmEditor.addListener('change:inputEditor', hideInputError);
 ohmEditor.addListener('change:grammars', hideInputError);
 ohmEditor.addListener('set:startRule', hideInputError);
 
-ohmEditor.addListener('parse:grammars', function (matchResult, grammars, err) {
+ohmEditor.addListener('parse:grammars', (matchResult, grammars, err) => {
   if (err) {
     const editor = ohmEditor.ui.grammarEditor;
     setError('grammar', editor, err.interval, err.shortMessage || err.message);
   }
 });
-ohmEditor.addListener('parse:input', function (matchResult, trace) {
+ohmEditor.addListener('parse:input', (matchResult, trace) => {
   if (trace.result.failed()) {
     const editor = ohmEditor.ui.inputEditor;
     // Intervals with start == end won't show up in CodeMirror.

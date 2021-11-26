@@ -39,7 +39,7 @@ export default {
       return undefined;
     },
     inlineRuleNameParts() {
-      const ruleName = this.traceNode.expr.ruleName;
+      const {ruleName} = this.traceNode.expr;
       return ruleName ? ruleName.split('_') : [];
     },
     labelData() {

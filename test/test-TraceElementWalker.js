@@ -157,7 +157,7 @@ test('step into', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
-  const $ = (sel) => div.querySelector(sel);
+  const $ = sel => div.querySelector(sel);
 
   walker.stepInto($('#node0'));
   expect(walker.previousNode()).toEqual(null);
@@ -185,7 +185,7 @@ test('step into from end', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div, {startAtEnd: true});
 
-  const $ = (sel) => div.querySelector(sel);
+  const $ = sel => div.querySelector(sel);
 
   walker.stepInto($('#node0'));
   expect(walker.isAtEnd).toEqual(false);
@@ -197,7 +197,7 @@ test('step out', () => {
   const div = createTestDiv();
   const walker = new TraceElementWalker(div);
 
-  const $ = (sel) => div.querySelector(sel);
+  const $ = sel => div.querySelector(sel);
 
   walker.stepOut($('#node0'));
   expect(walker.currentNode).toEqual($('#node0'));

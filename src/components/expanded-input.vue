@@ -115,7 +115,7 @@ export default {
           }
 
           // Ask the subtrees to render.
-          Array.from(el.lastChild.childNodes).forEach((childEl) => {
+          Array.from(el.lastChild.childNodes).forEach(childEl => {
             renderInput(childEl, isAnimating || isAncestorAnimating);
           });
         }

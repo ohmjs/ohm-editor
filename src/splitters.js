@@ -36,7 +36,7 @@ function initializeSplitter(el) {
       e.preventDefault();
     }
   };
-  window.addEventListener('mousemove', function (e) {
+  window.addEventListener('mousemove', e => {
     const parentElBounds = parentEl.getBoundingClientRect();
     const relativeX = e.clientX - parentElBounds.left;
     const relativeY = e.clientY - parentElBounds.top;
@@ -51,7 +51,7 @@ function initializeSplitter(el) {
       e.stopPropagation();
     }
   });
-  window.addEventListener('mouseup', function (e) {
+  window.addEventListener('mouseup', e => {
     dragging = false;
     dragOverlay.removeAttribute('style');
   });

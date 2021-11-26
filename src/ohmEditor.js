@@ -115,7 +115,7 @@ function updateCurrentGrammarAndStartRule() {
   }
 }
 
-ohmEditor.examples.addListener('set:selected', (id) => {
+ohmEditor.examples.addListener('set:selected', id => {
   updateCurrentGrammarAndStartRule();
 });
 ohmEditor.examples.addListener('set:example', (id, oldValue, newValue) => {

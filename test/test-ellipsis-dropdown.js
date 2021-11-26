@@ -38,7 +38,7 @@ test('showing and hiding the dropdown', async () => {
 
   const links = Array.from(vm.$el.querySelectorAll('li > a'));
 
-  const labels = links.map((el) => el.textContent);
+  const labels = links.map(el => el.textContent);
   expect(labels).toEqual(['Foo', 'Bar'], 'labels are correct');
 
   links[0].click();

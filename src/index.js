@@ -60,8 +60,8 @@ function getValidStartRule(grammar, ruleName = '') {
 }
 
 function refresh() {
-  const grammarEditor = ohmEditor.ui.grammarEditor;
-  const inputEditor = ohmEditor.ui.inputEditor;
+  const {grammarEditor} = ohmEditor.ui;
+  const {inputEditor} = ohmEditor.ui;
 
   const grammarSource = grammarEditor.getValue();
   const inputSource = inputEditor.getValue();
@@ -140,8 +140,8 @@ function resetGrammarMatcher() {
 }
 
 const checkboxes = $$('#options input[type=checkbox]');
-checkboxes.forEach(function (cb) {
-  cb.addEventListener('click', function (e) {
+checkboxes.forEach(cb => {
+  cb.addEventListener('click', e => {
     const optionName = cb.name;
 
     // Respect the user's wishes if they automatically enable/disable "show failures".
@@ -156,13 +156,13 @@ checkboxes.forEach(function (cb) {
 
 ohmEditor.setGrammar(null /* restore local storage */);
 
-ohmEditor.ui.inputEditor.on('change', function (cm) {
+ohmEditor.ui.inputEditor.on('change', cm => {
   inputChanged = true;
   ohmEditor.emit('change:inputEditor', cm);
   triggerRefresh(250);
 });
 
-ohmEditor.ui.grammarEditor.on('beforeChange', function (cm, change) {
+ohmEditor.ui.grammarEditor.on('beforeChange', (cm, change) => {
   grammarMatcher.replaceInputRange(
     cm.indexFromPos(change.from),
     cm.indexFromPos(change.to),
@@ -172,21 +172,21 @@ ohmEditor.ui.grammarEditor.on('beforeChange', function (cm, change) {
 
 ohmEditor.ui.grammarEditor.on('swapDoc', resetGrammarMatcher);
 
-ohmEditor.ui.grammarEditor.on('change', function (cm, change) {
+ohmEditor.ui.grammarEditor.on('change', (cm, change) => {
   grammarChanged = true;
   ohmEditor.emit('change:grammarEditor', cm);
   triggerRefresh(250);
 });
-ohmEditor.ui.grammarEditor.on('swapDoc', function (cm) {
+ohmEditor.ui.grammarEditor.on('swapDoc', cm => {
   grammarChanged = true;
   ohmEditor.emit('change:grammarEditor', cm);
   triggerRefresh(250);
 });
 
-ohmEditor.addListener('set:currentGrammar', (grammar) => {
+ohmEditor.addListener('set:currentGrammar', grammar => {
   triggerRefresh();
 });
-ohmEditor.addListener('set:startRule', (ruleName) => {
+ohmEditor.addListener('set:startRule', ruleName => {
   triggerRefresh();
 });
 
