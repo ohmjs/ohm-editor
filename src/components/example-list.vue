@@ -194,9 +194,13 @@ export default {
 
     // Add a new example to the list, and return its ID.
     // Every example added to the list must go through this function!
-    addExample(optData) {
+    addExample() {
       const id = uniqueId();
-      this.$set(this.exampleValues, id, {...EXAMPLE_DEFAULTS});
+      const grammar = ohmEditor.defaultGrammar();
+      this.$set(this.exampleValues, id, {
+        ...EXAMPLE_DEFAULTS,
+        selectedGrammar: grammar ? grammar.name : '',
+      });
 
       this._watchExample(id, this.updateExampleStatus);
       this.selectedId = id;
@@ -332,9 +336,12 @@ export default {
             status = {className: 'fail', err: e};
           }
         } else {
+          const message = selectedGrammar
+            ? `Unknown grammar '${selectedGrammar}'`
+            : 'No grammar defined';
           status = {
             className: 'fail',
-            err: {message: `Unknown grammar '${selectedGrammar}'`},
+            err: {message},
           };
         }
         this.$set(this.exampleStatus, id, status);

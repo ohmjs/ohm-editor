@@ -44,6 +44,7 @@ let wrapper;
 beforeEach(() => {
   wrapper = mount(ExampleList);
   ohmEditor.examples.getSelected = wrapper.vm.getSelected;
+  simulateGrammarEdit('');
 });
 
 afterEach(() => {
@@ -77,7 +78,7 @@ const flushQueue = () => new Promise((cb) => setTimeout(cb, 0));
 // Tests
 // -----
 
-test('adding and updating examples', () => {
+test('adding and updating examples', async () => {
   const {vm} = wrapper;
   expect(vm.getSelected()).toEqual(undefined);
 
@@ -111,6 +112,19 @@ test('adding and updating examples', () => {
   expect(vm.getSelected()).toEqual({
     text: '',
     selectedGrammar: '',
+    startRule: '',
+    shouldMatch: true,
+  });
+
+  await simulateGrammarEdit('BestGrammar { start = }');
+  const id3 = vm.addExample();
+  expect(vm.selectedId).toEqual(id3);
+
+  // Once there is a grammar, it will be used as the selectedGrammar for a
+  // newly-added example.
+  expect(vm.getSelected()).toEqual({
+    text: '',
+    selectedGrammar: 'BestGrammar',
     startRule: '',
     shouldMatch: true,
   });
@@ -186,7 +200,8 @@ test('pass/fail status', async () => {
   await Vue.nextTick();
 
   // status is undefined without a grammar
-  expect(vm.exampleStatus[id]).toBeUndefined();
+  expect(vm.exampleStatus[id].className).toBe('fail');
+  expect(vm.exampleStatus[id].err).toEqual({message: 'No grammar defined'});
 
   await simulateGrammarEdit('G { start = letter+ }');
   expect(vm.exampleStatus[id].className).toBe('pass');
@@ -224,6 +239,9 @@ test('start rule text', async () => {
 
   vm.setExample(id, '', 'MyGrammar', 'start');
   await Vue.nextTick();
+  expect(findEl(vm, '.startRule').textContent).toBe('MyGrammar ▸ start');
+
+  await simulateGrammarEdit('');
   expect(findEl(vm, '.startRule').textContent).toBe('MyGrammar ▸ start');
 });
 
