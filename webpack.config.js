@@ -8,7 +8,6 @@ const {VueLoaderPlugin} = require('vue-loader');
 module.exports = {
   module: {
     rules: [
-      {test: /\.(?:jpg|gif|png)$/, type: 'asset/resource'},
       {test: /\.vue$/, loader: 'vue-loader'},
       {
         test: /\.css$/,
@@ -26,13 +25,14 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'build'),
-    publicPath: '/assets/',
+    clean: true,
     filename: '[name]-bundle.js',
+    publicPath: '/assets/',
   },
   plugins: [new VueLoaderPlugin()],
   devServer: {
     static: {
-      directory: path.join(__dirname, 'src'),
+      directory: path.join(__dirname, 'public'),
     },
     port: 8080,
   },

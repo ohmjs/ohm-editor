@@ -6,7 +6,7 @@
       :disabled="!canGoToStart"
       @click.prevent="goToStart"
     >
-      <img src="../images/start.png" width="18" />
+      <img src="images/start.png" width="18" />
     </button>
     <button
       class="outline-btn"
@@ -14,7 +14,7 @@
       :disabled="!canGoBack"
       @click.prevent="stepBack"
     >
-      <img src="../images/backward.png" width="18" />
+      <img src="images/backward.png" width="18" />
     </button>
     <button
       class="outline-btn"
@@ -22,7 +22,7 @@
       :disabled="!canGoForward"
       @click.prevent="stepForward"
     >
-      <img src="../images/forward.png" width="18" />
+      <img src="images/forward.png" width="18" />
     </button>
     <button
       class="outline-btn"
@@ -30,7 +30,7 @@
       :disabled="!canGoToEnd"
       @click.prevent="goToEnd"
     >
-      <img src="../images/end.png" width="18" />
+      <img src="images/end.png" width="18" />
     </button>
   </div>
 </template>

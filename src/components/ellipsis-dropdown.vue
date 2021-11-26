@@ -1,4 +1,4 @@
-<style src="../third_party/css/bootstrap-dropdown-3.3.7.css"></style>
+<style src="../../public/third_party/css/bootstrap-dropdown-3.3.7.css"></style>
 
 <style>
 button.ellipsis-btn {
