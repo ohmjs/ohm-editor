@@ -25,8 +25,8 @@
 
 <script>
 import Vue from 'vue';
-import cmUtil from '../cmUtil';
-import domUtil from '../domUtil';
+import * as cmUtil from '../cmUtil';
+import * as domUtil from '../domUtil';
 import {isLeaf} from '../traceUtil';
 import ohmEditor from '../ohmEditor';
 

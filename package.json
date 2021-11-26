@@ -5,15 +5,13 @@
   "author": "Patrick Dubroy <pdubroy@gmail.com>",
   "scripts": {
     "build": "webpack --mode production",
-    "test:unit": "vue-cli-service test:unit",
     "lint": "eslint . --ext .js,.vue",
     "build-visualizer": "bash bin/build-visualizer.sh",
     "ci-test": "npm run lint && npm test",
     "format": "prettier --write . && npm run lint -- --fix",
     "postinstall": "true",
     "start": "webpack serve --mode development",
-    "test": "vue-cli-service test:unit",
-    "test-watch": "karma start --auto-watch"
+    "test": "node --experimental-vm-modules ./node_modules/.bin/vue-cli-service test:unit"
   },
   "main": "index.js",
   "dependencies": {},

@@ -1,9 +1,7 @@
 /* global window */
 
-'use strict';
-
-const cmUtil = require('./cmUtil');
-const ohmEditor = require('./ohmEditor');
+import * as cmUtil from './cmUtil';
+import ohmEditor from './ohmEditor';
 
 let grammarEditor;
 let grammarMemoTable;

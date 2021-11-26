@@ -1,18 +1,8 @@
-'use strict';
-
 module.exports = {
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'script',
+    sourceType: 'module',
   },
-  overrides: [
-    {
-      files: ['src/**/*.vue'],
-      parserOptions: {
-        sourceType: 'module',
-      },
-    },
-  ],
 
   // To minimize dependencies on Node- or browser-specific features, leave the
   // env empty, and instead define globals as needed.

@@ -1,11 +1,10 @@
 /* eslint-env browser */
 /* global CodeMirror */
 
-'use strict';
-
-const CheckedEmitter = require('checked-emitter');
+import CheckedEmitter from 'checked-emitter';
 
 const ohmEditor = new CheckedEmitter();
+export default ohmEditor;
 
 ohmEditor.registerEvents({
   // Emitted when the CodeMirror instances for the input and grammar have been initialized.
@@ -129,8 +128,3 @@ ohmEditor.addListener('parse:grammars', (result, grammars, err) => {
 });
 
 ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
-
-// Exports
-// -------
-
-module.exports = ohmEditor;

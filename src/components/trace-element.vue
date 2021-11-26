@@ -37,7 +37,7 @@
 /* global Node, d3, ohm */
 /* eslint-disable no-invalid-this */
 import {$} from '../domUtil';
-import cmUtil from '../cmUtil';
+import {scrollToInterval} from '../cmUtil';
 import {isLeaf} from '../traceUtil';
 import ohmEditor from '../ohmEditor';
 import traceLabel from './trace-label.vue';
@@ -413,7 +413,7 @@ export default {
       if (pexpr.source) {
         // grammarMark = cmUtil.markInterval(grammarEditor, pexpr.source, 'active-appl', false);
         grammarEditor.getWrapperElement().classList.add('highlighting');
-        cmUtil.scrollToInterval(grammarEditor, pexpr.source);
+        scrollToInterval(grammarEditor, pexpr.source);
       }
       const ruleName = pexpr.ruleName;
       if (ruleName) {

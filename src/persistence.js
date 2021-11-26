@@ -1,19 +1,13 @@
 /* eslint-env browser */
 /* global GitHub */
 
-'use strict';
+import Vue from 'vue';
 
-const Vue = require('vue').default;
-const ohmEditor = require('./ohmEditor');
-const domUtil = require('./domUtil');
+import EllipsisDropdownBase from './components/ellipsis-dropdown.vue';
+import {$, $$} from './domUtil';
+import ohmEditor from './ohmEditor';
 
-const EllipsisDropdown = Vue.extend(
-  require('./components/ellipsis-dropdown.vue').default ||
-    require('./components/ellipsis-dropdown.vue')
-);
-
-const $ = domUtil.$;
-const $$ = domUtil.$$;
+const EllipsisDropdown = Vue.extend(EllipsisDropdownBase);
 
 // These grammars are secret gists under the GitHub user 'ohm-official'.
 const officialGrammars = [

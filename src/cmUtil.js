@@ -1,5 +1,3 @@
-'use strict';
-
 // Private helpers
 // ---------------
 
@@ -38,45 +36,41 @@ function markBlock(cm, startLine, endLine, className) {
   };
 }
 
-// Exports
-// -------
+export function containsInterval(cm, interval) {
+  const startPos = cm.posFromIndex(interval.startIdx);
+  const endPos = cm.posFromIndex(interval.endIdx);
+  return cm.getRange(startPos, endPos) === interval.contents;
+}
 
-module.exports = {
-  containsInterval(cm, interval) {
-    const startPos = cm.posFromIndex(interval.startIdx);
-    const endPos = cm.posFromIndex(interval.endIdx);
-    return cm.getRange(startPos, endPos) === interval.contents;
-  },
-  markInterval(cm, interval, className, canHighlightBlocks) {
-    const startPos = cm.posFromIndex(interval.startIdx);
-    const endPos = cm.posFromIndex(interval.endIdx);
+export function markInterval(cm, interval, className, canHighlightBlocks) {
+  const startPos = cm.posFromIndex(interval.startIdx);
+  const endPos = cm.posFromIndex(interval.endIdx);
 
-    // See if the selection can be expanded to a block selection.
-    if (canHighlightBlocks && isBlockSelectable(cm, startPos, endPos)) {
-      return markBlock(cm, startPos.line, endPos.line, className);
-    }
-    return cm.markText(startPos, endPos, {className});
-  },
+  // See if the selection can be expanded to a block selection.
+  if (canHighlightBlocks && isBlockSelectable(cm, startPos, endPos)) {
+    return markBlock(cm, startPos.line, endPos.line, className);
+  }
+  return cm.markText(startPos, endPos, {className});
+}
 
-  clearMark(mark) {
-    if (mark) {
-      mark.clear();
-    }
-  },
+export function clearMark(mark) {
+  if (mark) {
+    mark.clear();
+  }
+}
 
-  scrollToInterval(cm, interval) {
-    const startHeight = indexToHeight(cm, interval.startIdx);
-    const endHeight = indexToHeight(cm, interval.endIdx);
-    const scrollInfo = cm.getScrollInfo();
-    const margin = scrollInfo.clientHeight - (endHeight - startHeight);
-    if (
-      startHeight < scrollInfo.top ||
-      endHeight > scrollInfo.top + scrollInfo.clientHeight
-    ) {
-      cm.scrollIntoView(
-        {left: 0, top: startHeight, right: 0, bottom: endHeight},
-        margin > 0 ? margin / 2 : undefined
-      );
-    }
-  },
-};
+export function scrollToInterval(cm, interval) {
+  const startHeight = indexToHeight(cm, interval.startIdx);
+  const endHeight = indexToHeight(cm, interval.endIdx);
+  const scrollInfo = cm.getScrollInfo();
+  const margin = scrollInfo.clientHeight - (endHeight - startHeight);
+  if (
+    startHeight < scrollInfo.top ||
+    endHeight > scrollInfo.top + scrollInfo.clientHeight
+  ) {
+    cm.scrollIntoView(
+      {left: 0, top: startHeight, right: 0, bottom: endHeight},
+      margin > 0 ? margin / 2 : undefined
+    );
+  }
+}

@@ -1,15 +1,11 @@
 /* global global */
 /* eslint-env jest */
 
-'use strict';
-
-const {mount} = require('@vue/test-utils');
-const Vue = require('vue').default || require('vue');
-const assert = require('assert');
-const ohm = require('ohm-js');
-
-// Dependencies w/ mocks
-// ---------------------
+import {mount} from '@vue/test-utils';
+import assert from 'assert';
+import {jest} from '@jest/globals';
+import ohm from 'ohm-js';
+import Vue from 'vue';
 
 // Returns a stub instance of CodeMirror.
 global.CodeMirror = () => {
@@ -20,8 +16,13 @@ global.CodeMirror = () => {
   };
 };
 
-const ohmEditor = require('../src/ohmEditor'); // Requires CodeMirror()
-ohmEditor.examples.getSelected;
+// It seems that we need to use dynamic imports in order for the mocked CodeMirror function
+// to take effect — putting it above all imports, or in beforeAll(), doesn't work.
+// Not sure what's up with the "double default" either — but this works.
+const {default: ExampleList} = (
+  await import('../src/components/example-list.vue')
+).default;
+const {default: ohmEditor} = (await import('../src/ohmEditor')).default; // Requires CodeMirror()
 
 let localStorageExamples;
 
@@ -50,10 +51,6 @@ beforeEach(() => {
 afterEach(() => {
   ohmEditor.examples.getSelected = null;
 });
-
-const ExampleList =
-  require('../src/components/example-list.vue').default ||
-  require('../src/components/example-list.vue');
 
 // Helpers
 // -------

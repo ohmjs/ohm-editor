@@ -44,8 +44,10 @@
 </template>
 
 <script>
+import * as domUtil from '../domUtil';
+import ExampleEditor from './example-editor.vue';
 import ohmEditor from '../ohmEditor';
-import domUtil from '../domUtil';
+import ThumbsUpButton from './thumbs-up-button.vue';
 
 let idCounter = 0;
 
@@ -69,12 +71,8 @@ const EXAMPLE_DEFAULTS = {
 export default {
   name: 'example-list',
   components: {
-    'example-editor':
-      require('./example-editor.vue').default ||
-      require('./example-editor.vue'),
-    'thumbs-up-button':
-      require('./thumbs-up-button.vue').default ||
-      require('./thumbs-up-button.vue'),
+    'example-editor': ExampleEditor,
+    'thumbs-up-button': ThumbsUpButton,
   },
   props: [],
   data() {

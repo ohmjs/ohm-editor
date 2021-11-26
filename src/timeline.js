@@ -1,9 +1,7 @@
 /* eslint-env browser */
 
-'use strict';
-
-const domUtil = require('./domUtil');
-const ohmEditor = require('./ohmEditor');
+import * as domUtil from './domUtil';
+import ohmEditor from './ohmEditor';
 
 let parsingSteps;
 

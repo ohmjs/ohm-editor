@@ -1,13 +1,9 @@
 /* eslint-env jest */
 
-'use strict';
+import {mount} from '@vue/test-utils';
+import Vue from 'vue';
 
-const {mount} = require('@vue/test-utils');
-const Vue = require('vue').default || require('vue');
-
-const EllipsisDropdown =
-  require('../src/components/ellipsis-dropdown.vue').default ||
-  require('../src/components/ellipsis-dropdown.vue');
+import EllipsisDropdown from '../src/components/ellipsis-dropdown.vue';
 
 // Helpers
 // -------

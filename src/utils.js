@@ -1,5 +1,3 @@
-'use strict';
-
 function objectForEach(obj, func) {
   Object.keys(obj).forEach(function (key) {
     return func(key, obj[key], obj);

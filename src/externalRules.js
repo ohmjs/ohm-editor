@@ -1,15 +1,10 @@
 /* eslint-env browser */
 /* global ohm */
 
-'use strict';
-
-const cmUtil = require('./cmUtil');
-const domUtil = require('./domUtil');
-const ohmEditor = require('./ohmEditor');
-const isPrimitiveRule = require('./traceUtil').isPrimitiveRule;
-
-const $ = domUtil.$;
-const $$ = domUtil.$$;
+import {containsInterval} from './cmUtil';
+import {$, $$} from './domUtil';
+import ohmEditor from './ohmEditor';
+import {isPrimitiveRule} from './traceUtil';
 
 const ohmGrammar = ohm.ohmGrammar;
 const builtInRules = ohm.grammar('G {}').superGrammar;
@@ -198,7 +193,7 @@ ohmEditor.addListener('change:option', function (name) {
 ohmEditor.addListener('peek:ruleDefinition', function (grammar, ruleName) {
   const cm = ohmEditor.ui.grammarEditor;
   const defInterval = grammar.rules[ruleName].source;
-  if (defInterval && !cmUtil.containsInterval(cm, defInterval)) {
+  if (defInterval && !containsInterval(cm, defInterval)) {
     const elem = $('#externalRules-' + ruleName);
     if (elem) {
       elem.classList.add('active-definition');

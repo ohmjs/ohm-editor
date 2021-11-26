@@ -1,7 +1,5 @@
 /* global NodeFilter */
 
-'use strict';
-
 // Similar to a DOM TreeWalker (https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker),
 // but specialized for walking our parse trees. It visits only labeled PExpr nodes, and it
 // it visits interior nodes (i.e., `.pexpr.labeled:not(.leaf)` nodes) on the way in AND on

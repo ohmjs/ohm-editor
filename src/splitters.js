@@ -1,7 +1,5 @@
 /* eslint-env browser */
 
-'use strict';
-
 function toStorageKey(el, suffix) {
   return 'splitter-' + el.id + '-' + suffix;
 }

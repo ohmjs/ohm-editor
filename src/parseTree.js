@@ -1,10 +1,10 @@
 /* eslint-env browser */
 
-'use strict';
+import CheckedEmitter from 'checked-emitter';
+import Vue from 'vue';
 
-const CheckedEmitter = require('checked-emitter');
-const Vue = require('vue').default;
-const ohmEditor = require('./ohmEditor');
+import ParseTree from './components/parse-tree.vue';
+import ohmEditor from './ohmEditor';
 
 const parseTree = (ohmEditor.parseTree = new CheckedEmitter());
 parseTree.vue = new Vue({
@@ -14,9 +14,7 @@ parseTree.vue = new Vue({
   },
   el: '#visualizerContainer',
   components: {
-    'parse-tree':
-      require('./components/parse-tree.vue').default ||
-      require('./components/parse-tree.vue'),
+    'parse-tree': ParseTree,
   },
   template:
     '<div id="visualizerContainer">' +

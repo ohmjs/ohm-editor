@@ -1,9 +1,7 @@
 /* eslint-env jest */
 /** @jest-environment jsdom */
 
-'use strict';
-
-const TraceElementWalker = require('../src/TraceElementWalker');
+import TraceElementWalker from '../src/TraceElementWalker';
 
 function createTestDiv() {
   const doc = document;

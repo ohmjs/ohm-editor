@@ -59,8 +59,9 @@
 <script>
 /* global CodeMirror */
 
-import domUtil from '../domUtil';
+import * as domUtil from '../domUtil';
 import ohmEditor from '../ohmEditor';
+import ThumbsUpButton from './thumbs-up-button.vue';
 
 const toOptValue = (grammarName, startRule) =>
   `${grammarName || ''}.${startRule || ''}`;
@@ -68,9 +69,7 @@ const toOptValue = (grammarName, startRule) =>
 export default {
   name: 'example-editor',
   components: {
-    'thumbs-up-button':
-      require('./thumbs-up-button.vue').default ||
-      require('./thumbs-up-button.vue'),
+    'thumbs-up-button': ThumbsUpButton,
   },
   props: {
     example: {type: Object, required: true},

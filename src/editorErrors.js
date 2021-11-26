@@ -1,10 +1,8 @@
 /* global document */
 
-'use strict';
-
-const cmUtil = require('./cmUtil');
-const domUtil = require('./domUtil');
-const ohmEditor = require('./ohmEditor');
+import {markInterval} from './cmUtil';
+import {createElement} from './domUtil';
+import ohmEditor from './ohmEditor';
 
 const errorMarks = {
   grammar: null,
@@ -27,7 +25,7 @@ function setError(category, editor, interval, messageOrNode) {
   hideError(category, editor);
 
   errorMarks[category] = {
-    mark: cmUtil.markInterval(editor, interval, 'error-interval', false),
+    mark: markInterval(editor, interval, 'error-interval', false),
     timeout: setTimeout(
       showError.bind(null, category, editor, interval, messageOrNode),
       1500
@@ -37,7 +35,7 @@ function setError(category, editor, interval, messageOrNode) {
 }
 
 function showError(category, editor, interval, messageOrNode) {
-  const errorEl = domUtil.createElement('.error');
+  const errorEl = createElement('.error');
   if (typeof messageOrNode === 'string') {
     errorEl.textContent = messageOrNode;
   } else {
@@ -50,7 +48,7 @@ function showError(category, editor, interval, messageOrNode) {
 }
 
 function createErrorEl(result, pos) {
-  const el = domUtil.createElement('span', 'Expected ');
+  const el = createElement('span', 'Expected ');
 
   const failures = result.getRightmostFailures();
   const sep = ', ';
@@ -62,9 +60,7 @@ function createErrorEl(result, pos) {
       prefix = i === failures.length - 1 ? lastSep : sep;
     }
     el.appendChild(document.createTextNode(prefix));
-    const link = el.appendChild(
-      domUtil.createElement('span.link', f.toString())
-    );
+    const link = el.appendChild(createElement('span.link', f.toString()));
     link.onclick = function () {
       ohmEditor.emit('goto:failure', f);
     };

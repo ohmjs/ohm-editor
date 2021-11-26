@@ -1,9 +1,7 @@
 /* global CodeMirror */
 
-'use strict';
-
-const ohmEditor = require('./ohmEditor');
-const domUtil = require('./domUtil');
+import ohmEditor from './ohmEditor';
+import {$} from './domUtil';
 
 // Returns the first ancestor node of `el` that has class `className`.
 function ancestorWithClassName(el, className) {
@@ -90,7 +88,7 @@ CodeMirror.defineExtension('openDialog', function (template, callback, opts) {
   ).parentNode;
   let footer = container.querySelector('.footer');
   if (!footer) {
-    footer = domUtil.$('#protos .footer').cloneNode(true);
+    footer = $('#protos .footer').cloneNode(true);
     container.appendChild(footer);
     footer.removeAttribute('hidden');
     installEventHandlers(editor, footer, callback);

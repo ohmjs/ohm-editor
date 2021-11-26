@@ -1,14 +1,11 @@
 /* eslint-env browser */
 
-'use strict';
+import Vue from 'vue';
 
-const Vue = require('vue').default;
-const ohmEditor = require('./ohmEditor');
+import ExampleListBase from './components/example-list.vue';
+import ohmEditor from './ohmEditor';
 
-const ExampleList = Vue.extend(
-  require('./components/example-list.vue').default ||
-    require('./components/example-list.vue')
-);
+const ExampleList = Vue.extend(ExampleListBase);
 
 const exampleList = new ExampleList({
   el: '#exampleContainer',

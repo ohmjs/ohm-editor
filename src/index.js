@@ -1,27 +1,22 @@
 /* eslint-env browser */
 /* global CodeMirror, ohm */
 
-'use strict';
+import {$, $$} from './domUtil';
+import ohmEditor from './ohmEditor';
 
-const domUtil = require('./domUtil');
-const ohmEditor = require('./ohmEditor');
-
-require('./editorErrors');
-require('./examples');
-require('./externalRules');
-require('./parseTree');
-require('./ruleHyperlinks');
-require('./searchBar');
-require('./splitters');
-require('./persistence');
+import './editorErrors';
+import './examples';
+import './externalRules';
+import './parseTree';
+import './ruleHyperlinks';
+import './searchBar';
+import './splitters';
+import './persistence';
 
 let grammarChanged = true;
 let inputChanged = true;
 
 let showFailuresImplicitly = true;
-
-const $ = domUtil.$;
-const $$ = domUtil.$$;
 
 let grammarMatcher = ohm.ohmGrammar.matcher();
 
