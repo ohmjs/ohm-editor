@@ -1,7 +1,7 @@
 # Ohm Editor
 
-[![Build Status](https://img.shields.io/travis/harc/ohm.svg?style=flat-square)](https://travis-ci.org/harc/ohm-editor)
-[![Live demo](https://img.shields.io/badge/Live%20demo-%E2%86%92-9D6EB3.svg?style=flat-square)](https://ohmlang.github.io/editor/)
+[![Build Status](https://github.com/harc/ohm-editor/actions/workflows/node.js.yml/badge.svg)](https://github.com/harc/ohm-editor/actions/workflows/node.js.yml)
+[![Live demo](https://img.shields.io/badge/Live%20demo-%E2%86%92-9D6EB3.svg)](https://ohmlang.github.io/editor/)
 
 A standalone editor for the [Ohm](https://github.com/cdglabs/ohm) language.
 
