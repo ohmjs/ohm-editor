@@ -159,7 +159,7 @@
   color: #aaa;
 }
 .pexpr[hidden] {
-  visibility: hidden;
+  display: none;
 }
 .pexpr.unlabeled > .self .label {
   display: none;
