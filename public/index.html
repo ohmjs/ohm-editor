@@ -3,7 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <title>Ohm Editor</title>
-    <script src="https://thirteen-six.ohmjs.org/script.js" data-site="KJSMJZEV" defer></script>
+    <script
+      src="https://thirteen-six.ohmjs.org/script.js"
+      data-site="KJSMJZEV"
+      defer
+    ></script>
     <link rel="stylesheet" href="style/parseTree.css" />
     <link
       rel="stylesheet"
@@ -109,14 +113,13 @@
         width: auto;
       }
 
-      #topSection {
-        display: flex;
-        flex: 1;
-      }
-
+      #topSection,
       #bottomSection {
         display: flex;
-        flex: 1;
+        flex: auto;
+
+        /* Ensure the splitter can make them smaller than their content. */
+        min-height: 0;
       }
 
       #bottomSection .overlay {
@@ -141,13 +144,13 @@
       #visualizerContainer {
         display: flex;
         flex-direction: column;
-        flex: 1;
+        flex: auto;
         overflow: hidden;
       }
 
       #grammarContainer,
       #visualizerContainer {
-        position: relative;
+        position: relative; /* For placing absolutely-positioned overlays */
       }
 
       #exampleContainer[hidden] {

@@ -4,6 +4,10 @@ function toStorageKey(el, suffix) {
   return 'splitter-' + el.id + '-' + suffix;
 }
 
+function ensureUnits(str, unit) {
+  return str.slice(-2) === unit ? str : `${str}${unit}`;
+}
+
 // Initializes a splitter element by patching the DOM and installing event handlers.
 function initializeSplitter(el) {
   const handle = document.createElement('div');
@@ -22,7 +26,7 @@ function initializeSplitter(el) {
   // `which` must be one of 'next' or 'prev'.
   function setSiblingSize(which, value) {
     const node = which === 'prev' ? prevEl : nextEl;
-    node.style.flexGrow = value;
+    node.style.flexBasis = value;
     if (el.id) {
       localStorage.setItem(toStorageKey(el, which), value);
     }
@@ -45,8 +49,8 @@ function initializeSplitter(el) {
     const pos = isVertical ? relativeX : relativeY;
 
     if (dragging && pos > 0 && pos < innerSize) {
-      setSiblingSize('next', innerSize - pos);
-      setSiblingSize('prev', pos);
+      setSiblingSize('next', `${innerSize - pos - 1}px`);
+      setSiblingSize('prev', `${pos}px`);
       e.preventDefault();
       e.stopPropagation();
     }
@@ -58,8 +62,8 @@ function initializeSplitter(el) {
 
   // Reset the sizes to 50% when the handle is double-clicked.
   handle.ondblclick = function (e) {
-    setSiblingSize('next', 1);
-    setSiblingSize('prev', 1);
+    setSiblingSize('next', 'calc(50% - 1px)');
+    setSiblingSize('prev', '50%');
   };
 
   // Restore the sizes from localStorage.
@@ -67,10 +71,10 @@ function initializeSplitter(el) {
     const nextPos = localStorage.getItem(toStorageKey(el, 'next'));
     const prevPos = localStorage.getItem(toStorageKey(el, 'prev'));
     if (nextPos && nextEl) {
-      nextEl.style.flexGrow = nextPos;
+      setSiblingSize('next', ensureUnits(nextPos, 'px'));
     }
     if (prevPos && prevEl) {
-      prevEl.style.flexGrow = prevPos;
+      setSiblingSize('prev', ensureUnits(prevPos, 'px'));
     }
   }
 }

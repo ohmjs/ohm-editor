@@ -1,6 +1,7 @@
 #parseTree {
   display: flex;
-  flex: 1;
+  height: 100%;
+  width: 100%;
 }
 
 #zoomOutButton {
@@ -40,7 +41,7 @@
 }
 
 #parseResults {
-  flex: 1;
+  flex: auto;
   overflow: auto;
   padding: 2px;
 }
@@ -184,7 +185,7 @@
 
 #visualizerBody {
   display: flex;
-  flex: 1;
+  flex: auto;
   flex-direction: column;
   overflow: hidden;
 }
