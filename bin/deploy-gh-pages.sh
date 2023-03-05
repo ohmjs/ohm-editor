@@ -36,6 +36,6 @@ read -p "Do you want to commit to ohmlang.github.io (y/n)? " -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   git pull --ff-only --no-stat
   git add static/editor
-  git commit -m "Update from harc/ohm-editor@${OHM_REV}"
+  git commit -m "Update from ohmjs/ohm-editor@${OHM_REV}"
   git push origin master
 fi

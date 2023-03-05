@@ -53,7 +53,7 @@
   "bin": {
     "ohm-editor": "cli.js"
   },
-  "bugs": "https://github.com/harc/ohm-editor/issues",
+  "bugs": "https://github.com/ohmjs/ohm-editor/issues",
   "contributors": [
     "Alex Warth <alexwarth@gmail.com> (http://tinlizzie.org/~awarth)",
     "Marko Röder <m.roeder@photon-software.de>",
@@ -90,5 +90,5 @@
     "test"
   ],
   "productName": "Ohm Editor",
-  "repository": "https://github.com/harc/ohm-editor"
+  "repository": "https://github.com/ohmjs/ohm-editor"
 }
