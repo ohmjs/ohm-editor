@@ -1,7 +1,7 @@
 /* eslint-env browser */
 /* global GitHub */
 
-import Vue from 'vue';
+import Vue from 'vue/dist/vue.esm.mjs';
 
 import EllipsisDropdownBase from './components/ellipsis-dropdown.vue';
 import {$, $$} from './domUtil';

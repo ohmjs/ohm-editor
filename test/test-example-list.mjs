@@ -23,6 +23,7 @@ const {default: ExampleList} = (
   await import('../src/components/example-list.vue')
 ).default;
 const {default: ohmEditor} = (await import('../src/ohmEditor')).default; // Requires CodeMirror()
+import Vue from 'vue/dist/vue.esm.mjs';
 
 let localStorageExamples;
 

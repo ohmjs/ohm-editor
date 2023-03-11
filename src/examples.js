@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import Vue from 'vue';
+import Vue from 'vue/dist/vue.esm.mjs';
 
 import ExampleListBase from './components/example-list.vue';
 import ohmEditor from './ohmEditor';

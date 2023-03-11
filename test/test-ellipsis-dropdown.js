@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 import {mount} from '@vue/test-utils';
-import Vue from 'vue';
+import Vue from 'vue/dist/vue.esm.mjs';
 
 import EllipsisDropdown from '../src/components/ellipsis-dropdown.vue';
 
