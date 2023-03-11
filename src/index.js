@@ -1,17 +1,17 @@
 /* eslint-env browser */
 /* global CodeMirror, ohm */
 
-import {$, $$} from './domUtil';
-import ohmEditor from './ohmEditor';
+import {$, $$} from './domUtil.js';
+import ohmEditor from './ohmEditor.js';
 
-import './editorErrors';
-import './examples';
-import './externalRules';
-import './parseTree';
-import './ruleHyperlinks';
-import './searchBar';
-import './splitters';
-import './persistence';
+import './editorErrors.js';
+import './examples.js';
+import './externalRules.js';
+import './parseTree.js';
+import './ruleHyperlinks.js';
+import './searchBar.js';
+import './splitters.js';
+import './persistence.js';
 
 let grammarChanged = true;
 let inputChanged = true;

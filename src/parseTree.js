@@ -4,7 +4,7 @@ import CheckedEmitter from 'checked-emitter';
 import Vue from 'vue/dist/vue.esm.mjs';
 
 import ParseTree from './components/parse-tree.vue';
-import ohmEditor from './ohmEditor';
+import ohmEditor from './ohmEditor.js';
 
 const parseTree = (ohmEditor.parseTree = new CheckedEmitter());
 parseTree.vue = new Vue({

@@ -1,7 +1,7 @@
 /* global window */
 
-import * as cmUtil from './cmUtil';
-import ohmEditor from './ohmEditor';
+import * as cmUtil from './cmUtil.js';
+import ohmEditor from './ohmEditor.js';
 
 let grammarEditor;
 let grammarMemoTable;

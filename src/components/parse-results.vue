@@ -1,5 +1,5 @@
 <script>
-import ohmEditor from '../ohmEditor';
+import ohmEditor from '../ohmEditor.js';
 import traceElement from './trace-element.vue';
 
 const EMPTY_LR_INFO = {};

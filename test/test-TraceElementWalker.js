@@ -1,6 +1,6 @@
 import 'global-jsdom/register';
 
-import { test } from 'uvu';
+import {test} from 'uvu';
 import * as assert from 'uvu/assert';
 
 import TraceElementWalker from '../src/TraceElementWalker.js';

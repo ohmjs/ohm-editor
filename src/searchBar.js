@@ -1,7 +1,7 @@
 /* global CodeMirror */
 
-import ohmEditor from './ohmEditor';
-import {$} from './domUtil';
+import ohmEditor from './ohmEditor.js';
+import {$} from './domUtil.js';
 
 // Returns the first ancestor node of `el` that has class `className`.
 function ancestorWithClassName(el, className) {

@@ -25,10 +25,10 @@
 
 <script>
 import Vue from 'vue/dist/vue.esm.mjs';
-import * as cmUtil from '../cmUtil';
-import * as domUtil from '../domUtil';
-import {isLeaf} from '../traceUtil';
-import ohmEditor from '../ohmEditor';
+import * as cmUtil from '../cmUtil.js';
+import * as domUtil from '../domUtil.js';
+import {isLeaf} from '../traceUtil.js';
+import ohmEditor from '../ohmEditor.js';
 
 import expandedInput from './expanded-input.vue';
 import parseResults from './parse-results.vue';

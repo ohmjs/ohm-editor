@@ -1,23 +1,4 @@
-// <style src="../../public/third_party/css/bootstrap-dropdown-3.3.7.css"></style>
-
-/*
-<style>
-button.ellipsis-btn {
-  border: none;
-  font-size: 18px;
-  font-weight: 900;
-  margin-top: 1px;
-  padding: 0 4px;
-}
-button.ellipsis-btn:hover {
-  background-color: #eee;
-  border: none;
-}
-.dropdown-menu {
-  margin-top: 4px;
-}
-</style>
-*/
+import Vue from 'vue/dist/vue.esm.mjs';
 
 const template = `
   <div class="dropdown">
@@ -46,7 +27,7 @@ const template = `
   </div>
 `;
 
-export default {
+export default Vue.component('ellipsis-dropdown', {
   name: 'ellipsis-dropdown',
   template,
   props: {
@@ -88,4 +69,4 @@ export default {
       this.hidden = true;
     },
   },
-};
+});

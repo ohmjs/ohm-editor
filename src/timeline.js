@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
-import * as domUtil from './domUtil';
-import ohmEditor from './ohmEditor';
+import * as domUtil from './domUtil.js';
+import ohmEditor from './ohmEditor.js';
 
 let parsingSteps;
 

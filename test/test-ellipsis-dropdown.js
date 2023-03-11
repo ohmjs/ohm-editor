@@ -1,7 +1,7 @@
 import 'global-jsdom/register';
 
-import {mount} from '@vue/test-utils';
-import { test } from 'uvu';
+import testUtils from '@vue/test-utils';
+import {test} from 'uvu';
 import * as assert from 'uvu/assert';
 import Vue from 'vue/dist/vue.esm.mjs';
 
@@ -19,7 +19,7 @@ function findEl(vm, query) {
 
 test('showing and hiding the dropdown', async () => {
   const counts = {Foo: 0, Bar: 0};
-  const {vm} = mount(EllipsisDropdown, {
+  const {vm} = testUtils.mount(EllipsisDropdown, {
     propsData: {
       items: {
         Foo() {

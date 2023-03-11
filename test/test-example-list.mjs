@@ -1,11 +1,11 @@
-/* global globalThis */
+/* eslint-env node */
 
 import 'global-jsdom/register';
 import './codeMirrorStub.js';
 
-import {mount} from '@vue/test-utils';
+import testUtils from '@vue/test-utils';
 import ohm from 'ohm-js';
-import { test } from 'uvu';
+import {test} from 'uvu';
 import * as assert from 'uvu/assert';
 import Vue from 'vue/dist/vue.esm.mjs';
 
@@ -15,21 +15,21 @@ import ohmEditor from '../src/ohmEditor.js';
 let localStorageExamples;
 
 test.before(async () => {
-  globalThis.localStorage = {
+  global.localStorage = {
     getItem() {
       return '[]';
     },
     setItem(name, value) {
       assert.is(name, 'examples');
       localStorageExamples = JSON.parse(value);
-    }
-  }
+    },
+  };
 });
 
 let wrapper;
 
 test.before.each(() => {
-  wrapper = mount(ExampleList)  
+  wrapper = testUtils.mount(ExampleList);
   ohmEditor.examples.getSelected = wrapper.vm.getSelected;
   simulateGrammarEdit('');
 });
@@ -269,7 +269,8 @@ test('start rule errors', async () => {
 
   simulateGrammarEdit('G {}');
   await flushQueue();
-  assert.is(findEl(vm, '.toolbar .errorIcon').title, 
+  assert.is(
+    findEl(vm, '.toolbar .errorIcon').title,
     'Rule nein is not declared in grammar G'
   );
 
@@ -279,7 +280,8 @@ test('start rule errors', async () => {
 
   vm.setExample(id, '', '', 'nope');
   await flushQueue();
-  assert.is(findEl(vm, '.toolbar .errorIcon').title, 
+  assert.is(
+    findEl(vm, '.toolbar .errorIcon').title,
     'Rule nope is not declared in grammar G'
   );
 
@@ -291,7 +293,8 @@ test('start rule errors', async () => {
   // Try setting a grammar that does not exist.
   vm.setExample(id, '', 'NoSuchGrammar');
   await flushQueue();
-  assert.is(wrapper.find('.toolbar .errorIcon').element.title, 
+  assert.is(
+    wrapper.find('.toolbar .errorIcon').element.title,
     "Unknown grammar 'NoSuchGrammar'"
   );
 });
@@ -309,9 +312,7 @@ test('example editing', async () => {
   assert.is(vm.getSelected().text, ''); // example is not updated after 'change:inputEditor'
 
   // after editing, example is not passing or failing
-  assert.not(
-    li.classList.contains('pass') || li.classList.contains('fail')
-  );
+  assert.not(li.classList.contains('pass') || li.classList.contains('fail'));
 
   ohmEditor.emit('change:input', 'asdf');
   await flushQueue();

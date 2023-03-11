@@ -1,8 +1,8 @@
 /* global document */
 
-import {markInterval} from './cmUtil';
-import {createElement} from './domUtil';
-import ohmEditor from './ohmEditor';
+import {markInterval} from './cmUtil.js';
+import {createElement} from './domUtil.js';
+import ohmEditor from './ohmEditor.js';
 
 const errorMarks = {
   grammar: null,

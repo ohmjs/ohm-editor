@@ -18,7 +18,7 @@
 
 <script>
 /* global window */
-import {isLRBaseCase} from '../traceUtil';
+import {isLRBaseCase} from '../traceUtil.js';
 
 const HORIZONTAL_ELLIPSIS = '\u2026';
 

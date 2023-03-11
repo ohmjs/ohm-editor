@@ -36,10 +36,10 @@
 <script>
 /* global Node, d3, ohm */
 /* eslint-disable no-invalid-this */
-import {$} from '../domUtil';
-import {scrollToInterval} from '../cmUtil';
-import {isLeaf} from '../traceUtil';
-import ohmEditor from '../ohmEditor';
+import {$} from '../domUtil.js';
+import {scrollToInterval} from '../cmUtil.js';
+import {isLeaf} from '../traceUtil.js';
+import ohmEditor from '../ohmEditor.js';
 import traceLabel from './trace-label.vue';
 
 let nextNodeId = 1; // Node 0 is always the root.

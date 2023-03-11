@@ -1,10 +1,10 @@
 /* eslint-env browser */
 /* global ohm */
 
-import {containsInterval} from './cmUtil';
-import {$, $$} from './domUtil';
-import ohmEditor from './ohmEditor';
-import {isPrimitiveRule} from './traceUtil';
+import {containsInterval} from './cmUtil.js';
+import {$, $$} from './domUtil.js';
+import ohmEditor from './ohmEditor.js';
+import {isPrimitiveRule} from './traceUtil.js';
 
 const {ohmGrammar} = ohm;
 const builtInRules = ohm.grammar('G {}').superGrammar;

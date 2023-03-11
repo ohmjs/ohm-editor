@@ -1,0 +1,240 @@
+#exampleList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#addExampleLink {
+  color: #999;
+  font-size: 12px;
+  margin: 6px 12px;
+  text-decoration: none;
+}
+
+#addExampleLink:hover {
+  color: #666;
+  text-decoration: underline;
+}
+
+#exampleList .example {
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  color: #999;
+  margin: 0;
+  white-space: nowrap;
+}
+
+#exampleList .example code {
+  border-left: 4px solid #bbb;
+  cursor: default;
+  flex: 1;
+  overflow: hidden;
+  padding: 6px 8px 6px 8px;
+  text-overflow: ellipsis;
+
+  /* Weirdly, it won't shrink smaller than its content unless we give it an explicit width. */
+  width: 1px;
+}
+
+#exampleList .example.fail code {
+  border-left: 4px solid #d44950;
+}
+
+#exampleList .example.pass code {
+  border-left: 4px solid #58b958;
+}
+
+#exampleList .example.pendingUpdate code {
+  color: #bbb;
+}
+
+#exampleList .example.selected {
+  color: #333;
+  background-color: #f7f7f7;
+}
+
+#exampleList code {
+  font-family: Menlo, Monaco, monospace;
+  font-size: 12px;
+}
+
+#exampleList .example .thumbsUpButton,
+#exampleList .example .delete {
+  cursor: default;
+  padding: 0 4px 0 4px;
+}
+
+#exampleList .example:not(.selected) .thumbsUpButton:not(:hover) {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+#exampleList .example .delete {
+  color: #999;
+  font-size: 12px;
+  margin-right: 4px;
+  visibility: hidden;
+}
+
+#exampleList .example:hover .delete {
+  visibility: visible;
+}
+
+#exampleList .example .delete:hover {
+  color: #666;
+}
+
+@media screen and (min-color-index: 0) and(-webkit-min-device-pixel-ratio:0) {
+  @media {
+    /* Safari 6.1+ ONLY */
+    #exampleList .example .thumbsUpButton {
+      font-size: 12px;
+    }
+  }
+}
+
+/* Firefox 1+ only */
+#exampleList .example .thumbsUpButton,
+x:-moz-any-link {
+  font-size: 16px;
+}
+
+#exampleList .example:hover {
+  background-color: #f7f7f7;
+}
+
+#exampleList code:empty::before {
+  content: '\a0'; /* Insert &nbsp; to keep the correct height. */
+}
+
+.startRule {
+  cursor: default;
+  color: hsl(0, 0%, 75%);
+  font-family: inherit;
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.selected .startRule {
+  color: hsl(0, 0%, 65%);
+}
+
+#startRuleDropdown {
+  min-width: 85px;
+}
+
+#userExampleContainer > .contents {
+  border-top: 1px solid #ddd;
+  flex: 1;
+  overflow: auto;
+  position: relative; /* For positioning #exampleEditor */
+}
+
+#editorOverlay {
+  background-color: rgba(0, 0, 0, 0.03);
+  display: flex;
+  padding: 20px;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+#exampleEditor {
+  background-color: white;
+  border-radius: 3px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+#exampleEditor .header {
+  background-color: #fafafa;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  color: #666;
+  padding: 8px 12px;
+}
+
+#exampleEditor .header .title {
+  flex: 1;
+  font-weight: 200;
+}
+
+#exampleEditor .exampleText {
+  flex: 1;
+}
+
+#exampleEditor > .editorWrapper {
+  border-bottom: 1px solid #eee;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  flex: 1;
+  margin: 0;
+  position: relative;
+}
+
+#exampleEditor .toolbar {
+  padding: 0 12px 0 12px;
+}
+
+#exampleEditor .toolbar .gap {
+  flex: 1;
+}
+
+#exampleEditor .toolbar .errorIcon {
+  cursor: help;
+  font-family: sans-serif; /* Ensures the emoji is shown in color. */
+  font-size: 13px;
+  margin: 0 4px;
+  position: relative;
+}
+
+#exampleEditor .toolbar label {
+  margin-right: 4px;
+  text-align: right;
+}
+
+#exampleEditor .toolbar > .contents {
+  align-items: center;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+#exampleEditor .toolbar .thumbsUpButton {
+  cursor: default;
+  font-size: 16px;
+  margin: 0 4px 0 8px;
+}
+
+#exampleEditor .CodeMirror-lines {
+  padding-bottom: 12px;
+  padding-top: 12px;
+}
+
+#exampleEditor .CodeMirror-lines pre {
+  padding-left: 12px;
+}
+
+#exampleEditor .CodeMirror-placeholder {
+  color: #999;
+}
+
+#exampleEditor.hideInputErrors .error {
+  display: none;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}

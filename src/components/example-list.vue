@@ -44,9 +44,9 @@
 </template>
 
 <script>
-import * as domUtil from '../domUtil';
+import * as domUtil from '../domUtil.js';
 import ExampleEditor from './example-editor.js';
-import ohmEditor from '../ohmEditor';
+import ohmEditor from '../ohmEditor.js';
 import ThumbsUpButton from './thumbs-up-button.js';
 
 let idCounter = 0;

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import {$} from '../domUtil';
+import {$} from '../domUtil.js';
 
 // Helpers
 // -------
