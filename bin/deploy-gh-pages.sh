@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# To run this, you need a checkout of https://github.com/ohmlang/ohmlang.github.io.
+# To run this, you need a checkout of https://github.com/ohmjs/ohmjs.org.
 
-# Accepts an optional argument, which is the path to the ohmlang.github.io repository root.
-# If not specified, it looks for a directory named ohmlang.github.io in the same directory
+# Accepts an optional argument, which is the path to the ohmjs.org repository root.
+# If not specified, it looks for a directory named ohmjs.org in the same directory
 # as this repository.
 
 set -e
@@ -13,7 +13,7 @@ OHM_REV=$(git rev-parse --short main)
 
 PAGES_DIR="$1"
 if [ -z "$1" ]; then
-  PAGES_DIR="$ROOT/../ohmlang.github.io"  # Default if $1 is empty
+  PAGES_DIR="$ROOT/../ohmjs.org"  # Default if $1 is empty
 fi
 
 # Now check that the $PAGES_DIR exists.
@@ -30,7 +30,7 @@ if ! git rev-parse --quiet --verify main > /dev/null; then
   echo "Not a git repository: $PAGES_DIR" && exit 1
 fi
 
-read -p "Do you want to commit to ohmlang.github.io (y/n)? " -n 1 -r
+read -p "Do you want to commit to ohmjs.org (y/n)? " -n 1 -r
 
 # Engage!
 if [[ $REPLY =~ ^[Yy]$ ]]; then
