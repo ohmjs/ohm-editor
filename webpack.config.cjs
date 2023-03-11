@@ -18,7 +18,7 @@ module.exports = {
   },
   resolve: {
     // Use the standalone version of Vue that includes the template compiler.
-    alias: {vue$: 'vue/dist/vue.esm.js'}, // eslint-disable-line quote-props
+    alias: {vue$: 'vue/dist/vue.esm.mjs'}, // eslint-disable-line quote-props
     fallback: {fs: false},
   },
   output: {

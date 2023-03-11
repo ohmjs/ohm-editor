@@ -2,8 +2,8 @@
 
 import Vue from 'vue/dist/vue.esm.mjs';
 
-import ExampleListBase from './components/example-list.vue';
-import ohmEditor from './ohmEditor';
+import ExampleListBase from './components/example-list.js';
+import ohmEditor from './ohmEditor.js';
 
 const ExampleList = Vue.extend(ExampleListBase);
 

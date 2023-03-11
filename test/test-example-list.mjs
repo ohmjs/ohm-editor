@@ -1,55 +1,40 @@
-/* global global */
-/* eslint-env jest */
+/* global globalThis */
+
+import 'global-jsdom/register';
+import './codeMirrorStub.js';
 
 import {mount} from '@vue/test-utils';
-import assert from 'assert';
-import {jest} from '@jest/globals';
 import ohm from 'ohm-js';
-import Vue from 'vue';
-
-// Returns a stub instance of CodeMirror.
-global.CodeMirror = () => {
-  return {
-    focus() {},
-    setOption() {},
-    setValue(val) {},
-  };
-};
-
-// It seems that we need to use dynamic imports in order for the mocked CodeMirror function
-// to take effect — putting it above all imports, or in beforeAll(), doesn't work.
-// Not sure what's up with the "double default" either — but this works.
-const {default: ExampleList} = (
-  await import('../src/components/example-list.vue')
-).default;
-const {default: ohmEditor} = (await import('../src/ohmEditor')).default; // Requires CodeMirror()
+import { test } from 'uvu';
+import * as assert from 'uvu/assert';
 import Vue from 'vue/dist/vue.esm.mjs';
+
+import ExampleList from '../src/components/example-list.js';
+import ohmEditor from '../src/ohmEditor.js';
 
 let localStorageExamples;
 
-beforeAll(() => {
-  jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-    return '[]';
-  });
-  jest.spyOn(Storage.prototype, 'setItem').mockImplementation((name, value) => {
-    assert.equal(name, 'examples');
-    localStorageExamples = JSON.parse(value);
-  });
-});
-
-afterAll(() => {
-  jest.restoreAllMocks();
+test.before(async () => {
+  globalThis.localStorage = {
+    getItem() {
+      return '[]';
+    },
+    setItem(name, value) {
+      assert.is(name, 'examples');
+      localStorageExamples = JSON.parse(value);
+    }
+  }
 });
 
 let wrapper;
 
-beforeEach(() => {
-  wrapper = mount(ExampleList);
+test.before.each(() => {
+  wrapper = mount(ExampleList)  
   ohmEditor.examples.getSelected = wrapper.vm.getSelected;
   simulateGrammarEdit('');
 });
 
-afterEach(() => {
+test.after.each(() => {
   ohmEditor.examples.getSelected = null;
 });
 
@@ -78,11 +63,11 @@ const flushQueue = () => new Promise((cb) => setTimeout(cb, 0));
 
 test('adding and updating examples', async () => {
   const {vm} = wrapper;
-  expect(vm.getSelected()).toEqual(undefined);
+  assert.is(vm.getSelected(), undefined);
 
   const id = vm.addExample();
-  expect(vm.selectedId).toBe(id); // adding selects the new example
-  expect(vm.getSelected()).toEqual({
+  assert.is(vm.selectedId, id); // adding selects the new example
+  assert.equal(vm.getSelected(), {
     text: '',
     selectedGrammar: '',
     startRule: '',
@@ -90,7 +75,7 @@ test('adding and updating examples', async () => {
   });
 
   vm.setExample(id, 'woooo', '', 'Start');
-  expect(vm.getSelected()).toEqual({
+  assert.equal(vm.getSelected(), {
     text: 'woooo',
     selectedGrammar: '',
     startRule: 'Start',
@@ -98,7 +83,7 @@ test('adding and updating examples', async () => {
   });
 
   vm.setExample(id, 'woooo', '', 'Start', false);
-  expect(vm.getSelected()).toEqual({
+  assert.equal(vm.getSelected(), {
     text: 'woooo',
     selectedGrammar: '',
     startRule: 'Start',
@@ -106,8 +91,8 @@ test('adding and updating examples', async () => {
   });
 
   const id2 = vm.addExample();
-  expect(vm.selectedId).toEqual(id2);
-  expect(vm.getSelected()).toEqual({
+  assert.equal(vm.selectedId, id2);
+  assert.equal(vm.getSelected(), {
     text: '',
     selectedGrammar: '',
     startRule: '',
@@ -116,11 +101,11 @@ test('adding and updating examples', async () => {
 
   await simulateGrammarEdit('BestGrammar { start = }');
   const id3 = vm.addExample();
-  expect(vm.selectedId).toEqual(id3);
+  assert.equal(vm.selectedId, id3);
 
   // Once there is a grammar, it will be used as the selectedGrammar for a
   // newly-added example.
-  expect(vm.getSelected()).toEqual({
+  assert.equal(vm.getSelected(), {
     text: '',
     selectedGrammar: 'BestGrammar',
     startRule: '',
@@ -138,19 +123,19 @@ test('deleting', async () => {
 
   await Vue.nextTick();
   vm.deleteExample(id);
-  expect(vm.selectedId).toEqual(null);
-  expect(vm.getSelected()).toEqual(undefined);
+  assert.equal(vm.selectedId, null);
+  assert.equal(vm.getSelected(), undefined);
 
   // Now, add two examples.
   const id1 = vm.addExample();
   let id2 = vm.addExample();
 
   vm.setExample(id1, "hi i'm id1");
-  expect(vm.selectedId).toBe(id2); // the second example is selected
+  assert.is(vm.selectedId, id2); // the second example is selected
 
   await Vue.nextTick();
   vm.deleteExample(id2);
-  expect(vm.selectedId).toBe(id1); // after deleting it, the first example is selected
+  assert.is(vm.selectedId, id1); // after deleting it, the first example is selected
 
   // Now add one more example, and delete the first one.
   id2 = vm.addExample();
@@ -158,11 +143,11 @@ test('deleting', async () => {
 
   await Vue.nextTick();
   vm.deleteExample(id1);
-  expect(vm.selectedId).toBe(id2); // after deleting first example, second is selected
+  assert.is(vm.selectedId, id2); // after deleting first example, second is selected
 
   await Vue.nextTick();
   // localStorage should hold the id2 example.
-  expect(localStorageExamples).toEqual([
+  assert.equal(localStorageExamples, [
     {text: "hi i'm id2", selectedGrammar: '', startRule: '', shouldMatch: true},
   ]);
 });
@@ -175,18 +160,18 @@ test('toggleShouldMatch', async () => {
   vm.toggleShouldMatch(id);
 
   const example = vm.getSelected();
-  expect(example.shouldMatch).toBe(false);
+  assert.is(example.shouldMatch, false);
 
   await Vue.nextTick();
-  expect(localStorageExamples).toEqual([
+  assert.equal(localStorageExamples, [
     {text: '', selectedGrammar: '', startRule: '', shouldMatch: false},
   ]);
 
   vm.toggleShouldMatch(id); // Toggle it back.
-  expect(example.shouldMatch).toBe(true);
+  assert.is(example.shouldMatch, true);
 
   await Vue.nextTick();
-  expect(localStorageExamples).toEqual([
+  assert.equal(localStorageExamples, [
     {text: '', selectedGrammar: '', startRule: '', shouldMatch: true},
   ]);
 });
@@ -198,29 +183,29 @@ test('pass/fail status', async () => {
   await Vue.nextTick();
 
   // status is undefined without a grammar
-  expect(vm.exampleStatus[id].className).toBe('fail');
-  expect(vm.exampleStatus[id].err).toEqual({message: 'No grammar defined'});
+  assert.is(vm.exampleStatus[id].className, 'fail');
+  assert.equal(vm.exampleStatus[id].err, {message: 'No grammar defined'});
 
   await simulateGrammarEdit('G { start = letter+ }');
-  expect(vm.exampleStatus[id].className).toBe('pass');
+  assert.is(vm.exampleStatus[id].className, 'pass');
 
   vm.exampleValues[id].shouldMatch = false;
   await Vue.nextTick();
-  expect(vm.exampleStatus[id].className).toBe('fail');
+  assert.is(vm.exampleStatus[id].className, 'fail');
 
   await simulateGrammarEdit('G { start = digit+ }');
-  expect(vm.exampleStatus[id].className).toBe('pass');
+  assert.is(vm.exampleStatus[id].className, 'pass');
 
   const id2 = vm.addExample();
   vm.setExample(id2, '123');
   await Vue.nextTick();
-  expect(vm.exampleStatus[id2].className).toBe('pass');
+  assert.is(vm.exampleStatus[id2].className, 'pass');
 
   ohmEditor.emit('change:grammars', '');
 
   await Vue.nextTick();
   for (const k of Object.keys(vm.exampleStatus)) {
-    expect(vm.exampleStatus[k]).toBeUndefined();
+    assert.is(vm.exampleStatus[k], undefined);
   }
 });
 
@@ -229,52 +214,52 @@ test('start rule text', async () => {
   const id = vm.addExample();
 
   await simulateGrammarEdit('G { start = letter }');
-  expect(findEl(vm, '.startRule').textContent).toBe('');
+  assert.is(findEl(vm, '.startRule').textContent, 'G ▸ (default)');
 
   vm.setExample(id, '', '', 'noSuchRule');
   await Vue.nextTick();
-  expect(findEl(vm, '.startRule').textContent).toBe('noSuchRule');
+  assert.is(findEl(vm, '.startRule').textContent, 'noSuchRule');
 
   vm.setExample(id, '', 'MyGrammar', 'start');
   await Vue.nextTick();
-  expect(findEl(vm, '.startRule').textContent).toBe('MyGrammar ▸ start');
+  assert.is(findEl(vm, '.startRule').textContent, 'MyGrammar ▸ start');
 
   await simulateGrammarEdit('');
-  expect(findEl(vm, '.startRule').textContent).toBe('MyGrammar ▸ start');
+  assert.is(findEl(vm, '.startRule').textContent, 'MyGrammar ▸ start');
 });
 
 test('start rule dropdown', async () => {
   const {vm} = wrapper;
   const id = vm.addExample();
-  expect(vm.selectedId).toBe(id);
+  assert.is(vm.selectedId, id);
 
   await Vue.nextTick();
 
   // Note: we need to call `find` again each time the dropdown gets re-rendered.
   let dropdown = wrapper.find('#startRuleDropdown');
-  expect(dropdown.element.value).toBe('.');
-  expect(getDropdownOptionValues(dropdown)).toEqual(['.']);
+  assert.is(dropdown.element.value, '.');
+  assert.equal(getDropdownOptionValues(dropdown), ['.']);
 
   await simulateGrammarEdit('G { start = letter }');
   dropdown = wrapper.find('#startRuleDropdown');
-  expect(getDropdownOptionValues(dropdown)).toEqual(['.', 'G.', 'G.start']);
-  expect(dropdown.element.value).toBe('.');
-  expect(vm.getSelected().selectedGrammar).toBe('');
+  assert.equal(getDropdownOptionValues(dropdown), ['.', 'G.', 'G.start']);
+  assert.is(dropdown.element.value, '.');
+  assert.is(vm.getSelected().selectedGrammar, '');
 
   // Ensure the example is updated a new value is selected in the dropdown.
   wrapper.find('#startRuleDropdown').setValue('G.');
   const {selectedGrammar, startRule} = vm.getSelected();
-  expect(selectedGrammar).toBe('G');
-  expect(startRule).toBe('');
+  assert.is(selectedGrammar, 'G');
+  assert.is(startRule, '');
 
   // Removing the grammar G doesn't affect the selected option.
   await simulateGrammarEdit('G2 { start = letter }');
   dropdown = wrapper.find('#startRuleDropdown');
-  expect(vm.getSelected().selectedGrammar).toBe('G');
-  expect(dropdown.element.value).toBe('G.');
+  assert.is(vm.getSelected().selectedGrammar, 'G');
+  assert.is(dropdown.element.value, 'G.');
 
   // ...but the unselected options should be updated.
-  expect(getDropdownOptionValues(dropdown)).toEqual(['G.', 'G2.', 'G2.start']);
+  assert.equal(getDropdownOptionValues(dropdown), ['G.', 'G2.', 'G2.start']);
 });
 
 test('start rule errors', async () => {
@@ -284,29 +269,29 @@ test('start rule errors', async () => {
 
   simulateGrammarEdit('G {}');
   await flushQueue();
-  expect(findEl(vm, '.toolbar .errorIcon').title).toBe(
+  assert.is(findEl(vm, '.toolbar .errorIcon').title, 
     'Rule nein is not declared in grammar G'
   );
 
   simulateGrammarEdit('G { nein = }');
   await flushQueue();
-  expect(findEl(vm, '.toolbar .errorIcon')).toBeFalsy(); // error disappears when rule exists
+  assert.not(findEl(vm, '.toolbar .errorIcon')); // error disappears when rule exists
 
   vm.setExample(id, '', '', 'nope');
   await flushQueue();
-  expect(findEl(vm, '.toolbar .errorIcon').title).toBe(
+  assert.is(findEl(vm, '.toolbar .errorIcon').title, 
     'Rule nope is not declared in grammar G'
   );
 
   vm.setExample(id, '', '', '');
   await flushQueue();
   // error disappears when example uses default start rule
-  expect(findEl(vm, '.toolbar .errorIcon')).toBeFalsy();
+  assert.not(findEl(vm, '.toolbar .errorIcon'));
 
   // Try setting a grammar that does not exist.
   vm.setExample(id, '', 'NoSuchGrammar');
   await flushQueue();
-  expect(wrapper.find('.toolbar .errorIcon').element.title).toBe(
+  assert.is(wrapper.find('.toolbar .errorIcon').element.title, 
     "Unknown grammar 'NoSuchGrammar'"
   );
 });
@@ -317,21 +302,21 @@ test('example editing', async () => {
   simulateGrammarEdit('G { start = letter* }');
   await flushQueue();
   const li = findEl(vm, 'li');
-  expect(li.classList.contains('pass')).toBeTruthy();
+  assert.ok(li.classList.contains('pass'));
 
   ohmEditor.emit('change:inputEditor', 'asdf');
   await flushQueue();
-  expect(vm.getSelected().text).toBe(''); // example is not updated after 'change:inputEditor'
+  assert.is(vm.getSelected().text, ''); // example is not updated after 'change:inputEditor'
 
   // after editing, example is not passing or failing
-  expect(
+  assert.not(
     li.classList.contains('pass') || li.classList.contains('fail')
-  ).toBeFalsy();
+  );
 
   ohmEditor.emit('change:input', 'asdf');
   await flushQueue();
-  expect(vm.getSelected().text).toBe('asdf'); // example is updated after 'change:input' event
-  expect(li.classList.contains('pass')).toBeTruthy(); // test is shown as passing again
+  assert.is(vm.getSelected().text, 'asdf'); // example is updated after 'change:input' event
+  assert.ok(li.classList.contains('pass')); // test is shown as passing again
 });
 
 test('thumbs up button', async () => {
@@ -339,11 +324,11 @@ test('thumbs up button', async () => {
   const id = vm.addExample();
   simulateGrammarEdit('G { start = any }');
   await flushQueue();
-  expect(vm.exampleStatus[id].className).toBe('fail'); // initially fails
+  assert.is(vm.exampleStatus[id].className, 'fail'); // initially fails
 
   findEl(vm, '.thumbsUpButton').click(); // Fake a button click.
   await flushQueue();
-  expect(vm.exampleStatus[id].className).toBe('pass'); // passes after toggling
+  assert.is(vm.exampleStatus[id].className, 'pass'); // passes after toggling
 });
 
 test('editor - thumbs up button', async () => {
@@ -351,9 +336,11 @@ test('editor - thumbs up button', async () => {
   const id = vm.addExample();
   simulateGrammarEdit('G { start = any }');
   await flushQueue();
-  expect(vm.exampleStatus[id].className).toBe('fail'); // initially fails
+  assert.is(vm.exampleStatus[id].className, 'fail'); // initially fails
 
   findEl(vm, '#exampleEditor .thumbsUpButton').click(); // Fake a button click.
   await flushQueue();
-  expect(vm.exampleStatus[id].className).toBe('pass'); // passes after toggling
+  assert.is(vm.exampleStatus[id].className, 'pass'); // passes after toggling
 });
+
+test.run();

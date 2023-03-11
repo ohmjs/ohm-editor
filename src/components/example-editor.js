@@ -1,4 +1,4 @@
-<template>
+const template = `
   <transition name="fade">
     <div id="editorOverlay" v-show="editing">
       <div id="exampleEditor" :class="classObj">
@@ -54,20 +54,22 @@
       </div>
     </div>
   </transition>
-</template>
+`;
 
-<script>
 /* global CodeMirror */
 
-import * as domUtil from '../domUtil';
-import ohmEditor from '../ohmEditor';
-import ThumbsUpButton from './thumbs-up-button.vue';
+import * as domUtil from '../domUtil.js';
+import ohmEditor from '../ohmEditor.js';
+import ThumbsUpButton from './thumbs-up-button.js';
+
+import Vue from 'vue/dist/vue.esm.mjs';
 
 const toOptValue = (grammarName, startRule) =>
   `${grammarName || ''}.${startRule || ''}`;
 
-export default {
+export default Vue.component('example-editor', {
   name: 'example-editor',
+  template,
   components: {
     'thumbs-up-button': ThumbsUpButton,
   },
@@ -217,5 +219,4 @@ export default {
       return options;
     },
   },
-};
-</script>
+});

@@ -1,6 +1,4 @@
-<style src="./example-list.css"></style>
-
-<template>
+const template = `
   <div id="exampleContainer">
     <div id="userExampleContainer">
       <div class="section-head flex-row">
@@ -41,13 +39,14 @@
       </div>
     </div>
   </div>
-</template>
+`;
 
-<script>
-import * as domUtil from '../domUtil';
+import * as domUtil from '../domUtil.js';
 import ExampleEditor from './example-editor.js';
-import ohmEditor from '../ohmEditor';
+import ohmEditor from '../ohmEditor.js';
 import ThumbsUpButton from './thumbs-up-button.js';
+
+import Vue from 'vue/dist/vue.esm.mjs';
 
 let idCounter = 0;
 
@@ -68,8 +67,9 @@ const EXAMPLE_DEFAULTS = {
 // Exports
 // -------
 
-export default {
+export default Vue.component('example-list', {
   name: 'example-list',
+  template,
   components: {
     'example-editor': ExampleEditor,
     'thumbs-up-button': ThumbsUpButton,
@@ -398,5 +398,4 @@ export default {
       }
     });
   },
-};
-</script>
+});
