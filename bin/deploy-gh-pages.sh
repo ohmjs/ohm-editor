@@ -9,7 +9,7 @@
 set -e
 
 ROOT=$(npm prefix)
-OHM_REV=$(git rev-parse --short master)
+OHM_REV=$(git rev-parse --short main)
 
 PAGES_DIR="$1"
 if [ -z "$1" ]; then
@@ -26,7 +26,7 @@ fi
 
 # Double check that $PAGES_DIR is actually a git repo.
 pushd "$PAGES_DIR"
-if ! git rev-parse --quiet --verify master > /dev/null; then
+if ! git rev-parse --quiet --verify main > /dev/null; then
   echo "Not a git repository: $PAGES_DIR" && exit 1
 fi
 
@@ -37,5 +37,5 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   git pull --ff-only --no-stat
   git add static/editor
   git commit -m "Update from ohmjs/ohm-editor@${OHM_REV}"
-  git push origin master
+  git push origin main
 fi
