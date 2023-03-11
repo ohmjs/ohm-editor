@@ -124,4 +124,4 @@ TraceElementWalker.prototype.stepOut = function (node) {
   this.exitingCurrentNode = this._isOnInteriorNode();
 };
 
-module.exports = TraceElementWalker;
+export default TraceElementWalker;
