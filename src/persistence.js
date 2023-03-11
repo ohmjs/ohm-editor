@@ -3,7 +3,7 @@
 
 import Vue from 'vue/dist/vue.esm.mjs';
 
-import EllipsisDropdownBase from './components/ellipsis-dropdown.vue';
+import EllipsisDropdownBase from './components/ellipsis-dropdown.js';
 import {$, $$} from './domUtil';
 import ohmEditor from './ohmEditor';
 

@@ -12,7 +12,7 @@
     "format": "prettier --write . && npm run lint -- --fix",
     "postinstall": "true",
     "start": "webpack serve --mode development",
-    "test": "node --experimental-vm-modules ./node_modules/.bin/vue-cli-service test:unit"
+    "test": "uvu test 'test-.*'"
   },
   "main": "index.js",
   "devDependencies": {

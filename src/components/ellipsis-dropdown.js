@@ -1,5 +1,6 @@
-<style src="../../public/third_party/css/bootstrap-dropdown-3.3.7.css"></style>
+// <style src="../../public/third_party/css/bootstrap-dropdown-3.3.7.css"></style>
 
+/*
 <style>
 button.ellipsis-btn {
   border: none;
@@ -16,8 +17,9 @@ button.ellipsis-btn:hover {
   margin-top: 4px;
 }
 </style>
+*/
 
-<template>
+const template = `
   <div class="dropdown">
     <button
       class="outline-btn ellipsis-btn"
@@ -42,11 +44,11 @@ button.ellipsis-btn:hover {
       </li>
     </ul>
   </div>
-</template>
+`;
 
-<script>
 export default {
   name: 'ellipsis-dropdown',
+  template,
   props: {
     // Specifies the menu items. Format is {<label>: <callback>, ...}
     // If the callback is null, the item will be disabled.
@@ -87,4 +89,3 @@ export default {
     },
   },
 };
-</script>
