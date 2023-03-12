@@ -3,11 +3,15 @@ const template = `
     <div id="userExampleContainer">
       <div class="section-head flex-row">
         <h2>Examples</h2>
-        <button class="outline-btn" @click="handleAddClick">+&nbsp;Add</button>
+        <button
+          aria-label="Add example"
+          class="outline-btn"
+          @click="handleAddClick"
+        >+&nbsp;Add</button>
       </div>
 
       <div class="contents">
-        <ul id="exampleList">
+        <ul id="exampleList" aria-label="Examples">
           <li
             v-for="(ex, id) in exampleValues"
             :id="id"

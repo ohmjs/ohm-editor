@@ -1,0 +1,391 @@
+{
+  "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe",
+  "forks_url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/forks",
+  "commits_url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/commits",
+  "id": "0a9a649c3c630fd0a470ba6cb75393fe",
+  "node_id": "MDQ6R2lzdDBhOWE2NDljM2M2MzBmZDBhNDcwYmE2Y2I3NTM5M2Zl",
+  "git_pull_url": "https://gist.github.com/0a9a649c3c630fd0a470ba6cb75393fe.git",
+  "git_push_url": "https://gist.github.com/0a9a649c3c630fd0a470ba6cb75393fe.git",
+  "html_url": "https://gist.github.com/0a9a649c3c630fd0a470ba6cb75393fe",
+  "files": {
+    "ES5.json": {
+      "filename": "ES5.json",
+      "type": "application/json",
+      "language": "JSON",
+      "raw_url": "https://gist.githubusercontent.com/ohm-official/0a9a649c3c630fd0a470ba6cb75393fe/raw/a927abb39d2dc66f25fa255c6cbfa0da3ea5fbd5/ES5.json",
+      "size": 741,
+      "truncated": false,
+      "content": "[\n  {\n    \"text\": \"var x = 3;\",\n    \"startRule\": null,\n    \"shouldMatch\": true\n  },\n  {\n    \"text\": \"() => 'not supported'\",\n    \"startRule\": null,\n    \"shouldMatch\": false\n  },\n  {\n    \"text\": \"(function(){var x\\nreturn 99 + 2 - 3});\",\n    \"startRule\": null,\n    \"shouldMatch\": true\n  },\n  {\n    \"text\": \"1.2395e1337\",\n    \"startRule\": \"numericLiteral\",\n    \"shouldMatch\": true\n  },\n  {\n    \"text\": \"for(;;)break;\",\n    \"startRule\": \"IterationStatement\",\n    \"shouldMatch\": true\n  },\n  {\n    \"text\": \"\",\n    \"startRule\": null,\n    \"shouldMatch\": true\n  },\n  {\n    \"text\": \"/* Just a comment */\",\n    \"startRule\": null,\n    \"shouldMatch\": true\n  },\n  {\n    \"text\": \"/* Unclosed comment\",\n    \"startRule\": null,\n    \"shouldMatch\": false\n  }\n]"
+    },
+    "ES5.ohm": {
+      "filename": "ES5.ohm",
+      "type": "text/plain",
+      "language": null,
+      "raw_url": "https://gist.githubusercontent.com/ohm-official/0a9a649c3c630fd0a470ba6cb75393fe/raw/ecf28e18611772a9e7c0acd7a47250d444648dfc/ES5.ohm",
+      "size": 21563,
+      "truncated": false,
+      "content": "ES5 {\n\n  Program = &(Directive*) SourceElement*\n\n  // §A.1 Lexical Grammar -- https://es5.github.io/#A.1\n\n  /*\n    Note: the following lexical conventions (see https://es5.github.io/#x7)\n    are not implemented in this parser.\n\n    // Goal production in contexts where a leading \"/\" or \"/=\" is permitted:\n    InputElementDiv = whitespace | lineTerminator | comment | token | DivPunctuator\n\n    // Goal production in contexts where a leading \"/\" or \"/=' is not permitted:\n    InputElementRegExp = whitespace | lineTerminator | comment | token | regularExpressionLiteral\n  */\n\n  sourceCharacter = any\n\n  // Override Ohm's built-in definition of space.\n  space := whitespace | lineTerminator | comment\n\n  whitespace = \"\\t\"\n             | \"\\x0B\"    -- verticalTab\n             | \"\\x0C\"    -- formFeed\n             | \" \"\n             | \"\\u00A0\"  -- noBreakSpace\n             | \"\\uFEFF\"  -- byteOrderMark\n             | unicodeSpaceSeparator\n\n  lineTerminator = \"\\n\" | \"\\r\" | \"\\u2028\" | \"\\u2029\"\n  lineTerminatorSequence = \"\\n\" | \"\\r\" ~\"\\n\" | \"\\u2028\" | \"\\u2029\" | \"\\r\\n\"\n\n  comment = multiLineComment | singleLineComment\n\n  multiLineComment = \"/*\" (~\"*/\" sourceCharacter)* \"*/\"\n  singleLineComment = \"//\" (~lineTerminator sourceCharacter)*\n\n  identifier (an identifier) = ~reservedWord identifierName\n  identifierName = identifierStart identifierPart*\n\n  identifierStart = letter | \"$\" | \"_\"\n                  | \"\\\\\" unicodeEscapeSequence -- escaped\n  identifierPart = identifierStart | unicodeCombiningMark\n                 | unicodeDigit | unicodeConnectorPunctuation\n                 | \"\\u200C\" | \"\\u200D\"\n  letter += unicodeCategoryNl\n  unicodeCategoryNl\n    = \"\\u2160\"..\"\\u2182\" | \"\\u3007\" | \"\\u3021\"..\"\\u3029\"\n  unicodeDigit (a digit)\n    = \"\\u0030\"..\"\\u0039\" | \"\\u0660\"..\"\\u0669\" | \"\\u06F0\"..\"\\u06F9\" | \"\\u0966\"..\"\\u096F\" | \"\\u09E6\"..\"\\u09EF\" | \"\\u0A66\"..\"\\u0A6F\" | \"\\u0AE6\"..\"\\u0AEF\" | \"\\u0B66\"..\"\\u0B6F\" | \"\\u0BE7\"..\"\\u0BEF\" | \"\\u0C66\"..\"\\u0C6F\" | \"\\u0CE6\"..\"\\u0CEF\" | \"\\u0D66\"..\"\\u0D6F\" | \"\\u0E50\"..\"\\u0E59\" | \"\\u0ED0\"..\"\\u0ED9\" | \"\\u0F20\"..\"\\u0F29\" | \"\\uFF10\"..\"\\uFF19\"\n\n  unicodeCombiningMark (a Unicode combining mark)\n    = \"\\u0300\"..\"\\u0345\" | \"\\u0360\"..\"\\u0361\" | \"\\u0483\"..\"\\u0486\" | \"\\u0591\"..\"\\u05A1\" | \"\\u05A3\"..\"\\u05B9\" | \"\\u05BB\"..\"\\u05BD\" | \"\\u05BF\"..\"\\u05BF\" | \"\\u05C1\"..\"\\u05C2\" | \"\\u05C4\"..\"\\u05C4\" | \"\\u064B\"..\"\\u0652\" | \"\\u0670\"..\"\\u0670\" | \"\\u06D6\"..\"\\u06DC\" | \"\\u06DF\"..\"\\u06E4\" | \"\\u06E7\"..\"\\u06E8\" | \"\\u06EA\"..\"\\u06ED\" | \"\\u0901\"..\"\\u0902\" | \"\\u093C\"..\"\\u093C\" | \"\\u0941\"..\"\\u0948\" | \"\\u094D\"..\"\\u094D\" | \"\\u0951\"..\"\\u0954\" | \"\\u0962\"..\"\\u0963\" | \"\\u0981\"..\"\\u0981\" | \"\\u09BC\"..\"\\u09BC\" | \"\\u09C1\"..\"\\u09C4\" | \"\\u09CD\"..\"\\u09CD\" | \"\\u09E2\"..\"\\u09E3\" | \"\\u0A02\"..\"\\u0A02\" | \"\\u0A3C\"..\"\\u0A3C\" | \"\\u0A41\"..\"\\u0A42\" | \"\\u0A47\"..\"\\u0A48\" | \"\\u0A4B\"..\"\\u0A4D\" | \"\\u0A70\"..\"\\u0A71\" | \"\\u0A81\"..\"\\u0A82\" | \"\\u0ABC\"..\"\\u0ABC\" | \"\\u0AC1\"..\"\\u0AC5\" | \"\\u0AC7\"..\"\\u0AC8\" | \"\\u0ACD\"..\"\\u0ACD\" | \"\\u0B01\"..\"\\u0B01\" | \"\\u0B3C\"..\"\\u0B3C\" | \"\\u0B3F\"..\"\\u0B3F\" | \"\\u0B41\"..\"\\u0B43\" | \"\\u0B4D\"..\"\\u0B4D\" | \"\\u0B56\"..\"\\u0B56\" | \"\\u0B82\"..\"\\u0B82\" | \"\\u0BC0\"..\"\\u0BC0\" | \"\\u0BCD\"..\"\\u0BCD\" | \"\\u0C3E\"..\"\\u0C40\" | \"\\u0C46\"..\"\\u0C48\" | \"\\u0C4A\"..\"\\u0C4D\" | \"\\u0C55\"..\"\\u0C56\" | \"\\u0CBF\"..\"\\u0CBF\" | \"\\u0CC6\"..\"\\u0CC6\" | \"\\u0CCC\"..\"\\u0CCD\" | \"\\u0D41\"..\"\\u0D43\" | \"\\u0D4D\"..\"\\u0D4D\" | \"\\u0E31\"..\"\\u0E31\" | \"\\u0E34\"..\"\\u0E3A\" | \"\\u0E47\"..\"\\u0E4E\" | \"\\u0EB1\"..\"\\u0EB1\" | \"\\u0EB4\"..\"\\u0EB9\" | \"\\u0EBB\"..\"\\u0EBC\" | \"\\u0EC8\"..\"\\u0ECD\" | \"\\u0F18\"..\"\\u0F19\" | \"\\u0F35\"..\"\\u0F35\" | \"\\u0F37\"..\"\\u0F37\" | \"\\u0F39\"..\"\\u0F39\" | \"\\u0F71\"..\"\\u0F7E\" | \"\\u0F80\"..\"\\u0F84\" | \"\\u0F86\"..\"\\u0F87\" | \"\\u0F90\"..\"\\u0F95\" | \"\\u0F97\"..\"\\u0F97\" | \"\\u0F99\"..\"\\u0FAD\" | \"\\u0FB1\"..\"\\u0FB7\" | \"\\u0FB9\"..\"\\u0FB9\" | \"\\u20D0\"..\"\\u20DC\" | \"\\u20E1\"..\"\\u20E1\" | \"\\u302A\"..\"\\u302F\" | \"\\u3099\"..\"\\u309A\" | \"\\uFB1E\"..\"\\uFB1E\" | \"\\uFE20\"..\"\\uFE23\"\n\n  unicodeConnectorPunctuation = \"\\u005F\" | \"\\u203F\"..\"\\u2040\" | \"\\u30FB\" | \"\\uFE33\"..\"\\uFE34\" | \"\\uFE4D\"..\"\\uFE4F\" | \"\\uFF3F\" | \"\\uFF65\"\n  unicodeSpaceSeparator = \"\\u2000\"..\"\\u200B\" | \"\\u3000\"\n\n  reservedWord = keyword | futureReservedWord | nullLiteral | booleanLiteral\n\n  // Note: keywords that are the complete prefix of another keyword should\n  // be prioritized (e.g. 'in' should come before 'instanceof')\n  keyword = break    | do        | instanceof | typeof\n          | case     | else      | new        | var\n          | catch    | finally   | return     | void\n          | continue | for       | switch     | while\n          | debugger | function  | this       | with\n          | default  | if        | throw\n          | delete   | in        | try\n\n  futureReservedWordLax = class  | enum  | extends\n                        | super  | const | export\n                        | import\n\n  futureReservedWordStrict = futureReservedWordLax\n                           | implements | let     | private   | public\n                           | interface  | package | protected | static\n                           | yield\n\n  futureReservedWord = futureReservedWordStrict\n\n  /*\n    Note: Punctuator and DivPunctuator (see https://es5.github.io/x7.html#x7.7) are\n    not currently used by this grammar.\n  */\n\n  literal = nullLiteral | booleanLiteral | numericLiteral\n          | stringLiteral | regularExpressionLiteral // spec forgot Regexp literals in appendix?\n  nullLiteral = \"null\" ~identifierPart\n  booleanLiteral = (\"true\" | \"false\") ~identifierPart\n\n  // For semantics on how decimal literals are constructed, see section 7.8.3\n\n  // Note that the ordering of hexIntegerLiteral and decimalLiteral is reversed w.r.t. the spec\n  // This is intentional: the order decimalLiteral | hexIntegerLiteral will parse\n  // \"0x...\" as a decimal literal \"0\" followed by \"x...\"\n  numericLiteral = octalIntegerLiteral | hexIntegerLiteral | decimalLiteral\n\n  decimalLiteral = decimalIntegerLiteral \".\" decimalDigit* exponentPart -- bothParts\n                 |                       \".\" decimalDigit+ exponentPart -- decimalsOnly\n                 | decimalIntegerLiteral                   exponentPart -- integerOnly\n\n  decimalIntegerLiteral = nonZeroDigit decimalDigit*  -- nonZero\n                        | \"0\"                         -- zero\n  decimalDigit = \"0\"..\"9\"\n  nonZeroDigit = \"1\"..\"9\"\n\n  exponentPart = exponentIndicator signedInteger -- present\n               |                                 -- absent\n  exponentIndicator = \"e\" | \"E\"\n  signedInteger = \"+\" decimalDigit* -- positive\n                | \"-\" decimalDigit* -- negative\n                |     decimalDigit+ -- noSign\n\n  hexIntegerLiteral = \"0x\" hexDigit+\n                    | \"0X\" hexDigit+\n\n  // hexDigit defined in Ohm's built-in rules (otherwise: hexDigit = \"0\"..\"9\" | \"a\"..\"f\" | \"A\"..\"F\")\n\n  octalIntegerLiteral = \"0\" octalDigit+\n\n  octalDigit = \"0\"..\"7\"\n\n  // For semantics on how string literals are constructed, see section 7.8.4\n  stringLiteral = \"\\\"\" doubleStringCharacter* \"\\\"\"\n                | \"'\" singleStringCharacter* \"'\"\n  doubleStringCharacter = ~(\"\\\"\" | \"\\\\\" | lineTerminator) sourceCharacter -- nonEscaped\n                        | \"\\\\\" escapeSequence                             -- escaped\n                        | lineContinuation                                -- lineContinuation\n  singleStringCharacter = ~(\"'\" | \"\\\\\" | lineTerminator) sourceCharacter -- nonEscaped\n                        | \"\\\\\" escapeSequence                            -- escaped\n                        | lineContinuation                               -- lineContinuation\n  lineContinuation = \"\\\\\" lineTerminatorSequence\n  escapeSequence = unicodeEscapeSequence\n                 | hexEscapeSequence\n                 | octalEscapeSequence\n                 | characterEscapeSequence  // Must come last.\n  characterEscapeSequence = singleEscapeCharacter\n                          | nonEscapeCharacter\n  singleEscapeCharacter = \"'\" | \"\\\"\" | \"\\\\\" | \"b\" | \"f\" | \"n\" | \"r\" | \"t\" | \"v\"\n  nonEscapeCharacter = ~(escapeCharacter | lineTerminator) sourceCharacter\n  escapeCharacter = singleEscapeCharacter | decimalDigit | \"x\" | \"u\"\n  octalEscapeSequence = zeroToThree octalDigit octalDigit    -- whole\n                      | fourToSeven octalDigit               -- eightTimesfourToSeven\n                      | zeroToThree octalDigit ~decimalDigit -- eightTimesZeroToThree\n                      | octalDigit ~decimalDigit             -- octal\n  hexEscapeSequence = \"x\" hexDigit hexDigit\n  unicodeEscapeSequence = \"u\" hexDigit hexDigit hexDigit hexDigit\n\n  zeroToThree = \"0\"..\"3\"\n  fourToSeven = \"4\"..\"7\"\n\n  // §7.8.5 Regular Expression Literals -- https://es5.github.io/#x7.8.5\n\n  regularExpressionLiteral = \"/\" regularExpressionBody \"/\" regularExpressionFlags\n  regularExpressionBody = regularExpressionFirstChar regularExpressionChar*\n  regularExpressionFirstChar = ~(\"*\" | \"\\\\\" | \"/\" | \"[\") regularExpressionNonTerminator\n                             | regularExpressionBackslashSequence\n                             | regularExpressionClass\n  regularExpressionChar = ~(\"\\\\\" | \"/\" | \"[\") regularExpressionNonTerminator\n                        | regularExpressionBackslashSequence\n                        | regularExpressionClass\n  regularExpressionBackslashSequence = \"\\\\\" regularExpressionNonTerminator\n  regularExpressionNonTerminator = ~(lineTerminator) sourceCharacter\n  regularExpressionClass = \"[\" regularExpressionClassChar* \"]\"\n  regularExpressionClassChar = ~(\"]\" | \"\\\\\") regularExpressionNonTerminator\n                             | regularExpressionBackslashSequence\n  regularExpressionFlags = identifierPart*\n\n  // === Implementation-level rules (not part of the spec) ===\n\n  multiLineCommentNoNL = \"/*\" (~(\"*/\" | lineTerminator) sourceCharacter)* \"*/\"\n\n  // does not accept lineTerminators, not even implicit ones in a multiLineComment (cf. section 7.4)\n  spacesNoNL = (whitespace | singleLineComment | multiLineCommentNoNL)*\n\n  // A semicolon is \"automatically inserted\" if a newline or the end of the input stream is\n  // reached, or the offending token is \"}\".\n  // See https://es5.github.io/#x7.9 for more information.\n  // NOTE: Applications of this rule *must* appear in a lexical context -- either in the body of a\n  // lexical rule, or inside `#()`.\n  sc = space* (\";\" | end)\n     | spacesNoNL (lineTerminator | ~multiLineCommentNoNL multiLineComment | &\"}\")\n\n  // Convenience rules for parsing keyword tokens.\n  break = \"break\" ~identifierPart\n  do = \"do\" ~identifierPart\n  instanceof = \"instanceof\" ~identifierPart\n  typeof = \"typeof\" ~identifierPart\n  case = \"case\" ~identifierPart\n  else = \"else\" ~identifierPart\n  new = \"new\" ~identifierPart\n  var = \"var\" ~identifierPart\n  catch = \"catch\" ~identifierPart\n  finally = \"finally\" ~identifierPart\n  return = \"return\" ~identifierPart\n  void = \"void\" ~identifierPart\n  continue = \"continue\" ~identifierPart\n  for = \"for\" ~identifierPart\n  switch = \"switch\" ~identifierPart\n  while = \"while\" ~identifierPart\n  debugger = \"debugger\" ~identifierPart\n  function = \"function\" ~identifierPart\n  this = \"this\" ~identifierPart\n  with = \"with\" ~identifierPart\n  default = \"default\" ~identifierPart\n  if = \"if\" ~identifierPart\n  throw = \"throw\" ~identifierPart\n  delete = \"delete\" ~identifierPart\n  in = \"in\" ~identifierPart\n  try = \"try\" ~identifierPart\n  get = \"get\" ~identifierPart\n  set = \"set\" ~identifierPart\n  class = \"class\" ~identifierPart\n  enum = \"enum\" ~identifierPart\n  extends = \"extends\" ~identifierPart\n  super = \"super\" ~identifierPart\n  const = \"const\" ~identifierPart\n  export = \"export\" ~identifierPart\n  import = \"import\" ~identifierPart\n  implements = \"implements\" ~identifierPart\n  let = \"let\" ~identifierPart\n  private = \"private\" ~identifierPart\n  public = \"public\" ~identifierPart\n  interface = \"interface\" ~identifierPart\n  package = \"package\" ~identifierPart\n  protected = \"protected\" ~identifierPart\n  static = \"static\" ~identifierPart\n  yield = \"yield\" ~identifierPart\n  \n  // end of lexical rules\n\n  noIn = ~in\n  withIn =\n\n  // §A.3 Expressions -- https://es5.github.io/#A.3\n\n  PrimaryExpression = this\n                    | identifier\n                    | literal\n                      // ( litToken.type === \"regexp\"\n                      //   ? this.ast(_fromIdx, \"RegExpExpr\",{body:  litToken.value.body\n                      //                            flags: litToken.value.flags}, [])\n                      //   : this.ast(_fromIdx, \"LiteralExpr\",{type:  litToken.type\n                      //                             value: litToken.value}, []) )\n                    | ArrayLiteral\n                    | ObjectLiteral\n                    | \"(\" Expression<withIn> \")\"  -- parenExpr\n\n  ArrayLiteral = \"[\" ListOf<AssignmentExpressionOrElision, \",\"> \"]\"\n  AssignmentExpressionOrElision = AssignmentExpression<withIn>\n                                |                       -- elision\n\n  ObjectLiteral = \"{\" ListOf<PropertyAssignment, \",\"> \"}\"              -- noTrailingComma\n                | \"{\" NonemptyListOf<PropertyAssignment, \",\"> \",\" \"}\"  -- trailingComma\n\n  PropertyAssignment = get PropertyName \"(\" \")\" \"{\" FunctionBody \"}\"                  -- getter\n                     | set PropertyName \"(\" FormalParameter \")\" \"{\" FunctionBody \"}\"  -- setter\n                     | PropertyName \":\" AssignmentExpression<withIn>                  -- simple\n\n  PropertyName = identifierName\n               | stringLiteral\n               | numericLiteral\n\n  MemberExpression = MemberExpression \"[\" Expression<withIn> \"]\"  -- arrayRefExp\n                   | MemberExpression \".\" identifierName  -- propRefExp\n                   | new MemberExpression Arguments       -- newExp\n                   | FunctionExpression\n                   | PrimaryExpression\n\n  NewExpression = MemberExpression\n                | new NewExpression -- newExp\n\n  CallExpression = CallExpression \"[\" Expression<withIn> \"]\"  -- arrayRefExp\n                 | CallExpression \".\" identifierName  -- propRefExp\n                 | CallExpression Arguments           -- callExpExp\n                 | MemberExpression Arguments         -- memberExpExp\n\n  Arguments = \"(\" ListOf<AssignmentExpression<withIn>, \",\"> \")\"\n\n  LeftHandSideExpression = CallExpression\n                         | NewExpression\n\n  PostfixExpression = LeftHandSideExpression #(spacesNoNL \"++\")  -- postIncrement\n                    | LeftHandSideExpression #(spacesNoNL \"--\")  -- postDecrement\n                    | LeftHandSideExpression\n\n  UnaryExpression = delete UnaryExpression  -- deleteExp\n                  | void   UnaryExpression  -- voidExp\n                  | typeof UnaryExpression  -- typeofExp\n                  | \"++\"   UnaryExpression  -- preIncrement\n                  | \"--\"   UnaryExpression  -- preDecrement\n                  | \"+\"    UnaryExpression  -- unaryPlus\n                  | \"-\"    UnaryExpression  -- unaryMinus\n                  | \"~\"    UnaryExpression  -- bnot\n                  | \"!\"    UnaryExpression  -- lnot\n                  | PostfixExpression\n\n  MultiplicativeExpression = MultiplicativeExpression \"*\" UnaryExpression -- mul\n                           | MultiplicativeExpression \"/\" UnaryExpression -- div\n                           | MultiplicativeExpression \"%\" UnaryExpression -- mod\n                           | UnaryExpression\n\n  AdditiveExpression = AdditiveExpression \"+\" MultiplicativeExpression -- add\n                     | AdditiveExpression \"-\" MultiplicativeExpression -- sub\n                     | MultiplicativeExpression\n\n  ShiftExpression = ShiftExpression \"<<\" AdditiveExpression  -- lsl\n                  | ShiftExpression \">>>\" AdditiveExpression -- lsr\n                  | ShiftExpression \">>\" AdditiveExpression  -- asr\n                  | AdditiveExpression\n\n  RelationalExpression<guardIn>\n    = RelationalExpression<guardIn> \"<\" ShiftExpression           -- lt\n    | RelationalExpression<guardIn> \">\" ShiftExpression           -- gt\n    | RelationalExpression<guardIn> \"<=\" ShiftExpression          -- le\n    | RelationalExpression<guardIn> \">=\" ShiftExpression          -- ge\n    | RelationalExpression<guardIn> \"instanceof\" ShiftExpression  -- instanceOfExp\n    | RelationalExpression<guardIn> guardIn \"in\" ShiftExpression  -- inExp\n    | ShiftExpression\n\n  EqualityExpression<guardIn>\n    = EqualityExpression<guardIn> \"==\" RelationalExpression<guardIn>  -- equal\n    | EqualityExpression<guardIn> \"!=\" RelationalExpression<guardIn>  -- notEqual\n    | EqualityExpression<guardIn> \"===\" RelationalExpression<guardIn> -- eq\n    | EqualityExpression<guardIn> \"!==\" RelationalExpression<guardIn> -- notEq\n    | RelationalExpression<guardIn>\n\n  BitwiseANDExpression<guardIn>\n    = BitwiseANDExpression<guardIn> \"&\" EqualityExpression<guardIn> -- band\n    | EqualityExpression<guardIn>\n\n  BitwiseXORExpression<guardIn>\n    = BitwiseXORExpression<guardIn> \"^\" BitwiseANDExpression<guardIn> -- bxor\n    | BitwiseANDExpression<guardIn>\n\n  BitwiseORExpression<guardIn>\n    = BitwiseORExpression<guardIn> \"|\" BitwiseXORExpression<guardIn> -- bor\n    | BitwiseXORExpression<guardIn>\n\n  LogicalANDExpression<guardIn>\n    = LogicalANDExpression<guardIn> \"&&\" BitwiseORExpression<guardIn> -- land\n    | BitwiseORExpression<guardIn>\n\n  LogicalORExpression<guardIn>\n    = LogicalORExpression<guardIn> \"||\" LogicalANDExpression<guardIn> -- lor\n    | LogicalANDExpression<guardIn>\n\n  ConditionalExpression<guardIn>\n    = LogicalORExpression<guardIn> \"?\" AssignmentExpression<withIn> \":\" AssignmentExpression<guardIn> -- conditional\n    | LogicalORExpression<guardIn>\n\n  AssignmentExpression<guardIn>\n    = LeftHandSideExpression assignmentOperator AssignmentExpression<guardIn> -- assignment\n    | ConditionalExpression<guardIn>\n\n  Expression<guardIn> (an expression)\n    = Expression<guardIn> \",\" AssignmentExpression<guardIn> -- commaExp\n    | AssignmentExpression<guardIn>\n\n  assignmentOperator = \"=\" | \">>>=\" | \"<<=\" | \">>=\"\n                     | \"*=\" | \"/=\" | \"%=\" | \"+=\" | \"-=\" | \"&=\" | \"^=\" | \"|=\"\n\n  // §A.4 Statements -- https://es5.github.io/#A.4\n\n  Statement\n    = Block\n    | VariableStatement\n    | EmptyStatement\n    | ExpressionStatement\n    | IfStatement\n    | IterationStatement\n    | ContinueStatement\n    | BreakStatement\n    | ReturnStatement\n    | WithStatement\n    | LabelledStatement\n    | SwitchStatement\n    | ThrowStatement\n    | TryStatement\n    | DebuggerStatement\n\n  Block = \"{\" StatementList \"}\"\n\n  StatementList = Statement*\n\n  VariableStatement = var VariableDeclarationList<withIn> #sc\n\n  VariableDeclarationList<guardIn> = NonemptyListOf<VariableDeclaration<guardIn>, \",\">\n\n  VariableDeclaration<guardIn> = identifier Initialiser<guardIn>?\n\n  Initialiser<guardIn> = \"=\" AssignmentExpression<guardIn>\n\n  EmptyStatement = \";\" // note: this semicolon eats newlines\n\n  ExpressionStatement = ~(\"{\" | function) Expression<withIn> #sc\n\n  IfStatement = if \"(\" Expression<withIn> \")\" Statement (else Statement)?\n\n  IterationStatement = do Statement while \"(\" Expression<withIn> \")\" #sc  -- doWhile\n                     | while \"(\" Expression<withIn> \")\" Statement           -- whileDo\n                     | for \"(\" Expression<noIn>? \";\"\n                                 Expression<withIn>? \";\"\n                                 Expression<withIn>? \")\" Statement          -- for3\n                     | for \"(\" var VariableDeclarationList<noIn> \";\"\n                                 Expression<withIn>? \";\"\n                                 Expression<withIn>? \")\" Statement          -- for3var\n                     | for \"(\" LeftHandSideExpression in\n                                 Expression<withIn> \")\" Statement           -- forIn\n                     | for \"(\" var VariableDeclaration<noIn> in\n                                 Expression<withIn> \")\" Statement           -- forInVar\n\n  ContinueStatement = continue #((spacesNoNL identifier)? sc)\n\n  BreakStatement = break #((spacesNoNL identifier)? sc)\n\n  ReturnStatement = return (#(spacesNoNL ~space) Expression<withIn>)? #sc\n\n  WithStatement = with \"(\" Expression<withIn> \")\" Statement\n\n  SwitchStatement = switch \"(\" Expression<withIn> \")\" CaseBlock\n\n  CaseBlock = \"{\" CaseClause* DefaultClause CaseClause* \"}\"  -- withDefault\n            | \"{\"                           CaseClause* \"}\"  -- withoutDefault\n\n  CaseClause = case Expression<withIn> \":\" Statement*\n\n  DefaultClause = default \":\" Statement*\n\n  LabelledStatement = identifier \":\" Statement\n\n  ThrowStatement = throw Expression<withIn> #sc  -- throwExpr\n\n  TryStatement = try Block Catch Finally  -- tryCatchFinally\n               | try Block Finally        -- tryFinally\n               | try Block Catch          -- tryCatch\n\n  Catch = catch \"(\" FormalParameter \")\" Block\n\n  Finally = finally Block\n\n  DebuggerStatement = #(debugger sc)\n\n  // §A.5 Functions and Programs -- https://es5.github.io/#A.5\n\n  FunctionDeclaration\n    = function identifier \"(\" FormalParameterList \")\" \"{\" FunctionBody \"}\"\n\n  FunctionExpression\n    = function identifier \"(\" FormalParameterList \")\" \"{\" FunctionBody \"}\"  -- named\n    | function \"(\" FormalParameterList \")\" \"{\" FunctionBody \"}\"             -- anonymous\n\n  FormalParameterList = ListOf<FormalParameter, \",\">\n\n  FormalParameter = identifier\n\n  /*\n    Note: The Directive Prologue is the longest sequence of ExpressionStatement\n    productions occurring as the initial SourceElement (see https://es5.github.io/#x14.1)\n  */\n  FunctionBody = &(Directive*) SourceElement*\n\n  SourceElement = Declaration | Statement\n\n  // Broken out so es6 can override to include ConstDecl and LetDecl\n  Declaration = FunctionDeclaration\n\n  Directive = stringLiteral #sc\n}\n\nES5Lax <: ES5 {\n  futureReservedWord := futureReservedWordLax\n}\n"
+    }
+  },
+  "public": false,
+  "created_at": "2017-07-05T11:50:09Z",
+  "updated_at": "2017-07-06T14:56:45Z",
+  "description": "JavaScript (ES5)",
+  "comments": 0,
+  "user": null,
+  "comments_url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/comments",
+  "owner": {
+    "login": "ohm-official",
+    "id": 29918665,
+    "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ohm-official",
+    "html_url": "https://github.com/ohm-official",
+    "followers_url": "https://api.github.com/users/ohm-official/followers",
+    "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+    "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+    "repos_url": "https://api.github.com/users/ohm-official/repos",
+    "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "6cc972cd2f55a9694df0e64376406c67003bded6",
+      "committed_at": "2017-07-06T14:56:44Z",
+      "change_status": {
+        "total": 2,
+        "additions": 1,
+        "deletions": 1
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/6cc972cd2f55a9694df0e64376406c67003bded6"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "416432cdc395781f646bdfefd8bea91a884ad581",
+      "committed_at": "2017-07-06T14:00:41Z",
+      "change_status": {
+        "total": 2,
+        "additions": 1,
+        "deletions": 1
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/416432cdc395781f646bdfefd8bea91a884ad581"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "423604380b438dbb38ee82bc77bddbcd4906d0d8",
+      "committed_at": "2017-07-06T14:00:00Z",
+      "change_status": {
+        "total": 22,
+        "additions": 16,
+        "deletions": 6
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/423604380b438dbb38ee82bc77bddbcd4906d0d8"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "5aef16241c00bb9ee2c0fedd63cb070fe7e535d2",
+      "committed_at": "2017-07-06T13:58:53Z",
+      "change_status": {
+        "total": 13,
+        "additions": 9,
+        "deletions": 4
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/5aef16241c00bb9ee2c0fedd63cb070fe7e535d2"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "2183faf5ff0562191d63a6031aebd62f933226e6",
+      "committed_at": "2017-07-06T13:56:19Z",
+      "change_status": {
+        "total": 2,
+        "additions": 1,
+        "deletions": 1
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/2183faf5ff0562191d63a6031aebd62f933226e6"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "2c6f69ef90562f1e8688c3f396413349ab670b4c",
+      "committed_at": "2017-07-06T13:56:07Z",
+      "change_status": {
+        "total": 4,
+        "additions": 2,
+        "deletions": 2
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/2c6f69ef90562f1e8688c3f396413349ab670b4c"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "da353920b3057ffa0384c614951fe8b911684082",
+      "committed_at": "2017-07-06T13:52:57Z",
+      "change_status": {
+        "total": 2,
+        "additions": 1,
+        "deletions": 1
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/da353920b3057ffa0384c614951fe8b911684082"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "2a3914af44f58af136050dbbea284d430c177ae8",
+      "committed_at": "2017-07-06T13:49:02Z",
+      "change_status": {
+        "total": 28,
+        "additions": 27,
+        "deletions": 1
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/2a3914af44f58af136050dbbea284d430c177ae8"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "44a49bc340cd60881d94ab0a07497ec3596849db",
+      "committed_at": "2017-07-05T11:53:47Z",
+      "change_status": {
+        "total": 0,
+        "additions": 0,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/44a49bc340cd60881d94ab0a07497ec3596849db"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "b2e56b668add1c22e4dc880064851d06e572dd54",
+      "committed_at": "2017-07-05T11:51:58Z",
+      "change_status": {
+        "total": 0,
+        "additions": 0,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/b2e56b668add1c22e4dc880064851d06e572dd54"
+    },
+    {
+      "user": {
+        "login": "ohm-official",
+        "id": 29918665,
+        "node_id": "MDQ6VXNlcjI5OTE4NjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/29918665?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ohm-official",
+        "html_url": "https://github.com/ohm-official",
+        "followers_url": "https://api.github.com/users/ohm-official/followers",
+        "following_url": "https://api.github.com/users/ohm-official/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ohm-official/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ohm-official/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ohm-official/subscriptions",
+        "organizations_url": "https://api.github.com/users/ohm-official/orgs",
+        "repos_url": "https://api.github.com/users/ohm-official/repos",
+        "events_url": "https://api.github.com/users/ohm-official/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ohm-official/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "cd921ba9500d021fe8026a49a662aeac7c470c69",
+      "committed_at": "2017-07-05T11:50:08Z",
+      "change_status": {
+
+      },
+      "url": "https://api.github.com/gists/0a9a649c3c630fd0a470ba6cb75393fe/cd921ba9500d021fe8026a49a662aeac7c470c69"
+    }
+  ],
+  "truncated": false
+}

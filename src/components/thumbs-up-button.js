@@ -1,5 +1,5 @@
 const template = `
-  <div class="thumbsUpButton" :title="title">
+  <div class="thumbsUpButton" :title="title" role="switch">
     <span v-if="showThumbsUp">&#x1F44D;</span>
     <span v-else>&#x1F44E;</span>
   </div>

@@ -1,3 +1,5 @@
 build
 node_modules
+test/data/har/**
+test/snapshots/**
 third_party
