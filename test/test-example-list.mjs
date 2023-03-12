@@ -7,7 +7,7 @@ import testUtils from '@vue/test-utils';
 import ohm from 'ohm-js';
 import {test} from 'uvu';
 import * as assert from 'uvu/assert';
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 
 import ExampleList from '../src/components/example-list.js';
 import ohmEditor from '../src/ohmEditor.js';

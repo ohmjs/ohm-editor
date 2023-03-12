@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
 import CheckedEmitter from 'checked-emitter';
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 
 import ParseTree from './components/parse-tree.vue';
 import ohmEditor from './ohmEditor.js';

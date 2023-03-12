@@ -1,4 +1,4 @@
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 
 const template = `
   <div class="dropdown">

@@ -12,7 +12,7 @@
     "format": "prettier --write . && npm run lint -- --fix",
     "postinstall": "true",
     "start": "webpack serve --mode development",
-    "test": "uvu test 'test-.*' && npm run test:e2e",
+    "test": "uvu test 'test-.*'",
     "test:e2e": "npx playwright test --config=playwright.config.cjs"
   },
   "main": "index.js",

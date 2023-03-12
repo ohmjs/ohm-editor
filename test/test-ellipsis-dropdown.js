@@ -3,7 +3,7 @@ import 'global-jsdom/register';
 import testUtils from '@vue/test-utils';
 import {test} from 'uvu';
 import * as assert from 'uvu/assert';
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 
 import EllipsisDropdown from '../src/components/ellipsis-dropdown.js';
 

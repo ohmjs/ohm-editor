@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 import * as cmUtil from '../cmUtil.js';
 import * as domUtil from '../domUtil.js';
 import {isLeaf} from '../traceUtil.js';

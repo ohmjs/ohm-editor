@@ -62,7 +62,7 @@ import * as domUtil from '../domUtil.js';
 import ohmEditor from '../ohmEditor.js';
 import ThumbsUpButton from './thumbs-up-button.js';
 
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 
 const toOptValue = (grammarName, startRule) =>
   `${grammarName || ''}.${startRule || ''}`;

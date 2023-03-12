@@ -5,7 +5,7 @@ const template = `
   </div>
 `;
 
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 
 export default Vue.component('thumbs-up-button', {
   name: 'thumbs-up-button',

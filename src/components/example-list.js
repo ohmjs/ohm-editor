@@ -50,7 +50,7 @@ import ExampleEditor from './example-editor.js';
 import ohmEditor from '../ohmEditor.js';
 import ThumbsUpButton from './thumbs-up-button.js';
 
-import Vue from 'vue/dist/vue.esm.mjs';
+import Vue from 'vue/dist/vue.common.js';
 
 let idCounter = 0;
 
