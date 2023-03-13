@@ -17,11 +17,11 @@ jobs:
         run: npm ci
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+      - name: Debug
+        run: echo "${{ github.ref_name }}"
       - name: Run Playwright tests
         if: ${{ !startsWith(github.ref_name, 'update-snapshots/') }}
         run: npm run test:e2e
-      - name: Debug
-        run: echo "${{ github.ref_name }}"
       - name: Update snapshots
         if: ${{ startsWith(github.ref_name, 'update-snapshots/') }}
         run: npm run update-snapshots
