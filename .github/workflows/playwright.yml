@@ -29,6 +29,8 @@ jobs:
         if: ${{ success() && github.event_name == 'pull_request' }} 
         with:
           add: 'test/snapshots'
+          default_author: github_actions
+          ref: ${{ github.event.pull_request.head.ref }}
           push: origin ${{ github.head_ref }}
       - uses: actions/upload-artifact@v3
         if: always()
