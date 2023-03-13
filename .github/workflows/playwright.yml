@@ -18,10 +18,10 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        if: ${{ !startsWith(github.ref, 'update-snapshots/') }}
+        if: ${{ !startsWith(github.ref_name, 'update-snapshots/') }}
         run: npm run test:e2e
       - name: Update snapshots 
-        if: ${{ startsWith(github.ref, 'update-snapshots/') }}
+        if: ${{ startsWith(github.ref_name, 'update-snapshots/') }}
         run: npm run update-snapshots
       - uses: actions/upload-artifact@v3
         if: always()
