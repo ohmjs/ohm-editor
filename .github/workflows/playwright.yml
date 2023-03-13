@@ -26,9 +26,10 @@ jobs:
         if: ${{ startsWith(github.head_ref, 'update-snapshots/') }}
         run: npm run update-snapshots
       - uses: EndBug/add-and-commit@v9
-        if: ${{ startsWith(github.head_ref, 'update-snapshots/') }}
+        if: ${{ success() && github.event_name == 'pull_request' }} 
         with:
           add: 'test/snapshots'
+          push: origin ${{ github.head_ref }}
       - uses: actions/upload-artifact@v3
         if: always()
         with:
