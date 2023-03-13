@@ -14,7 +14,7 @@
     "start": "webpack serve --mode development",
     "test": "uvu test 'test-.*'",
     "test:e2e": "npx playwright test --config=playwright.config.cjs",
-    "update-snapshots": "npx playwright test --config=playwright.config.cjs --update-snapshots"
+    "update-snapshots": "npm run test:e2e -- --update-snapshots && git add test/snapshots && git commit -m 'Update snapshots'"
   },
   "main": "index.js",
   "devDependencies": {
