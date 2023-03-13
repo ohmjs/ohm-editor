@@ -6,19 +6,23 @@ on:
     branches: [main, master]
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: Install dependencies
         run: npm ci
-      - name: Install Playwright Browsers
+      - name: Install Playwright browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
+        if: !startsWith(github.ref, 'update-snapshots/')
         run: npm run test:e2e
+      - name: Update snapshots 
+        if: startsWith(github.ref, 'update-snapshots/')
+        run: npm run update-snapshots
       - uses: actions/upload-artifact@v3
         if: always()
         with:

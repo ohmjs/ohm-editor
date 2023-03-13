@@ -13,7 +13,8 @@
     "postinstall": "true",
     "start": "webpack serve --mode development",
     "test": "uvu test 'test-.*'",
-    "test:e2e": "npx playwright test --config=playwright.config.cjs"
+    "test:e2e": "npx playwright test --config=playwright.config.cjs",
+    "update-snapshots": "npx playwright test --config=playwright.config.cjs --update-snapshots"
   },
   "main": "index.js",
   "devDependencies": {
@@ -72,7 +73,7 @@
       "eslint-plugin-tape"
     ]
   },
-  "homepage": "https://ohmlang.github.io/editor/",
+  "homepage": "https://ohmjs.org/editor/",
   "keywords": [
     "editor",
     "ide",
