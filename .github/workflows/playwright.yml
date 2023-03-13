@@ -32,6 +32,7 @@ jobs:
         with:
           add: 'test/snapshots'
           default_author: github_actions
+          message: 'Update snapshots'
           push: origin ${{ github.head_ref }}
       - uses: actions/upload-artifact@v3
         if: always()
