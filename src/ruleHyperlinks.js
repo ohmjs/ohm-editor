@@ -132,7 +132,7 @@ function registerListeners(editor) {
   });
 }
 
-ohmEditor.addListener('parse:grammars', (matchResult, grammars, err) => {
+ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
   if (!grammarEditor) {
     grammarEditor = ohmEditor.ui.grammarEditor; // eslint-disable-line prefer-destructuring
     registerListeners(grammarEditor);

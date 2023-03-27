@@ -45,7 +45,7 @@ async function simulateGrammarEdit(source) {
   await ohmEditor.emit('change:grammars', source);
   await Vue.nextTick();
 
-  await ohmEditor.emit('parse:grammars', null, ohm.grammars(source), null);
+  await ohmEditor.emit('parse:grammars', null, ohm.grammars(source), [], null);
   await flushQueue();
 }
 

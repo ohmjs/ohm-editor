@@ -179,7 +179,7 @@ grammarEditor.on('swapDoc', cm => {
   widget = new LastLineWidget(cm);
 });
 
-ohmEditor.addListener('parse:grammars', (matchResult, grammars, err) => {
+ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
   grammarMatchResult = matchResult;
   updateExternalRules();
 });
