@@ -129,7 +129,9 @@ async function initializeLayout() {
   const isEmbedded = params.get('embed') === 'true';
 
   if (!isEmbedded) {
-    await import(/* webpackChunkName: "persistence" */ './persistence.js');
+    const scriptEl = document.createElement("script");
+    scriptEl.src = "assets/persistence-bundle.js";
+    document.body.appendChild(scriptEl);
   }
 
   if (USE_TWO_PANE_LAYOUT) {
