@@ -4,10 +4,6 @@ function toStorageKey(el, suffix) {
   return 'splitter-' + el.id + '-' + suffix;
 }
 
-function ensureUnits(str, unit) {
-  return str.slice(-2) === unit ? str : `${str}${unit}`;
-}
-
 // Initializes a splitter element by patching the DOM and installing event handlers.
 function initializeSplitter(el) {
   const handle = document.createElement('div');
@@ -17,18 +13,24 @@ function initializeSplitter(el) {
   const isVertical = el.classList.contains('vertical');
   let dragging = false;
   const prevEl = el.previousElementSibling;
-  const nextEl = el.nextElementSibling;
   const parentEl = el.parentElement;
 
   const dragOverlay = document.querySelector('#dragOverlay');
 
-  // Set the size of one of the splitter element's siblings to the given value.
-  // `which` must be one of 'next' or 'prev'.
-  function setSiblingSize(which, value) {
-    const node = which === 'prev' ? prevEl : nextEl;
-    node.style.flexBasis = value;
+  // Set the size of the splitter element's preceding sibling to the given value.
+  function setSiblingSize(value) {
+    const body = document.querySelector('body');
+    const prop = isVertical ? 'width' : 'height';
+    const className = isVertical ? 'columnsResized': 'rowsResized';
+    if (value === '') {
+      prevEl.style[prop] = value;
+      body.classList.remove(className);
+    } else {
+      prevEl.style[prop] = value;
+      body.classList.add(className);
+    }
     if (el.id) {
-      localStorage.setItem(toStorageKey(el, which), value);
+      localStorage.setItem(toStorageKey(el, 'prev'), value);
     }
   }
 
@@ -49,8 +51,7 @@ function initializeSplitter(el) {
     const pos = isVertical ? relativeX : relativeY;
 
     if (dragging && pos > 0 && pos < innerSize) {
-      setSiblingSize('next', `${innerSize - pos - 1}px`);
-      setSiblingSize('prev', `${pos}px`);
+      setSiblingSize(`${pos}px`);
       e.preventDefault();
       e.stopPropagation();
     }
@@ -62,21 +63,8 @@ function initializeSplitter(el) {
 
   // Reset the sizes to 50% when the handle is double-clicked.
   handle.ondblclick = function (e) {
-    setSiblingSize('next', 'calc(50% - 1px)');
-    setSiblingSize('prev', '50%');
+    setSiblingSize('');
   };
-
-  // Restore the sizes from localStorage.
-  if (el.id) {
-    const nextPos = localStorage.getItem(toStorageKey(el, 'next'));
-    const prevPos = localStorage.getItem(toStorageKey(el, 'prev'));
-    if (nextPos && nextEl) {
-      setSiblingSize('next', ensureUnits(nextPos, 'px'));
-    }
-    if (prevPos && prevEl) {
-      setSiblingSize('prev', ensureUnits(prevPos, 'px'));
-    }
-  }
 }
 
 // Initialize all the splitters on the page.

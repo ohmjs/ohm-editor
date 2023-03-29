@@ -1,18 +1,8 @@
 import {test, expect} from '@playwright/test';
+import { initNetworkReplay } from './playwrightHelpers.js';
 
 test('basic behaviour', async ({page}) => {
-  // Avoid hitting GitHub, especially since we can get rate limited.
-  await page.routeFromHAR('test/data/har/api.github.com.har', {
-    url: /^https:\/\/api.github.com\//,
-  });
-  await page.routeFromHAR('test/data/har/unpkg.com.har', {
-    url: /^https:\/\/unpkg.com\//,
-  });
-
-  // Kill requests to analytics script.
-  await page.route(/^https:\/\/thirteen-six.ohmjs.org\//, route =>
-    route.abort()
-  );
+  initNetworkReplay(page);
 
   await page.goto('http://localhost:8080/');
   await expect(page).toHaveTitle(/Ohm Editor/);
