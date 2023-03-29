@@ -1,3 +1,4 @@
+import {expect} from '@playwright/test';
 
 export async function initNetworkReplay(page) { 
   // Avoid hitting GitHub, especially since we can get rate limited.
@@ -12,4 +13,29 @@ export async function initNetworkReplay(page) {
   await page.route(/^https:\/\/thirteen-six.ohmjs.org\//, route =>
     route.abort()
   );
+}
+
+export async function selectArithmeticGrammar(page) {
+  // Select the Arithmetic grammar.
+  await page
+    .getByRole('combobox', {name: 'Selected grammar'})
+    .selectOption({label: 'Arithmetic'});
+
+  // Wait for the grammar to be loaded...
+  await page.waitForFunction(`
+    ohmEditor.ui.grammarEditor.getValue().startsWith('Arithmetic {')
+  `);
+
+  // ...and the examples.
+  const listItems = page
+    .getByRole('list', {name: 'Examples'})
+    .getByRole('listitem');
+  await expect(listItems).toHaveCount(5);
+}
+
+export async function loadEditorWithArithmeticGrammar(page) {
+  await initNetworkReplay(page);
+  await page.goto('http://localhost:8080/');
+  await expect(page).toHaveTitle(/Ohm Editor/);
+  await selectArithmeticGrammar(page);
 }

@@ -1,27 +1,8 @@
 import {test, expect} from '@playwright/test';
-import { initNetworkReplay } from './playwrightHelpers.js';
+import { loadEditorWithArithmeticGrammar } from './playwrightHelpers.js';
 
 test('basic behaviour', async ({page}) => {
-  initNetworkReplay(page);
-
-  await page.goto('http://localhost:8080/');
-  await expect(page).toHaveTitle(/Ohm Editor/);
-
-  // 1️. Select the Arithmetic grammar.
-  await page
-    .getByRole('combobox', {name: 'Selected grammar'})
-    .selectOption({label: 'Arithmetic'});
-
-  // Wait for the grammar to be loaded...
-  await page.waitForFunction(`
-    ohmEditor.ui.grammarEditor.getValue().startsWith('Arithmetic {')
-  `);
-
-  // ...and the examples.
-  const listItems = page
-    .getByRole('list', {name: 'Examples'})
-    .getByRole('listitem');
-  await expect(listItems).toHaveCount(5);
+  await loadEditorWithArithmeticGrammar(page);
 
   await expect(page).toHaveScreenshot('arithmetic-all-examples-green.png');
 
