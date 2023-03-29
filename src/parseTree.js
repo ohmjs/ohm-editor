@@ -16,11 +16,15 @@ parseTree.vue = new Vue({
   components: {
     'parse-tree': ParseTree,
   },
-  template:
-    '<div id="visualizerContainer">' +
-    '  <parse-tree :rootTrace="trace" />' +
-    '  <div v-show="parsing" class="overlay"></div>' +
-    '</div>',
+  template: `
+    <div id="visualizerContainer">
+      <div class="section-head flex-row">
+        <h2>Parse</h2>
+      </div>
+      <parse-tree :rootTrace="trace" />
+      <div v-show="parsing" class="overlay"></div>
+    </div>
+  `,
   methods: {
     onEdit(cm) {
       this.parsing = true;

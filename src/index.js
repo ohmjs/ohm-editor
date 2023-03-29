@@ -10,7 +10,6 @@ import './externalRules.js';
 import './parseTree.js';
 import './ruleHyperlinks.js';
 import './searchBar.js';
-import './persistence.js';
 import {initializeSplitter} from './splitters.js';
 
 let grammarChanged = true;
@@ -20,7 +19,7 @@ let showFailuresImplicitly = true;
 
 let grammarMatcher = ohm.ohmGrammar.matcher();
 
-const USE_TWO_PANE_LAYOUT = false;
+const USE_TWO_PANE_LAYOUT = true;
 
 // Helpers
 // -------
@@ -134,10 +133,10 @@ async function initializeLayout() {
   }
 
   if (USE_TWO_PANE_LAYOUT) {
-    $('body').classList.add('twoPane');
     initializeSplitter($('#topSplitter'), $('#grammarContainer'));
     initializeSplitter($('#mainSplitter'), $('#grammarContainer'));
   } else {
+    $('body').classList.remove('twoPane');
     initializeSplitter($('#topSplitter'), $('#grammarContainer'));
     initializeSplitter($('#mainSplitter'), $('#exampleContainer'));
   }

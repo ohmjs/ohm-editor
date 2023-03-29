@@ -33,6 +33,10 @@ body.rowsResized {
   grid-template-rows: min-content 1px 1fr;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 #topSplitter {
   grid-area: vsplit;
 }
@@ -161,6 +165,15 @@ body.rowsResized {
   grid-area: viz;
 }
 
+#visualizerContainer .section-head {
+  display: none;
+}
+
+.twoPane #visualizerContainer .section-head {
+  border-bottom: 1px solid #ddd;
+  display: flex;
+}
+
 #exampleRequestContainer,
 #userExampleContainer,
 #grammarContainer,
@@ -182,7 +195,7 @@ body.rowsResized {
 
 h2 {
   color: #e0a;
-  font-size: 1em;
+  font-size: 0.8em;
   -moz-user-select: none;
   -ms-user-select: none;
   -webkit-user-select: none;
@@ -211,6 +224,10 @@ h2 {
   height: 100%;
   position: absolute; /* See .flex-fix above. */
   width: 100%;
+}
+
+.editorWrapper .CodeMirror-lines {
+  padding: 8px 0 !important;
 }
 
 .CodeMirror .error-interval {
@@ -257,7 +274,7 @@ h2 {
   padding-top: 0;
 }
 .CodeMirror-lines pre {
-  padding-left: 14px;
+  padding-left: 20px;
 }
 
 .footer {
@@ -269,9 +286,6 @@ h2 {
   margin-top: 1px;
   overflow: hidden;
   padding: 5px 6px 4px 6px;
-}
-.footer[hidden] {
-  display: none;
 }
 .footer [type='search'] {
   border: 1px solid hsl(225, 10%, 85%);
