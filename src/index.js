@@ -10,8 +10,8 @@ import './externalRules.js';
 import './parseTree.js';
 import './ruleHyperlinks.js';
 import './searchBar.js';
-import './splitters.js';
 import './persistence.js';
+import {initializeSplitter} from './splitters.js';
 
 let grammarChanged = true;
 let inputChanged = true;
@@ -19,6 +19,8 @@ let inputChanged = true;
 let showFailuresImplicitly = true;
 
 let grammarMatcher = ohm.ohmGrammar.matcher();
+
+const USE_TWO_PANE_LAYOUT = false;
 
 // Helpers
 // -------
@@ -123,6 +125,24 @@ ohmEditor.saveState = function (editor, key) {
   localStorage.setItem(key, editor.getValue());
 };
 
+async function initializeLayout() {
+  const params = new URLSearchParams(window.location.search);
+  const isEmbedded = params.get('embed') === 'true';
+
+  if (!isEmbedded) {
+    await import(/* webpackChunkName: "persistence" */ './persistence.js');
+  }
+
+  if (USE_TWO_PANE_LAYOUT) {
+    $('body').classList.add('twoPane');
+    initializeSplitter($('#topSplitter'), $('#grammarContainer'));
+    initializeSplitter($('#mainSplitter'), $('#grammarContainer'));
+  } else {
+    initializeSplitter($('#topSplitter'), $('#grammarContainer'));
+    initializeSplitter($('#mainSplitter'), $('#exampleContainer'));
+  }
+}
+
 // Main
 // ----
 
@@ -209,5 +229,6 @@ console.log(
 );
 /* eslint-enable no-console */
 
+initializeLayout();
 resetGrammarMatcher();
 refresh();

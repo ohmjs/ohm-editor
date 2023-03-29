@@ -5,17 +5,24 @@ body {
 body {
   background-color: white;
   display: grid;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
-    'Helvetica', 'Arial', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica',
+    'Arial', sans-serif;
   grid-template-rows: 1fr 1px 1fr;
   grid-template-columns: 1fr 1px 1fr;
   grid-template-areas:
-    "grammar vsplit examples"
-    "hsplit hsplit hsplit"
-    "viz viz viz";
+    'grammar vsplit examples'
+    'hsplit hsplit hsplit'
+    'viz viz viz';
   margin: 0;
   overflow: hidden;
   padding: 0;
+}
+
+body.twoPane {
+  grid-template-areas:
+    'grammar vsplit viz'
+    'hsplit vsplit viz'
+    'examples vsplit viz';
 }
 
 body.columnsResized {

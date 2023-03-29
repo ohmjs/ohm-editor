@@ -5,15 +5,15 @@ function toStorageKey(el, suffix) {
 }
 
 // Initializes a splitter element by patching the DOM and installing event handlers.
-function initializeSplitter(el) {
+// `target` is the element whose width or height is adjusted by the splitter.
+export function initializeSplitter(splitter, target) {
   const handle = document.createElement('div');
   handle.classList.add('handle');
-  el.appendChild(handle);
+  splitter.appendChild(handle);
 
-  const isVertical = el.classList.contains('vertical');
+  const isVertical = splitter.classList.contains('vertical');
   let dragging = false;
-  const prevEl = el.previousElementSibling;
-  const parentEl = el.parentElement;
+  const parentEl = splitter.parentElement;
 
   const dragOverlay = document.querySelector('#dragOverlay');
 
@@ -21,21 +21,21 @@ function initializeSplitter(el) {
   function setSiblingSize(value) {
     const body = document.querySelector('body');
     const prop = isVertical ? 'width' : 'height';
-    const className = isVertical ? 'columnsResized': 'rowsResized';
+    const className = isVertical ? 'columnsResized' : 'rowsResized';
     if (value === '') {
-      prevEl.style[prop] = value;
+      target.style[prop] = value;
       body.classList.remove(className);
     } else {
-      prevEl.style[prop] = value;
+      target.style[prop] = value;
       body.classList.add(className);
     }
-    if (el.id) {
-      localStorage.setItem(toStorageKey(el, 'prev'), value);
+    if (splitter.id) {
+      localStorage.setItem(toStorageKey(splitter, 'prev'), value);
     }
   }
 
   handle.onmousedown = function (e) {
-    if (!el.classList.contains('disabled')) {
+    if (!splitter.classList.contains('disabled')) {
       dragging = true;
       dragOverlay.style.display = 'block';
       dragOverlay.style.cursor = isVertical ? 'ew-resize' : 'ns-resize';
@@ -65,13 +65,4 @@ function initializeSplitter(el) {
   handle.ondblclick = function (e) {
     setSiblingSize('');
   };
-}
-
-// Initialize all the splitters on the page.
-// A splitter is a <div> that has the class '.splitter' and no children.
-// If it also has the class '.vertical', it is a vertical splitter (i.e, it splits
-// two columns). Otherwise, it is assumed to be a horizontal splitter.
-const splitters = document.querySelectorAll('.splitter');
-for (let i = 0; i < splitters.length; ++i) {
-  initializeSplitter(splitters[i]);
 }
