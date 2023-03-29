@@ -214,8 +214,8 @@ x:-moz-any-link {
 }
 
 #exampleEditor .CodeMirror-lines {
-  padding-bottom: 12px;
-  padding-top: 12px;
+  padding-bottom: 16px;
+  padding-top: 16px;
 }
 
 #exampleEditor .CodeMirror-lines pre {

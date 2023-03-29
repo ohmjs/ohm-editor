@@ -16,13 +16,13 @@ test('splitters', async ({page}) => {
   // 1. Drag the top splitter to the left, making the grammar pane smaller.
   const topSplitter = page.locator('#topSplitter');
   await topSplitter.dragTo(page.locator('body'), {
-    targetPosition: { x: 200, y: 400 }
+    targetPosition: {x: 200, y: 400},
   });
   await expect(page).toHaveScreenshot('topSplitter-after-drag-1.png');
 
   // 2. Drag it to the right, making the examples pane smaller.
   await topSplitter.dragTo(page.locator('body'), {
-    targetPosition: { x: 900, y: 400 }
+    targetPosition: {x: 900, y: 400},
   });
   await expect(page).toHaveScreenshot('topSplitter-after-drag-2.png');
 
@@ -34,7 +34,7 @@ test('splitters', async ({page}) => {
   // enough that the examples pane isn't fully visible.
   const mainSplitter = page.locator('#mainSplitter div');
   await mainSplitter.dragTo(page.locator('body'), {
-    targetPosition: { x: 200, y: 100 }
+    targetPosition: {x: 200, y: 100},
   });
   await expect(page).toHaveScreenshot('mainSplitter-after-drag-1.png');
 
