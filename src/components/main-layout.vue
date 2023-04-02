@@ -71,6 +71,8 @@
 import ExampleList from './example-list.js';
 import {initializeSplitter} from '../splitters.js';
 
+const DEFAULT_ROW_SIZES = ['2fr', '1fr'];
+
 export default {
   components: {
     'example-list': ExampleList
@@ -79,7 +81,7 @@ export default {
   },
   data: () => ({
     colSizes: ['1fr', '1fr'],
-    rowSizes: ['1fr', '1fr'],
+    rowSizes: DEFAULT_ROW_SIZES,
     savedRowSizes: undefined,
   }),
   computed: {
@@ -91,24 +93,13 @@ export default {
     }
   },
   mounted() {
-    const {exampleList} = this.$refs;
+    initializeSplitter(this.$refs.vSplitter, true, this.setColumnSplit);
+    initializeSplitter(this.$refs.hSplitter, false, this.setRowSplit, this.rowAdjustmentDone);
 
-    const setRowSplit = (a, b) => {
-      if (a === -1) {
-        this.rowSizes = ['auto', 'auto'];
-      } else {
-        this.rowSizes = ['auto', `max(${b}px, ${exampleList.minHeight}px)`]
-      }
-      this.savedRowSizes = undefined; // Prevent restoring the saved sizes.
-      exampleList.collapsed = false;
-    };
-    const setColumnSplit = (a, b) => {
-      this.colSizes = (a === -1) ? ['auto', 'auto'] : ['auto', `${b}px`];
-    };
-    initializeSplitter(this.$refs.vSplitter, true, setColumnSplit);
-    initializeSplitter(this.$refs.hSplitter, false, setRowSplit);
-
-    this.$watch('$refs.exampleList.collapsed', isCollapsed => {
+    this.$watch('$refs.exampleList.collapsed', this.onExampleListCollapsed);
+  },
+  methods: {
+    onExampleListCollapsed(isCollapsed) {
       if (isCollapsed) {
         // Collapsing can only come from clicking the button.
         // Save the size so we can restore it when its uncollapsed.
@@ -117,8 +108,37 @@ export default {
       } else if (this.savedRowSizes) {
         this.rowSizes = [...this.savedRowSizes];
         this.savedRowSizes = undefined;
+      } else {
+        this.rowSizes = DEFAULT_ROW_SIZES;
       }
-    });
+    },
+    setColumnSplit(a, b) {
+      if (a === -1) {
+        this.colSizes = ['1fr', '1fr'];
+      } else {
+        this.colSizes = ['1fr', `${b}px`];
+      }
+    },
+    setRowSplit(a, b) {
+      const {exampleList} = this.$refs;
+      if (a === -1) {
+        this.rowSizes = ['1fr', '1fr'];
+      } else {
+        this.rowSizes = ['1fr', `max(${b}px, ${exampleList.minHeight}px)`]
+      }
+      // Manually adjusting the split invalidates any saved sizes, as those
+      // are only needed when un-collapsing.
+      this.savedRowSizes = undefined;
+
+      if (b < exampleList.minHeight) {
+        // It was manually dragged to be as small as the collapsed state,
+        // so actually make it collapsed.
+        exampleList.collapsed = true;
+      } else {
+        // Otherwise, un-collapse it.
+        exampleList.collapsed = false;
+      }
+    },
   }
 };
 </script>
