@@ -1,7 +1,47 @@
+#exampleContainer {
+  display: flex;
+  flex-direction: row;
+  flex: auto;
+  grid-area: examples;
+}
+
+#exampleContainer h2 {
+  color: #333;
+  flex: 0;
+  font-variant: all-small-caps;
+  font-weight: normal;
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+#exampleContainer .section-head {
+  padding-right: 6px;
+}
+
 #exampleList {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.flex-spacer {
+  flex: 1;
+}
+
+.chevron-btn {
+  background-color: transparent;
+  background-image: url('../images/chevron-down.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: none;
+  cursor: default;
+  height: 12px;
+  width: 12px;
+}
+
+.chevron-btn.closed {
+  background-image: url('../images/chevron-up.svg');
 }
 
 #addExampleLink {

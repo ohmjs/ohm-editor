@@ -1,38 +1,20 @@
 /* eslint-env browser */
 
-function toStorageKey(el, suffix) {
-  return 'splitter-' + el.id + '-' + suffix;
-}
-
 // Initializes a splitter element by patching the DOM and installing event handlers.
 // `target` is the element whose width or height is adjusted by the splitter.
-export function initializeSplitter(splitter, target) {
+// `setSplit` is a callback which takes two arguments, indicating the desired ratio
+// between the two elements.
+export function initializeSplitter(splitter, isVertical, setSplit) {
   const handle = document.createElement('div');
   handle.classList.add('handle');
   splitter.appendChild(handle);
 
-  const isVertical = splitter.classList.contains('vertical');
   let dragging = false;
+  
+  // This is assumed to be the element that the splitter divides.
   const parentEl = splitter.parentElement;
 
   const dragOverlay = document.querySelector('#dragOverlay');
-
-  // Set the size of the splitter element's preceding sibling to the given value.
-  function setSiblingSize(value) {
-    const body = document.querySelector('body');
-    const prop = isVertical ? 'width' : 'height';
-    const className = isVertical ? 'columnsResized' : 'rowsResized';
-    if (value === '') {
-      target.style[prop] = value;
-      body.classList.remove(className);
-    } else {
-      target.style[prop] = value;
-      body.classList.add(className);
-    }
-    if (splitter.id) {
-      localStorage.setItem(toStorageKey(splitter, 'prev'), value);
-    }
-  }
 
   handle.onmousedown = function (e) {
     if (!splitter.classList.contains('disabled')) {
@@ -51,7 +33,7 @@ export function initializeSplitter(splitter, target) {
     const pos = isVertical ? relativeX : relativeY;
 
     if (dragging && pos > 0 && pos < innerSize) {
-      setSiblingSize(`${pos}px`);
+      setSplit(pos, innerSize - pos);
       e.preventDefault();
       e.stopPropagation();
     }
@@ -63,6 +45,7 @@ export function initializeSplitter(splitter, target) {
 
   // Reset the sizes to 50% when the handle is double-clicked.
   handle.ondblclick = function (e) {
-    setSiblingSize('');
+    setSplit(-1, -1);
+    e.preventDefault();
   };
 }
