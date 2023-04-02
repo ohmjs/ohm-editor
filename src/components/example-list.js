@@ -113,7 +113,7 @@ export default Vue.component('example-list', {
     },
     count() {
       return Object.keys(this.exampleValues).length;
-    }
+    },
   },
   watch: {
     selectedId(id) {

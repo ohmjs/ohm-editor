@@ -1,43 +1,43 @@
 <style>
-  .main-grid {
-    display: grid;
-    flex: 1;
-    grid-template-areas:
-      'grammar vsplit viz'
-      'hsplit vsplit viz'
-      'examples vsplit viz';
-  }
-  .splitter {
-    background-color: #ddd;
-    grid-area: hsplit;
-    height: 1px;
-    min-height: 1px;
-    overflow: visible;
-    position: relative;
-  }
-  .vertical.splitter {
-    grid-area: vsplit;
-    height: auto;
-    min-height: auto;
-    min-width: 1px;
-    width: 1px;
-  }
-  .splitter .handle {
-    bottom: -2px;
-    cursor: ns-resize;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: -2px;
-    z-index: 10;
-  }
-  .vertical.splitter .handle {
-    bottom: 0;
-    cursor: ew-resize;
-    left: -2px;
-    right: -2px;
-    top: 0;
-  }
+.main-grid {
+  display: grid;
+  flex: 1;
+  grid-template-areas:
+    'grammar vsplit viz'
+    'hsplit vsplit viz'
+    'examples vsplit viz';
+}
+.splitter {
+  background-color: #ddd;
+  grid-area: hsplit;
+  height: 1px;
+  min-height: 1px;
+  overflow: visible;
+  position: relative;
+}
+.vertical.splitter {
+  grid-area: vsplit;
+  height: auto;
+  min-height: auto;
+  min-width: 1px;
+  width: 1px;
+}
+.splitter .handle {
+  bottom: -2px;
+  cursor: ns-resize;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: -2px;
+  z-index: 10;
+}
+.vertical.splitter .handle {
+  bottom: 0;
+  cursor: ew-resize;
+  left: -2px;
+  right: -2px;
+  top: 0;
+}
 </style>
 
 <template>
@@ -64,7 +64,7 @@
     <example-list ref="exampleList" />
     <div ref="hSplitter" class="splitter"></div>
     <div id="visualizerContainer"></div>
-  </div>  
+  </div>
 </template>
 
 <script>
@@ -75,10 +75,9 @@ const DEFAULT_ROW_SIZES = ['2fr', '1fr'];
 
 export default {
   components: {
-    'example-list': ExampleList
+    'example-list': ExampleList,
   },
-  props: {
-  },
+  props: {},
   data: () => ({
     colSizes: ['1fr', '1fr'],
     rowSizes: DEFAULT_ROW_SIZES,
@@ -88,13 +87,18 @@ export default {
     styleObj() {
       return {
         gridTemplateColumns: `${this.colSizes[0]} 1px ${this.colSizes[1]}`,
-        gridTemplateRows: `${this.rowSizes[0]} 1px ${this.rowSizes[1]}`
+        gridTemplateRows: `${this.rowSizes[0]} 1px ${this.rowSizes[1]}`,
       };
-    }
+    },
   },
   mounted() {
     initializeSplitter(this.$refs.vSplitter, true, this.setColumnSplit);
-    initializeSplitter(this.$refs.hSplitter, false, this.setRowSplit, this.rowAdjustmentDone);
+    initializeSplitter(
+      this.$refs.hSplitter,
+      false,
+      this.setRowSplit,
+      this.rowAdjustmentDone
+    );
 
     this.$watch('$refs.exampleList.collapsed', this.onExampleListCollapsed);
   },
@@ -124,7 +128,7 @@ export default {
       if (a === -1) {
         this.rowSizes = ['1fr', '1fr'];
       } else {
-        this.rowSizes = ['1fr', `max(${b}px, ${exampleList.minHeight}px)`]
+        this.rowSizes = ['1fr', `max(${b}px, ${exampleList.minHeight}px)`];
       }
       // Manually adjusting the split invalidates any saved sizes, as those
       // are only needed when un-collapsing.
@@ -139,6 +143,6 @@ export default {
         exampleList.collapsed = false;
       }
     },
-  }
+  },
 };
 </script>

@@ -10,7 +10,7 @@ export function initializeSplitter(splitter, isVertical, setSplit) {
   splitter.appendChild(handle);
 
   let dragging = false;
-  
+
   // This is assumed to be the element that the splitter divides.
   const parentEl = splitter.parentElement;
 

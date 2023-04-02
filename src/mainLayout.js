@@ -4,7 +4,7 @@ import mainLayoutConfig from './components/main-layout.vue';
 
 const MainLayout = Vue.component('main-layout', mainLayoutConfig);
 
-const mainLayout = new MainLayout({
+new MainLayout({
   el: '#mainLayout',
   propsData: {},
 });

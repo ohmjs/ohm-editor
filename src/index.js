@@ -127,8 +127,8 @@ function initializeLayout() {
   const isEmbedded = params.get('embed') === 'true';
 
   if (!isEmbedded) {
-    const scriptEl = document.createElement("script");
-    scriptEl.src = "assets/persistence-bundle.js";
+    const scriptEl = document.createElement('script');
+    scriptEl.src = 'assets/persistence-bundle.js';
     document.body.appendChild(scriptEl);
   }
 }

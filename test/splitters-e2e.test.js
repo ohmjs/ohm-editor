@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import { loadEditorWithArithmeticGrammar } from './playwrightHelpers.js';
+import {loadEditorWithArithmeticGrammar} from './playwrightHelpers.js';
 
 test('splitters', async ({page}) => {
   await loadEditorWithArithmeticGrammar(page);
@@ -8,7 +8,7 @@ test('splitters', async ({page}) => {
     // To avoid inconsistencies with the hover state of the examples, always
     // hover the first example before taking the screenshot.
     await page.hover('.example');
-    await expect(page).toHaveScreenshot('topSplitter-before-drag.png');  
+    await expect(page).toHaveScreenshot('topSplitter-before-drag.png');
   };
 
   await expectInitialScreenshot();
