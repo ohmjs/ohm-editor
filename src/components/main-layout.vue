@@ -100,7 +100,10 @@ export default {
       this.rowAdjustmentDone
     );
 
-    this.$watch('$refs.exampleList.collapsed', this.exampleListCollapsedChanged);
+    this.$watch(
+      '$refs.exampleList.collapsed',
+      this.exampleListCollapsedChanged
+    );
   },
   methods: {
     exampleListCollapsedChanged(isCollapsed) {
