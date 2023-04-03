@@ -100,17 +100,17 @@ export default {
       this.rowAdjustmentDone
     );
 
-    this.$watch('$refs.exampleList.collapsed', this.onExampleListCollapsed);
+    this.$watch('$refs.exampleList.collapsed', this.exampleListCollapsedChanged);
   },
   methods: {
-    onExampleListCollapsed(isCollapsed) {
+    exampleListCollapsedChanged(isCollapsed) {
       if (isCollapsed) {
         // Collapsing can only come from clicking the button.
         // Save the size so we can restore it when its uncollapsed.
-        this.savedRowSizes = [...this.rowSizes];
+        this.savedRowSizes = this.rowSizes;
         this.rowSizes = ['1fr', 'min-content'];
       } else if (this.savedRowSizes) {
-        this.rowSizes = [...this.savedRowSizes];
+        this.rowSizes = this.savedRowSizes;
         this.savedRowSizes = undefined;
       } else {
         this.rowSizes = DEFAULT_ROW_SIZES;
@@ -125,14 +125,15 @@ export default {
     },
     setRowSplit(a, b) {
       const {exampleList} = this.$refs;
+
       if (a === -1) {
         this.rowSizes = ['1fr', '1fr'];
       } else {
         this.rowSizes = ['1fr', `max(${b}px, ${exampleList.minHeight}px)`];
       }
-      // Manually adjusting the split invalidates any saved sizes, as those
-      // are only needed when un-collapsing.
-      this.savedRowSizes = undefined;
+      // Change the collapsed state (below) will restore the saved sizes.
+      // Make sure it uses the right ones.
+      this.savedRowSizes = this.rowSizes;
 
       if (b < exampleList.minHeight) {
         // It was manually dragged to be as small as the collapsed state,
