@@ -6,10 +6,16 @@ button.ellipsis-btn {
   margin-top: 1px;
   padding: 0 4px;
 }
+
 button.ellipsis-btn:hover {
-  background-color: #eee;
+  background-color: var(--button-hover-background-color);
   border: none;
 }
+
+button.ellipsis-btn:active {
+  background-color: var(--active-hover-background-color);
+}
+
 .dropdown-menu {
   margin-top: 4px;
 }

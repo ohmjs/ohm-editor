@@ -3,11 +3,12 @@ const template = `
     <div id="userExampleContainer">
       <div ref="sectionHead" class="section-head flex-row">
         <h2>Examples</h2>
-        <button class="outline-btn">{{ count }}</button>
+        <button class="outline-btn round" :hidden="!collapsed">{{ count }}</button>
         <button
           aria-label="Add example"
           class="outline-btn"
           @click="handleAddClick"
+          :hidden="collapsed"
         >+</button>
         <div class="flex-spacer"></div>
         <button

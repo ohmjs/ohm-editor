@@ -1,3 +1,12 @@
+:root {
+  --button-background-color: rgb(239, 239, 239);
+  --button-text-color: #333;
+  --button-disabled-background-color: #f0f0f0;
+  --button-disabled-text-color: #888;
+  --button-hover-background-color: #e5e5e5;
+  --button-active-background-color: #ddd;
+}
+
 html,
 body {
   height: 100%;
@@ -396,27 +405,30 @@ h2 {
 }
 
 .outline-btn {
-  background-color: rgb(239, 239, 239);
+  background-color: var(--button-background-color);
   border: 0;
   border-radius: 3px;
-  color: #333;
+  color: var(--button-text-color);
   padding: 2px 6px;
 }
 
+.outline-btn.round {
+  border-radius: 12px;
+}
+
 .outline-btn:hover {
-  background-color: #e5e5e5;
-  color: #333;
+  background-color: var(--button-hover-background-color);
 }
 
 .outline-btn[disabled],
 .outline-btn[disabled]:hover {
-  background-color: #f0f0f0;
-  color: #888;
+  background-color: var(--button-disabled-background-color);
+  color: var(--button-disabled-text-color);
 }
 
 .outline-btn:active,
 .outline-btn:active:focus {
-  background-color: #ddd;
+  background-color: var(--button-active-background-color);
   box-shadow: none;
   outline-style: none;
 }
