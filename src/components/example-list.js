@@ -185,6 +185,7 @@ export default Vue.component('example-list', {
     },
     handleChevronClick(e) {
       this.collapsed = !this.collapsed;
+      this.$emit('chevronClick', this.collapsed);
       e.preventDefault();
     },
     handleMouseDown(e) {

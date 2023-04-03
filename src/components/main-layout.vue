@@ -63,7 +63,7 @@
       </div>
     </div>
     <div ref="vSplitter" class="splitter vertical"></div>
-    <example-list ref="exampleList" />
+    <example-list ref="exampleList" @chevronClick="onChevronClick" />
     <div ref="hSplitter" class="splitter"></div>
     <div id="visualizerContainer"></div>
   </div>
@@ -102,17 +102,11 @@ export default {
       this.setRowSplit,
       this.rowAdjustmentDone
     );
-
-    this.$watch(
-      '$refs.exampleList.collapsed',
-      this.exampleListCollapsedChanged
-    );
     initGrammarEditor(this.$refs.editorWrapper);
   },
   methods: {
-    exampleListCollapsedChanged(isCollapsed) {
-      if (isCollapsed) {
-        // Collapsing can only come from clicking the button.
+    onChevronClick(willCollapse) {
+      if (willCollapse) {
         // Save the size so we can restore it when its uncollapsed.
         this.savedRowSizes = this.rowSizes;
         this.rowSizes = ['1fr', 'min-content'];
@@ -138,16 +132,11 @@ export default {
       } else {
         this.rowSizes = ['1fr', `max(${b}px, ${exampleList.minHeight}px)`];
       }
-      // Change the collapsed state (below) will restore the saved sizes.
-      // Make sure it uses the right ones.
-      this.savedRowSizes = this.rowSizes;
 
+      // Allow collapsing/uncollapsing via dragging.
       if (b < exampleList.minHeight) {
-        // It was manually dragged to be as small as the collapsed state,
-        // so actually make it collapsed.
         exampleList.collapsed = true;
       } else {
-        // Otherwise, un-collapse it.
         exampleList.collapsed = false;
       }
     },
