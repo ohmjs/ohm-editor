@@ -58,7 +58,9 @@
           </div>
         </div>
       </div>
-      <div class="flex-fix"><div class="editorWrapper"></div></div>
+      <div class="flex-fix">
+        <div ref="editorWrapper" class="editorWrapper"></div>
+      </div>
     </div>
     <div ref="vSplitter" class="splitter vertical"></div>
     <example-list ref="exampleList" />
@@ -69,6 +71,7 @@
 
 <script>
 import ExampleList from './example-list.js';
+import {initGrammarEditor} from '../ohmEditor.js';
 import {initializeSplitter} from '../splitters.js';
 
 const DEFAULT_ROW_SIZES = ['2fr', '1fr'];
@@ -104,6 +107,7 @@ export default {
       '$refs.exampleList.collapsed',
       this.exampleListCollapsedChanged
     );
+    initGrammarEditor(this.$refs.editorWrapper);
   },
   methods: {
     exampleListCollapsedChanged(isCollapsed) {

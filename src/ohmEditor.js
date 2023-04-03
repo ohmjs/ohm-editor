@@ -79,9 +79,7 @@ ohmEditor.examples.registerEvents({
 
 ohmEditor.ui = {
   inputEditor: null, // Initialized in example-list.js.
-  grammarEditor: CodeMirror(
-    document.querySelector('#grammarContainer .editorWrapper')
-  ),
+  grammarEditor: null,
 };
 
 ohmEditor.defaultGrammar = () => {
@@ -127,4 +125,7 @@ ohmEditor.addListener('parse:grammars', (result, grammars, err) => {
   updateCurrentGrammarAndStartRule();
 });
 
-ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
+export function initGrammarEditor(editorWrapperEl) {
+  ohmEditor.ui.grammarEditor = CodeMirror(editorWrapperEl);
+  ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
+}
