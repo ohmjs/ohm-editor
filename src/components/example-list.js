@@ -3,7 +3,12 @@ const template = `
     <div id="userExampleContainer">
       <div ref="sectionHead" class="section-head flex-row">
         <h2>Examples</h2>
-        <button class="outline-btn round" :hidden="!collapsed">{{ count }}</button>
+        <button
+          class="example-count outline-btn round"
+          :class="classForAllExamples"
+          :hidden="!collapsed"
+          @click="toggleCollapsed"
+        >{{ count }}</button>
         <button
           aria-label="Add example"
           class="outline-btn"
@@ -14,7 +19,7 @@ const template = `
         <button
           class="chevron-btn"
           :class="collapsed ? 'closed' : ''"
-          @click="handleChevronClick"
+          @click="toggleCollapsed"
         ></button>
       </div>
 
@@ -105,6 +110,11 @@ export default Vue.component('example-list', {
     };
   },
   computed: {
+    classForAllExamples() {
+      return [
+        ...new Set(Object.values(this.exampleStatus).map(s => s.className)),
+      ];
+    },
     selectedExampleStatus() {
       return this.exampleStatus[this.selectedId];
     },
@@ -183,9 +193,9 @@ export default Vue.component('example-list', {
       this.deleteExample(li.id);
       e.preventDefault();
     },
-    handleChevronClick(e) {
+    toggleCollapsed(e) {
       this.collapsed = !this.collapsed;
-      this.$emit('chevronClick', this.collapsed);
+      this.$emit('toggleCollapsed', this.collapsed);
       e.preventDefault();
     },
     handleMouseDown(e) {

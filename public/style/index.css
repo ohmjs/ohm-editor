@@ -1,10 +1,25 @@
 :root {
-  --button-background-color: rgb(239, 239, 239);
+  --button-background-color: #efefef;
   --button-text-color: #333;
   --button-disabled-background-color: #f0f0f0;
   --button-disabled-text-color: #888;
   --button-hover-background-color: #e5e5e5;
   --button-active-background-color: #ddd;
+
+  /* Tailwind green 400–600 */
+  --color-success-1: #66bb6a;
+  --color-success-2: #4caf50;
+  --color-success-3: #43a047;
+
+  /* Tailwind amber 300–500 */
+  --color-warning-1: #ffd54f;
+  --color-warning-2: #ffca28;
+  --color-warning-3: #ffc107;
+
+  /* Tailwind red 400–600 */
+  --color-failure-1: #ef5350;
+  --color-failure-2: #f44336;
+  --color-failure-3: #e53935;
 }
 
 html,

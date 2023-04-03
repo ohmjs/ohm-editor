@@ -8,9 +8,10 @@
 #exampleContainer h2 {
   color: #333;
   flex: 0;
-  font-variant: all-small-caps;
+  font-size: 10px;
   font-weight: normal;
-  margin: 8px 6px 10px 0;
+  margin: 8px 6px 8px 0;
+  text-transform: uppercase;
 }
 
 #exampleContainer .section-head {
@@ -25,6 +26,32 @@
 
 .flex-spacer {
   flex: 1;
+}
+
+.example-count.pass.fail {
+  background-color: var(--color-warning-1);
+  color: var(--button-text-color);
+}
+
+.example-count.pass.fail:hover {
+  background-color: var(--color-warning-2);
+}
+
+.example-count.pass.fail:active {
+  background-color: var(--color-warning-3);
+}
+
+.example-count.fail {
+  background-color: var(--color-failure-1);
+  color: white;
+}
+
+.example-count.fail:hover {
+  background-color: var(--color-failure-2);
+}
+
+.example-count.fail:active {
+  background-color: var(--color-failure-3);
 }
 
 .chevron-btn {
@@ -82,11 +109,11 @@
 }
 
 #exampleList .example.fail code {
-  border-left: 4px solid #d44950;
+  border-left: 4px solid var(--color-failure-1);
 }
 
 #exampleList .example.pass code {
-  border-left: 4px solid #58b958;
+  border-left: 4px solid var(--color-success-1);
 }
 
 #exampleList .example.pendingUpdate code {

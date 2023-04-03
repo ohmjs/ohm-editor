@@ -63,7 +63,10 @@
       </div>
     </div>
     <div ref="vSplitter" class="splitter vertical"></div>
-    <example-list ref="exampleList" @chevronClick="onChevronClick" />
+    <example-list
+      ref="exampleList"
+      @toggleCollapsed="onToggleExamplesCollapsed"
+    />
     <div ref="hSplitter" class="splitter"></div>
     <div id="visualizerContainer"></div>
   </div>
@@ -105,7 +108,7 @@ export default {
     initGrammarEditor(this.$refs.editorWrapper);
   },
   methods: {
-    onChevronClick(willCollapse) {
+    onToggleExamplesCollapsed(willCollapse) {
       if (willCollapse) {
         // Save the size so we can restore it when its uncollapsed.
         this.savedRowSizes = this.rowSizes;
