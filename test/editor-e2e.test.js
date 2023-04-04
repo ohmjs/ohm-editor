@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import { loadEditorWithArithmeticGrammar } from './playwrightHelpers.js';
+import {loadEditorWithArithmeticGrammar} from './playwrightHelpers.js';
 
 test('basic behaviour', async ({page}) => {
   await loadEditorWithArithmeticGrammar(page);

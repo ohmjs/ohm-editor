@@ -1,48 +1,44 @@
+:root {
+  --button-background-color: #efefef;
+  --button-text-color: #333;
+  --button-disabled-background-color: #f0f0f0;
+  --button-disabled-text-color: #888;
+  --button-hover-background-color: #e5e5e5;
+  --button-active-background-color: #ddd;
+
+  /* Tailwind green 400–600 */
+  --color-success-1: #66bb6a;
+  --color-success-2: #4caf50;
+  --color-success-3: #43a047;
+
+  /* Tailwind amber 300–500 */
+  --color-warning-1: #ffd54f;
+  --color-warning-2: #ffca28;
+  --color-warning-3: #ffc107;
+
+  /* Tailwind red 400–600 */
+  --color-failure-1: #ef5350;
+  --color-failure-2: #f44336;
+  --color-failure-3: #e53935;
+}
+
 html,
 body {
   height: 100%;
 }
+
 body {
   background-color: white;
-  display: grid;
+  display: flex;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica',
     'Arial', sans-serif;
-  grid-template-rows: 1fr 1px 1fr;
-  grid-template-columns: 1fr 1px 1fr;
-  grid-template-areas:
-    'grammar vsplit examples'
-    'hsplit hsplit hsplit'
-    'viz viz viz';
   margin: 0;
   overflow: hidden;
   padding: 0;
 }
 
-body.twoPane {
-  grid-template-areas:
-    'grammar vsplit viz'
-    'hsplit vsplit viz'
-    'examples vsplit viz';
-}
-
-body.columnsResized {
-  grid-template-columns: min-content 1px 1fr;
-}
-
-body.rowsResized {
-  grid-template-rows: min-content 1px 1fr;
-}
-
 [hidden] {
   display: none !important;
-}
-
-#topSplitter {
-  grid-area: vsplit;
-}
-
-#mainSplitter {
-  grid-area: hsplit;
 }
 
 #dragOverlay {
@@ -154,13 +150,6 @@ body.rowsResized {
   grid-area: grammar;
 }
 
-#exampleContainer {
-  display: flex;
-  flex-direction: row;
-  flex: auto;
-  grid-area: examples;
-}
-
 #visualizerContainer {
   grid-area: viz;
 }
@@ -187,10 +176,6 @@ body.rowsResized {
 #grammarContainer,
 #visualizerContainer {
   position: relative; /* For placing absolutely-positioned overlays */
-}
-
-#exampleContainer[hidden] {
-  display: none;
 }
 
 h2 {
@@ -304,36 +289,6 @@ h2 {
     0 0 0 1px hsla(216, 89%, 62%, 0.5);
   border-color: hsl(217, 60%, 71%);
   outline: none;
-}
-
-.splitter {
-  background-color: #ddd;
-  height: 1px;
-  min-height: 1px;
-  overflow: visible;
-  position: relative;
-}
-.vertical.splitter {
-  height: auto;
-  min-height: auto;
-  min-width: 1px;
-  width: 1px;
-}
-.splitter .handle {
-  bottom: -2px;
-  cursor: ns-resize;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: -2px;
-  z-index: 10;
-}
-.vertical.splitter .handle {
-  bottom: 0;
-  cursor: ew-resize;
-  left: -2px;
-  right: -2px;
-  top: 0;
 }
 
 .externalRules {
@@ -465,28 +420,30 @@ h2 {
 }
 
 .outline-btn {
-  background-color: transparent;
-  border: 1px solid #aaa;
+  background-color: var(--button-background-color);
+  border: 0;
   border-radius: 3px;
-  color: #888;
-  padding: 1px 6px 2px 6px;
+  color: var(--button-text-color);
+  padding: 2px 6px;
+}
+
+.outline-btn.round {
+  border-radius: 12px;
 }
 
 .outline-btn:hover {
-  border-color: #666;
-  color: #444;
+  background-color: var(--button-hover-background-color);
 }
 
 .outline-btn[disabled],
 .outline-btn[disabled]:hover {
-  border-color: #ddd;
-  color: #ccc;
+  background-color: var(--button-disabled-background-color);
+  color: var(--button-disabled-text-color);
 }
 
 .outline-btn:active,
 .outline-btn:active:focus {
-  color: rgba(2, 117, 216, 0.8);
-  border-color: rgba(2, 117, 216, 0.8);
+  background-color: var(--button-active-background-color);
   box-shadow: none;
   outline-style: none;
 }

@@ -4,13 +4,13 @@
 import {$, $$} from './domUtil.js';
 import ohmEditor from './ohmEditor.js';
 
+// TODO: Ideally these modules wouldn't do all their work as side effects.
 import './editorErrors.js';
-import './examples.js';
+import './mainLayout.js';
 import './externalRules.js';
 import './parseTree.js';
 import './ruleHyperlinks.js';
 import './searchBar.js';
-import {initializeSplitter} from './splitters.js';
 
 let grammarChanged = true;
 let inputChanged = true;
@@ -18,8 +18,6 @@ let inputChanged = true;
 let showFailuresImplicitly = true;
 
 let grammarMatcher = ohm.ohmGrammar.matcher();
-
-const USE_TWO_PANE_LAYOUT = true;
 
 // Helpers
 // -------
@@ -124,23 +122,14 @@ ohmEditor.saveState = function (editor, key) {
   localStorage.setItem(key, editor.getValue());
 };
 
-async function initializeLayout() {
+function initializeLayout() {
   const params = new URLSearchParams(window.location.search);
   const isEmbedded = params.get('embed') === 'true';
 
   if (!isEmbedded) {
-    const scriptEl = document.createElement("script");
-    scriptEl.src = "assets/persistence-bundle.js";
+    const scriptEl = document.createElement('script');
+    scriptEl.src = 'assets/persistence-bundle.js';
     document.body.appendChild(scriptEl);
-  }
-
-  if (USE_TWO_PANE_LAYOUT) {
-    initializeSplitter($('#topSplitter'), $('#grammarContainer'));
-    initializeSplitter($('#mainSplitter'), $('#grammarContainer'));
-  } else {
-    $('body').classList.remove('twoPane');
-    initializeSplitter($('#topSplitter'), $('#grammarContainer'));
-    initializeSplitter($('#mainSplitter'), $('#exampleContainer'));
   }
 }
 

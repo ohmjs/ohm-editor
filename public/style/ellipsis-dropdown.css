@@ -1,14 +1,21 @@
 button.ellipsis-btn {
+  background-color: transparent;
   border: none;
   font-size: 18px;
   font-weight: 900;
   margin-top: 1px;
   padding: 0 4px;
 }
+
 button.ellipsis-btn:hover {
-  background-color: #eee;
+  background-color: var(--button-hover-background-color);
   border: none;
 }
+
+button.ellipsis-btn:active {
+  background-color: var(--active-hover-background-color);
+}
+
 .dropdown-menu {
   margin-top: 4px;
 }

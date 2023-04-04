@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 
-export async function initNetworkReplay(page) { 
+export async function initNetworkReplay(page) {
   // Avoid hitting GitHub, especially since we can get rate limited.
   await page.routeFromHAR('test/data/har/api.github.com.har', {
     url: /^https:\/\/api.github.com\//,
