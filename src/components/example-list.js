@@ -17,6 +17,7 @@ const template = `
         >+</button>
         <div class="flex-spacer"></div>
         <button
+          :aria-label="collapsed ? 'Expand' : 'Collapse'"
           class="chevron-btn"
           :class="collapsed ? 'closed' : ''"
           @click="toggleCollapsed"
