@@ -135,11 +135,7 @@ test('multi-line rule definitions', () => {
   const {token, startState} = createModeFactory(ohm)();
   const state = startState();
 
-  let tokens = tokenizeLine(
-    token,
-    new FakeStream('myRule', '="x"'),
-    state
-  );
+  let tokens = tokenizeLine(token, new FakeStream('myRule', '="x"'), state);
   assert.equal(tokens, ['ruleDef']);
 
   tokens = tokenizeLine(

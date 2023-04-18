@@ -3,7 +3,7 @@
 
 import CheckedEmitter from 'checked-emitter';
 
-import { createModeFactory } from './ohmMode.js';
+import {createModeFactory} from './ohmMode.js';
 
 const ohmEditor = new CheckedEmitter();
 export default ohmEditor;
@@ -131,7 +131,7 @@ export function initGrammarEditor(editorWrapperEl) {
   CodeMirror.defineMode('ohm', createModeFactory(ohm));
   ohmEditor.ui.grammarEditor = CodeMirror(editorWrapperEl, {
     mode: {name: 'ohm'},
-    theme: 'light-owl'
+    theme: 'light-owl',
   });
   ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
 }

@@ -55,12 +55,12 @@ export function createModeFactory(ohm) {
   const tok = (wrapper, tokenType) => ({
     tokenType,
     rule: wrapper.ctorName,
-    contents: wrapper.sourceString
+    contents: wrapper.sourceString,
   });
 
   const semantics = grammar.createSemantics().addOperation('tokens', {
     tokens(tokenIter) {
-      return tokenIter.children.map((c) => c.tokens());
+      return tokenIter.children.map(c => c.tokens());
     },
     def(ident, _) {
       return tok(this, 'ruleDef');
@@ -107,7 +107,7 @@ export function createModeFactory(ohm) {
     },
   });
 
-  const getTokens = (input) => {
+  const getTokens = input => {
     const matchResult = grammar.match(input, 'tokens');
     // In general, this should never fail.
     if (matchResult.failed()) {
@@ -116,7 +116,7 @@ export function createModeFactory(ohm) {
     return semantics(matchResult).tokens();
   };
 
-  const withTokenPos = (tokens) => {
+  const withTokenPos = tokens => {
     let pos = 0;
     return tokens.map(t => {
       const startPos = pos;
@@ -129,16 +129,18 @@ export function createModeFactory(ohm) {
     const tokens = [];
     for (const [pos, tok] of withTokenPos(getTokens(input + nextLine))) {
       if (pos > input.length) break;
-      tokens.push(tok)
+      tokens.push(tok);
     }
     return tokens;
-  }
+  };
 
   const maybeHandleMultiLineRuleStart = (input, tokens, getNextLine) => {
     // Find the first token that's not whitespace or a comment.
     // If it's a multiLineRuleStart, then re-parse with the contents of the
     // next line included.
-    const firstRealToken = tokens.find(({ tokenType }) => ![null, 'comment'].includes(tokenType));
+    const firstRealToken = tokens.find(
+      ({tokenType}) => ![null, 'comment'].includes(tokenType)
+    );
     if (firstRealToken?.rule === 'multiLineRuleStart') {
       return handleMultiLineRuleStart(input, getNextLine());
     }
@@ -173,7 +175,9 @@ export function createModeFactory(ohm) {
       const input = state.input.slice(stream.pos);
 
       const initialTokens = getTokens(input);
-      state.tokens = maybeHandleMultiLineRuleStart(input, initialTokens, () => stream.lookAhead(1));
+      state.tokens = maybeHandleMultiLineRuleStart(input, initialTokens, () =>
+        stream.lookAhead(1)
+      );
     }
     if (!state.tokens || state.tokens.length === 0) {
       stream.skipToEnd();
@@ -193,7 +197,7 @@ export function createModeFactory(ohm) {
     }
 
     return tokenType;
-  }
+  };
 
   // Implement CodeMirror's "mode factory" interface
   return () => {
@@ -202,7 +206,7 @@ export function createModeFactory(ohm) {
         return {
           input: undefined,
           tokens: [],
-          insideComment: false
+          insideComment: false,
         };
       },
       token,
