@@ -4,7 +4,7 @@ const grammarDef = String.raw`
   OhmTokens <: Ohm {
     token +=
       | def
-      | ruleDescr // TODO: Add this to tokens in main grammar?
+      | strictRuleDescr
       | multiLineRuleStart
       | whitespace
       | multiLineCommentStart
@@ -21,12 +21,16 @@ const grammarDef = String.raw`
       | Formals? ":="  -- override
       | Formals? "+="  -- extend
 
+    // Since this can only appear as part of a rule definition, we don't need
+    // to explicitly handle the multi-line case here -- we get it for free.
+    strictRuleDescr = ruleDescr &(spaces "=")
+
     // Another case for a partial definition: the operator ('=', ':=', etc.)
     // appears on the next line. Without additional context, this may not
     // be distinguishable from a rule application at the end of a rule body.
     multiLineRuleStart = ident &applySyntactic<MultiLineRuleAfterIdent>
 
-    MultiLineRuleAfterIdent = Formals? ruleDescr? end
+    MultiLineRuleAfterIdent = Formals? ruleDescr? &end
 
     // These rules are needed due to the line-oriented and incremental
     // nature of CodeMirror syntax highlighting.
@@ -36,11 +40,9 @@ const grammarDef = String.raw`
 
     // TODO: Move this into the main grammar (?)
     operator += "..." | ".." | "|" | "#"
+    punctuation += "(" | ")"
 
     whitespace = (~comment space)+
-
-
-    zzz = terminal multiLineCommentStart
   }
 `;
 
@@ -56,55 +58,54 @@ export function createModeFactory(ohm) {
     contents: wrapper.sourceString
   });
 
-  const semantics = grammar.createSemantics()
-    .addOperation('tokens', {
-      tokens(tokenIter) {
-        return tokenIter.children.map((c) => c.tokens());
-      },
-      def(ident, _) {
-        return tok(this, 'ruleDef');
-      },
-      ruleDescr(_open, text, _close) {
-        return tok(this, 'meta');
-      },
-      multiLineRuleStart(ident, rest) {
-        // This is not *really* a rule start, but a trailing rule application.
-        return tok(this, 'variable');
-      },
-      whitespace(spaceIter) {
-        return tok(this, null);
-      },
-      multiLineCommentStart(_, _ch) {
-        return tok(this, 'comment');
-      },
-      terminalStart(_, _ch) {
-        return tok(this, 'string');
-      },
-      lenientCaseName(_, _ws, name) {
-        return tok(this, 'caseName');
-      },
-      comment_singleLine(_open, anyIter, _close) {
-        return tok(this, 'comment');
-      },
-      comment_multiLine(_open, anyIter, _close) {
-        return tok(this, 'comment');
-      },
-      ident(name) {
-        return tok(this, 'variable');
-      },
-      operator(_) {
-        return tok(this, 'operator');
-      },
-      punctuation(term) {
-        return tok(this, 'punctuation');
-      },
-      terminal(_open, charIter, _close) {
-        return tok(this, 'string');
-      },
-      any(_) {
-        return tok(this, null);
-      },
-    });
+  const semantics = grammar.createSemantics().addOperation('tokens', {
+    tokens(tokenIter) {
+      return tokenIter.children.map((c) => c.tokens());
+    },
+    def(ident, _) {
+      return tok(this, 'ruleDef');
+    },
+    strictRuleDescr(ruleDesc, _, _eq) {
+      return tok(this, 'meta');
+    },
+    multiLineRuleStart(ident, rest) {
+      // This is not *really* a rule start, but a trailing rule application.
+      return tok(this, 'variable');
+    },
+    whitespace(spaceIter) {
+      return tok(this, null);
+    },
+    multiLineCommentStart(_, _ch) {
+      return tok(this, 'comment');
+    },
+    terminalStart(_, _ch) {
+      return tok(this, 'string');
+    },
+    lenientCaseName(_, _ws, name) {
+      return tok(this, 'caseName');
+    },
+    comment_singleLine(_open, anyIter, _close) {
+      return tok(this, 'comment');
+    },
+    comment_multiLine(_open, anyIter, _close) {
+      return tok(this, 'comment');
+    },
+    ident(name) {
+      return tok(this, 'variable');
+    },
+    operator(_) {
+      return tok(this, 'operator');
+    },
+    punctuation(term) {
+      return tok(this, 'punctuation');
+    },
+    terminal(_open, charIter, _close) {
+      return tok(this, 'string');
+    },
+    any(_) {
+      return tok(this, null);
+    },
+  });
 
   const getTokens = (input) => {
     const matchResult = grammar.match(input, 'tokens');
@@ -115,21 +116,34 @@ export function createModeFactory(ohm) {
     return semantics(matchResult).tokens();
   };
 
-  const maybeHandleMultiLineRuleStart = (tokens, stream) => {
-    const [lastToken] = tokens.slice(-1);
-    if (
-      lastToken.rule === 'multiLineRuleStart' &&
-      (tokens.length === 1 ||
-        (tokens.length === 2 && tokens[0].rule === 'whitespace'))
-    ) {
-      // Re-parse the last token with the contents of the next line included.
-      // This parses the entire next line, but only the first resulting token
-      // is kept and the others are discarded.
-      const [newToken] = getTokens(lastToken.contents + stream.lookAhead(1));
-      return tokens.slice(0, -1).concat(newToken);
+  const withTokenPos = (tokens) => {
+    let pos = 0;
+    return tokens.map(t => {
+      const startPos = pos;
+      pos += t.contents.length;
+      return [startPos, t];
+    });
+  };
+
+  const handleMultiLineRuleStart = (input, nextLine) => {
+    const tokens = [];
+    for (const [pos, tok] of withTokenPos(getTokens(input + nextLine))) {
+      if (pos > input.length) break;
+      tokens.push(tok)
     }
     return tokens;
   }
+
+  const maybeHandleMultiLineRuleStart = (input, tokens, getNextLine) => {
+    // Find the first token that's not whitespace or a comment.
+    // If it's a multiLineRuleStart, then re-parse with the contents of the
+    // next line included.
+    const firstRealToken = tokens.find(({ tokenType }) => ![null, 'comment'].includes(tokenType));
+    if (firstRealToken?.rule === 'multiLineRuleStart') {
+      return handleMultiLineRuleStart(input, getNextLine());
+    }
+    return tokens;
+  };
 
   const handleComment = (stream, state) => {
     while (!stream.eol()) {
@@ -140,9 +154,9 @@ export function createModeFactory(ohm) {
       stream.next();
     }
     return 'comment';
-  }
-    
-  function token(stream, state) {
+  };
+
+  const token = (stream, state) => {
     if (state.insideComment) {
       return handleComment(stream, state);
     }
@@ -156,8 +170,10 @@ export function createModeFactory(ohm) {
 
       // We need to start parsing at `stream.pos` because the comment handling
       // may have already consumed some characters on this line.
-      const tokens = getTokens(state.input.slice(stream.pos));
-      state.tokens = maybeHandleMultiLineRuleStart(tokens, stream);
+      const input = state.input.slice(stream.pos);
+
+      const initialTokens = getTokens(input);
+      state.tokens = maybeHandleMultiLineRuleStart(input, initialTokens, () => stream.lookAhead(1));
     }
     if (!state.tokens || state.tokens.length === 0) {
       stream.skipToEnd();

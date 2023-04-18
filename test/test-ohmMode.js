@@ -5,9 +5,10 @@ import * as assert from 'uvu/assert';
 import {createModeFactory} from '../src/ohmMode.js';
 
 class FakeStream {
-  constructor(str) {
+  constructor(str, nextLine) {
     this.string = str;
     this.pos = 0;
+    this.nextLine = nextLine;
   }
 
   next() {
@@ -29,6 +30,11 @@ class FakeStream {
 
   eol() {
     return this.pos >= this.string.length;
+  }
+
+  lookAhead(n) {
+    assert.is(n, 1);
+    return this.nextLine;
   }
 }
 
@@ -113,7 +119,7 @@ test('open strings', () => {
   assert.equal(tokens, ['ruleDef', 'operator', 'string']);
 });
 
-test.skip('rule descriptions', () => {
+test('rule descriptions', () => {
   const tokens = simpleTokenize('x=(y)+');
   assert.equal(tokens, [
     'ruleDef',
@@ -125,14 +131,20 @@ test.skip('rule descriptions', () => {
   ]);
 });
 
-test.skip('multi-line rule definitions', () => {
+test('multi-line rule definitions', () => {
   const {token, startState} = createModeFactory(ohm)();
   const state = startState();
 
-  // TODO: Support lookAhead in FakeStream
-  const tokens = tokenizeLine(
+  let tokens = tokenizeLine(
     token,
-    new FakeStream('myRule(so amazing)', '='),
+    new FakeStream('myRule', '="x"'),
+    state
+  );
+  assert.equal(tokens, ['ruleDef']);
+
+  tokens = tokenizeLine(
+    token,
+    new FakeStream('myRule(my desc)', '="x"'),
     state
   );
   assert.equal(tokens, ['ruleDef', 'meta']);
