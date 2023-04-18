@@ -55,10 +55,12 @@ function simpleTokenize(str) {
 test('basic token types', () => {
   // As defined in ohm-grammar.ohm:
   //   token = caseName | comment | ident | operator | punctuation | terminal | any
-  const tokens = simpleTokenize('r(desc)/**/=r2<r3>"a".."z"+--caseName//');
+  const tokens = simpleTokenize('G{r(desc)/**/=r2<r3>"a".."z"+--caseName}//');
   assert.equal(tokens, [
+    'grammarDef',
+    'punctuation', // {
     'ruleDef',
-    'meta',
+    'meta', // (desc)
     'comment',
     'operator', // =
     'variable', // r2
@@ -70,6 +72,7 @@ test('basic token types', () => {
     'string', // "z"
     'operator', // "+"
     'caseName',
+    'punctuation', // }
     'comment',
   ]);
 });
@@ -144,6 +147,11 @@ test('multi-line rule definitions', () => {
     state
   );
   assert.equal(tokens, ['ruleDef', 'meta']);
+});
+
+test('grammar name', () => {
+  const tokens = simpleTokenize('MyGrammr {');
+  assert.equal(tokens, ['grammarDef', null, 'punctuation']);
 });
 
 test.run();

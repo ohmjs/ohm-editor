@@ -258,7 +258,9 @@ h2 {
 .CodeMirror-lines {
   padding-top: 0;
 }
-.CodeMirror-lines pre {
+
+.externalRules pre,
+.CodeMirror pre.CodeMirror-line {
   padding-left: 20px;
 }
 

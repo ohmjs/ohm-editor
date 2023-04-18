@@ -4,6 +4,7 @@ const grammarDef = String.raw`
   OhmTokens <: Ohm {
     token +=
       | def
+      | grammarDef
       | strictRuleDescr
       | multiLineRuleStart
       | whitespace
@@ -12,6 +13,7 @@ const grammarDef = String.raw`
       | lenientCaseName
 
     def = ident &applySyntactic<DefAfterIdent>
+    grammarDef = ident &(spaces "{")
 
     // Recognize a partial definition, for two cases:
     // 1. The user is just starting to type it
@@ -40,7 +42,7 @@ const grammarDef = String.raw`
 
     // TODO: Move this into the main grammar (?)
     operator += "..." | ".." | "|" | "#"
-    punctuation += "(" | ")"
+    punctuation += "(" | ")" | "{" | "}"
 
     whitespace = (~comment space)+
   }
@@ -64,6 +66,9 @@ export function createModeFactory(ohm) {
     },
     def(ident, _) {
       return tok(this, 'ruleDef');
+    },
+    grammarDef(ident, _, _open) {
+      return tok(this, 'grammarDef');
     },
     strictRuleDescr(ruleDesc, _, _eq) {
       return tok(this, 'meta');

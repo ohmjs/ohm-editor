@@ -9,12 +9,15 @@
 .cm-s-light-owl span.cm-string {
   color: #c96765;
 }
+.cm-s-light-owl span.cm-grammarDef {
+  color: #4876d6;
+}
 .cm-s-light-owl span.cm-ruleDef {
   color: #4876d6;
-} /* rule definitions */
+}
 .cm-s-light-owl span.cm-operator {
   color: #994cc3;
-} /* use of rule param */
+}
 
 .cm-s-light-owl span.cm-meta {
   color: #989fb1;
