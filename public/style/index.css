@@ -20,6 +20,8 @@
   --color-failure-1: #ef5350;
   --color-failure-2: #f44336;
   --color-failure-3: #e53935;
+
+  --editor-font: Menlo, Monaco, sans-serif;
 }
 
 html,
@@ -64,7 +66,7 @@ body {
   font-size: 0.75em;
 }
 #grammarName {
-  font-family: Menlo, Monaco, sans-serif;
+  font-family: var(--editor-font);
 }
 #grammarName.unnamed {
   font-style: italic;
@@ -203,9 +205,13 @@ h2 {
   position: relative;
 }
 
-.editorWrapper .CodeMirror {
-  font-family: Menlo, Monaco, sans-serif;
+.editorWrapper .CodeMirror,
+.externalRules pre {
+  font-family: var(--editor-font);
   font-size: 12px;
+}
+
+.editorWrapper .CodeMirror {
   height: 100%;
   position: absolute; /* See .flex-fix above. */
   width: 100%;
