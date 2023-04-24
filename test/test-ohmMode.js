@@ -154,4 +154,9 @@ test('grammar name', () => {
   assert.equal(tokens, ['grammarDef', null, 'punctuation']);
 });
 
+test('multi-line rule definition, but no next line', () => {
+  const tokens = simpleTokenize('G');
+  assert.equal(tokens, ['variable']);
+});
+
 test.run();
