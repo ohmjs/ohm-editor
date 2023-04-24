@@ -114,7 +114,7 @@ ohmEditor.setGrammar = function (grammar) {
       grammar = $('#sampleGrammar').textContent; // default element
     }
   }
-  const doc = CodeMirror.Doc(grammar, 'null');
+  const doc = CodeMirror.Doc(grammar, 'ohm');
   ohmEditor.ui.grammarEditor.swapDoc(doc);
 };
 
