@@ -22,6 +22,8 @@
   --color-failure-3: #e53935;
 
   --editor-font: Menlo, Monaco, sans-serif;
+
+  --grey-text-color: #666;
 }
 
 html,
@@ -102,6 +104,10 @@ body {
   position: fixed;
   right: 15px;
 }
+body.embedded #optionPanel {
+  display: none;
+}
+
 #options input[type='checkbox'] {
   position: relative;
   margin: 0 4px 0 0;
@@ -206,7 +212,8 @@ h2 {
 }
 
 .editorWrapper .CodeMirror,
-.externalRules pre {
+.externalRules pre,
+.fakeJsDecl pre {
   font-family: var(--editor-font);
   font-size: 12px;
 }
@@ -266,6 +273,7 @@ h2 {
 }
 
 .externalRules pre,
+.fakeJsDecl pre,
 .CodeMirror pre.CodeMirror-line {
   padding-left: 20px;
 }
@@ -299,9 +307,21 @@ h2 {
   outline: none;
 }
 
-.externalRules {
-  color: #999;
+.fakeJsDecl pre {
+  color: var(--grey-text-color);
   margin: 0;
+}
+
+.externalRules {
+  color: var(--grey-text-color);
+  margin: 0;
+}
+
+.noExternalRules .externalRules {
+  display: none;
+}
+
+.externalRules {
   padding-top: 14px;
 }
 .externalRules .content {

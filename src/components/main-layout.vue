@@ -143,6 +143,14 @@ export default {
         exampleList.collapsed = false;
       }
     },
+    toggleExamplesCollapsed(collapsed = undefined) {
+      const {exampleList} = this.$refs;
+      if (collapsed === undefined) {
+        collapsed = !exampleList.collapsed;
+      }
+      exampleList.collapsed = collapsed;
+      this.onToggleExamplesCollapsed(collapsed);
+    },
   },
 };
 </script>

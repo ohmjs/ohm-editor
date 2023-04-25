@@ -130,7 +130,7 @@ export function createModeFactory(ohm) {
     });
   };
 
-  const handleMultiLineRuleStart = (input, nextLine='') => {
+  const handleMultiLineRuleStart = (input, nextLine = '') => {
     const tokens = [];
     for (const [pos, tok] of withTokenPos(getTokens(input + nextLine))) {
       if (pos > input.length) break;
