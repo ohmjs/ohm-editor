@@ -159,4 +159,18 @@ test('multi-line rule definition, but no next line', () => {
   assert.equal(tokens, ['variable']);
 });
 
+test('whitespace crossing a line break', () => {
+  const {token, startState} = createModeFactory(ohm)();
+  const state = startState();
+
+  // Make sure that the trailing whitespace on the first line and the leading
+  // whitespace on the second line don't get merged into a single token.
+  const tokens = tokenizeLine(
+    token,
+    new FakeStream('x (an x) ', ' = "x"'),
+    state
+  );
+  assert.equal(tokens, ['ruleDef', null, 'meta', null]);
+});
+
 test.run();

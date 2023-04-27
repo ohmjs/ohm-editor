@@ -44,7 +44,9 @@ const grammarDef = String.raw`
     operator += "..." | ".." | "|" | "#"
     punctuation += "(" | ")" | "{" | "}"
 
-    whitespace = (~comment space)+
+    // Whitespace should not match across lines, since CodeMirror doesn't
+    // allow tokens to cross a line break.
+    whitespace = (~comment ~"\n" space)+
   }
 `;
 
@@ -132,7 +134,8 @@ export function createModeFactory(ohm) {
 
   const handleMultiLineRuleStart = (input, nextLine = '') => {
     const tokens = [];
-    for (const [pos, tok] of withTokenPos(getTokens(input + nextLine))) {
+    // Include the newline so that no token crosses a line boundary.
+    for (const [pos, tok] of withTokenPos(getTokens(input + '\n' + nextLine))) {
       if (pos > input.length) break;
       tokens.push(tok);
     }
