@@ -428,7 +428,7 @@ export default Vue.component('example-list', {
       this.setGrammars(null);
     });
     ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
-      self.setGrammars(grammars);
+      this.setGrammars(grammars);
     });
     ohmEditor.addListener('change:inputEditor', source => {
       // Don't indicate that input is pending if the user just changed the selected example.

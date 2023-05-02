@@ -12,8 +12,6 @@ import './parseTree.js';
 import './ruleHyperlinks.js';
 import './searchBar.js';
 
-const FEAT_INLINE_EXAMPLES = true;
-
 let grammarChanged = true;
 let inputChanged = true;
 
@@ -22,6 +20,8 @@ let showFailuresImplicitly = true;
 let grammarMatcher = ohm.ohmGrammar.matcher();
 
 const urlParams = new URLSearchParams(window.location.search);
+
+const enableInlineExamples = urlParams.get('examples') === 'inline';
 
 // Helpers
 // -------
@@ -95,7 +95,7 @@ function refresh() {
     const {matchResult, grammars, examples, err} = parseGrammars();
     ohmEditor.emit('parse:grammars', matchResult, grammars, examples, err);
 
-    if (FEAT_INLINE_EXAMPLES) {
+    if (enableInlineExamples) {
       ohmEditor.examples.restoreExamples(examples.map(({ example, grammar, rule, shouldMatch }) => {
         return { text: example, startRule: rule, selectedGrammar: grammar, shouldMatch };
       }));
