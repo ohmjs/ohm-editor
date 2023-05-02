@@ -86,12 +86,20 @@ ohmEditor.addListener('change:inputEditor', hideInputError);
 ohmEditor.addListener('change:grammars', hideInputError);
 ohmEditor.addListener('set:startRule', hideInputError);
 
-ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
-  if (err) {
-    const editor = ohmEditor.ui.grammarEditor;
-    setError('grammar', editor, err.interval, err.shortMessage || err.message);
+ohmEditor.addListener(
+  'parse:grammars',
+  (matchResult, grammars, examples, err) => {
+    if (err) {
+      const editor = ohmEditor.ui.grammarEditor;
+      setError(
+        'grammar',
+        editor,
+        err.interval,
+        err.shortMessage || err.message
+      );
+    }
   }
-});
+);
 ohmEditor.addListener('parse:input', (matchResult, trace) => {
   if (trace.result.failed()) {
     const editor = ohmEditor.ui.inputEditor;

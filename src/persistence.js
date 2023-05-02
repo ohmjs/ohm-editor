@@ -319,9 +319,12 @@ function doSaveAs() {
       saveButton.disabled = true;
     });
     if (examples) {
-      ohmEditor.once('parse:grammars', (matchResult, grammars, inlineExamples, err) => {
-        ohmEditor.examples.restoreExamples(examples);
-      });
+      ohmEditor.once(
+        'parse:grammars',
+        (matchResult, grammars, inlineExamples, err) => {
+          ohmEditor.examples.restoreExamples(examples);
+        }
+      );
     }
 
     ohmEditor.examples.restoreExamples([]); // clear examples

@@ -38,7 +38,9 @@ function parseGrammars() {
       err = ex;
     }
     if (enableInlineExamples) {
-      examples = ohmExtras.extractExamples(ohmEditor.ui.grammarEditor.getValue());
+      examples = ohmExtras.extractExamples(
+        ohmEditor.ui.grammarEditor.getValue()
+      );
     }
   } else {
     err = {
@@ -98,9 +100,16 @@ function refresh() {
     ohmEditor.emit('parse:grammars', matchResult, grammars, examples, err);
 
     if (enableInlineExamples) {
-      ohmEditor.examples.restoreExamples(examples.map(({ example, grammar, rule, shouldMatch }) => {
-        return { text: example, startRule: rule, selectedGrammar: grammar, shouldMatch };
-      }));
+      ohmEditor.examples.restoreExamples(
+        examples.map(({example, grammar, rule, shouldMatch}) => {
+          return {
+            text: example,
+            startRule: rule,
+            selectedGrammar: grammar,
+            shouldMatch,
+          };
+        })
+      );
     }
   }
   const {currentGrammar} = ohmEditor;

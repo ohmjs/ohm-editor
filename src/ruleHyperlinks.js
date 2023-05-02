@@ -132,12 +132,15 @@ function registerListeners(editor) {
   });
 }
 
-ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
-  if (!grammarEditor) {
-    grammarEditor = ohmEditor.ui.grammarEditor; // eslint-disable-line prefer-destructuring
-    registerListeners(grammarEditor);
+ohmEditor.addListener(
+  'parse:grammars',
+  (matchResult, grammars, examples, err) => {
+    if (!grammarEditor) {
+      grammarEditor = ohmEditor.ui.grammarEditor; // eslint-disable-line prefer-destructuring
+      registerListeners(grammarEditor);
+    }
+    grammarMemoTable = matchResult.succeeded()
+      ? matchResult.matcher.memoTable
+      : null;
   }
-  grammarMemoTable = matchResult.succeeded()
-    ? matchResult.matcher.memoTable
-    : null;
-});
+);

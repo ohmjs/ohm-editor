@@ -179,10 +179,13 @@ grammarEditor.on('swapDoc', cm => {
   widget = new LastLineWidget(cm);
 });
 
-ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
-  grammarMatchResult = matchResult;
-  updateExternalRules();
-});
+ohmEditor.addListener(
+  'parse:grammars',
+  (matchResult, grammars, examples, err) => {
+    grammarMatchResult = matchResult;
+    updateExternalRules();
+  }
+);
 
 ohmEditor.addListener('change:option', name => {
   if (name === 'showSpaces') {
