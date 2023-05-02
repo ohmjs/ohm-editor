@@ -37,7 +37,9 @@ function parseGrammars() {
     } catch (ex) {
       err = ex;
     }
-    examples = ohmExtras.extractExamples(ohmEditor.ui.grammarEditor.getValue());
+    if (enableInlineExamples) {
+      examples = ohmExtras.extractExamples(ohmEditor.ui.grammarEditor.getValue());
+    }
   } else {
     err = {
       message: matchResult.message,
