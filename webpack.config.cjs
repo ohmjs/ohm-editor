@@ -15,6 +15,7 @@ module.exports = {
   },
   entry: {
     visualizer: './src/index.js',
+    persistence: './src/persistence.js',
   },
   resolve: {
     // Use the standalone version of Vue that includes the template compiler.

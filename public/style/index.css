@@ -1,0 +1,488 @@
+:root {
+  --button-background-color: #efefef;
+  --button-text-color: #333;
+  --button-disabled-background-color: #f0f0f0;
+  --button-disabled-text-color: #888;
+  --button-hover-background-color: #e5e5e5;
+  --button-active-background-color: #ddd;
+
+  /* Tailwind green 400–600 */
+  --color-success-1: #66bb6a;
+  --color-success-2: #4caf50;
+  --color-success-3: #43a047;
+
+  /* Tailwind amber 300–500 */
+  --color-warning-1: #ffd54f;
+  --color-warning-2: #ffca28;
+  --color-warning-3: #ffc107;
+
+  /* Tailwind red 400–600 */
+  --color-failure-1: #ef5350;
+  --color-failure-2: #f44336;
+  --color-failure-3: #e53935;
+
+  --editor-font: Menlo, Monaco, sans-serif;
+
+  --grey-text-color: #666;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: white;
+  display: flex;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica',
+    'Arial', sans-serif;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+#dragOverlay {
+  bottom: 0;
+  display: none;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  /* Must be less than the .splitter z-index, but greater than everything in codemirror.css. */
+  z-index: 9;
+}
+
+#grammarControls {
+  margin: 0 -4px;
+}
+#grammarControls > * {
+  margin: 0 4px;
+}
+
+#grammarControls label {
+  font-size: 0.75em;
+}
+#grammarName {
+  font-family: var(--editor-font);
+}
+#grammarName.unnamed {
+  font-style: italic;
+  color: #999;
+}
+
+#saveGrammar {
+  min-width: 64px;
+}
+
+/* Clever hack: when the button is disabled, make it say 'Saved' */
+#saveGrammar::after {
+  content: 'd';
+}
+#saveGrammar:not([disabled])::after {
+  display: none;
+}
+#saveGrammar[disabled] {
+  color: #888;
+}
+
+#optionPanel {
+  align-items: center;
+  background-color: white;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  color: #444;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  bottom: 15px;
+  padding: 8px 12px 10px 10px;
+  position: fixed;
+  right: 15px;
+}
+body.embedded #optionPanel {
+  display: none;
+}
+
+#options input[type='checkbox'] {
+  position: relative;
+  margin: 0 4px 0 0;
+}
+#options ul {
+  list-style: none;
+  margin: 0.3em 0 0 0;
+  padding: 0;
+}
+#options li {
+  margin-top: 4px;
+}
+#options hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 8px 0 2px 0;
+}
+
+#measuringDiv {
+  height: auto;
+  position: absolute;
+  visibility: hidden;
+  white-space: nowrap;
+  width: auto;
+}
+
+#topSection,
+#bottomSection {
+  display: flex;
+  flex: auto;
+
+  /* Ensure the splitter can make them smaller than their content. */
+  min-height: 0;
+}
+
+#bottomSection .overlay {
+  background-color: white;
+  height: 100%;
+  left: 0;
+  opacity: 0.4;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+#grammarContainer {
+  min-width: 200px;
+  grid-area: grammar;
+}
+
+#visualizerContainer {
+  grid-area: viz;
+}
+
+#visualizerContainer .section-head {
+  display: none;
+}
+
+.twoPane #visualizerContainer .section-head {
+  border-bottom: 1px solid #ddd;
+  display: flex;
+}
+
+#exampleRequestContainer,
+#userExampleContainer,
+#grammarContainer,
+#visualizerContainer {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  overflow: hidden;
+}
+
+#grammarContainer,
+#visualizerContainer {
+  position: relative; /* For placing absolutely-positioned overlays */
+}
+
+h2 {
+  color: #e0a;
+  font-size: 0.8em;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+
+.section-head {
+  padding: 0 10px;
+}
+
+.section-head h2 {
+  flex: 1;
+}
+
+/*
+  Hack to fix a problem with `height: 100%` in flex items.
+  See https://github.com/codemirror/CodeMirror/issues/3679
+*/
+.flex-fix {
+  flex: 1;
+  position: relative;
+}
+
+.editorWrapper .CodeMirror,
+.externalRules pre,
+.fakeJsDecl pre {
+  font-family: var(--editor-font);
+  font-size: 12px;
+}
+
+.editorWrapper .CodeMirror {
+  height: 100%;
+  position: absolute; /* See .flex-fix above. */
+  width: 100%;
+}
+
+.editorWrapper .CodeMirror-lines {
+  padding: 8px 0 !important;
+}
+
+.CodeMirror .error-interval {
+  border-bottom: 1px dashed #c7254e;
+}
+
+.CodeMirror.highlighting {
+  color: rgba(51, 51, 51, 0.8);
+}
+
+.CodeMirror .highlight {
+  background-color: #b5d5ff;
+}
+
+.CodeMirror .error {
+  background-color: #fbe3ea;
+  border-radius: 2px;
+  color: #c7254e;
+  margin: 2px 4px;
+  padding: 12px;
+}
+.CodeMirror .error .link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.CodeMirror .error .link:active {
+  color: #941b3a; /* #C7254E, but 20% darker. */
+}
+
+.CodeMirror div {
+  background-color: rgba(238, 0, 170, 0);
+  transition: background-color 0.25s ease-in-out;
+}
+.CodeMirror .active-definition {
+  background-color: rgba(238, 0, 170, 0.1);
+}
+
+.CodeMirror .active-appl {
+  font-weight: bold;
+  position: relative;
+  color: black;
+}
+.CodeMirror-lines {
+  padding-top: 0;
+}
+
+.externalRules pre,
+.fakeJsDecl pre,
+.CodeMirror pre.CodeMirror-line {
+  padding-left: 20px;
+}
+
+.footer {
+  align-items: stretch;
+  background-color: #ececec;
+  border-top: 1px solid #ddd;
+  color: #666;
+  display: flex;
+  margin-top: 1px;
+  overflow: hidden;
+  padding: 5px 6px 4px 6px;
+}
+.footer [type='search'] {
+  border: 1px solid hsl(225, 10%, 85%);
+  border-radius: 3px;
+  flex: 1;
+  height: 19px;
+  margin-right: 4px;
+  padding: 2px 3px 2px 0;
+}
+.footer [type='button'] {
+  position: relative;
+  top: 1px;
+}
+.footer [type='search']:focus {
+  box-shadow: 0 0 0 1px hsla(216, 89%, 62%, 0.5) inset,
+    0 0 0 1px hsla(216, 89%, 62%, 0.5);
+  border-color: hsl(217, 60%, 71%);
+  outline: none;
+}
+
+.fakeJsDecl pre {
+  color: var(--grey-text-color);
+  margin: 0;
+}
+
+.externalRules {
+  color: var(--grey-text-color);
+  margin: 0;
+}
+
+.noExternalRules .externalRules {
+  display: none;
+}
+
+.externalRules {
+  padding-top: 14px;
+}
+.externalRules .content {
+  border-top: 1px solid #eee;
+  padding-top: 14px;
+}
+.externalRules pre {
+  margin-bottom: 14px;
+}
+
+.contextMenu {
+  background-color: #f0f0f0;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  position: fixed;
+  left: 20px;
+  top: 20px;
+  z-index: 11; /* Must be great than .splitter .handle */
+}
+.contextMenu > ul {
+  margin: 6px 0;
+  padding: 0;
+}
+.contextMenu ul ul {
+  left: 100%;
+  top: 0;
+  padding: 0;
+  margin-top: -1px; /* For aligning diff caused by 1px border */
+  position: absolute;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  border-left-color: rgba(187, 187, 187, 0.26);
+  background-color: #f0f0f0;
+}
+.contextMenu li {
+  position: relative; /* For position submenus */
+  display: flex;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  padding: 2px 20px;
+}
+.contextMenu li.disabled {
+  color: #aaa;
+}
+.contextMenu li:hover {
+  cursor: default;
+}
+.contextMenu li:hover:not(.disabled) {
+  background-color: #4f9dfb;
+}
+.contextMenu li:hover:not(.disabled) > label {
+  color: white;
+}
+.contextMenu li:not(.disabled):hover > ul {
+  display: block;
+}
+
+#promptScreen {
+  display: none;
+  position: fixed;
+  z-index: 15; /* z-index = 11 is .contexMenu */
+  padding-top: 200px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#promptScreen > * {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 15px;
+  border: 1px solid #888;
+  width: 300px;
+}
+
+#promptScreen h2 {
+  margin: 0;
+}
+
+#loginBoxMessage,
+#newGrammarBoxMessage {
+  margin: 8px 8px 0;
+  display: inline-block;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: bold;
+}
+
+#loginBoxMessage:empty,
+#newGrammarBoxMessage:empty {
+  display: none;
+}
+
+#promptScreen label {
+  display: inline-block;
+  font-size: 14px;
+  width: 85px;
+}
+
+#promptScreen label,
+#promptScreen input[type='submit'],
+#promptScreen input[type='reset'] {
+  margin-top: 10px;
+}
+
+.close {
+  color: #aaaaaa;
+  float: right;
+  margin: -10px -5px 0 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #e0a;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.outline-btn {
+  background-color: var(--button-background-color);
+  border: 0;
+  border-radius: 3px;
+  color: var(--button-text-color);
+  padding: 2px 6px;
+}
+
+.outline-btn.round {
+  border-radius: 12px;
+}
+
+.outline-btn:hover {
+  background-color: var(--button-hover-background-color);
+}
+
+.outline-btn[disabled],
+.outline-btn[disabled]:hover {
+  background-color: var(--button-disabled-background-color);
+  color: var(--button-disabled-text-color);
+}
+
+.outline-btn:active,
+.outline-btn:active:focus {
+  background-color: var(--button-active-background-color);
+  box-shadow: none;
+  outline-style: none;
+}
+
+.outline-btn:focus {
+  box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);
+  outline-style: none;
+}
+
+.flex-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}

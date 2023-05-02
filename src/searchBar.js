@@ -77,10 +77,6 @@ function installEventHandlers(editor, footer, findCallback) {
 CodeMirror.defineExtension('openDialog', function (template, callback, opts) {
   const editor = this; // eslint-disable-line no-invalid-this
 
-  if (template.indexOf('Search:') !== 0) {
-    throw new Error('No dialog for template ' + template);
-  }
-
   // Re-use the existing footer if it's visible, or create a new one.
   const container = ancestorWithClassName(
     editor.getWrapperElement(),

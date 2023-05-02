@@ -4,7 +4,7 @@ import 'global-jsdom/register';
 import './codeMirrorStub.js';
 
 import testUtils from '@vue/test-utils';
-import ohm from 'ohm-js';
+import * as ohm from 'ohm-js';
 import {test} from 'uvu';
 import * as assert from 'uvu/assert';
 import Vue from 'vue/dist/vue.common.js';

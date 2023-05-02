@@ -24,3 +24,9 @@ To run the editor in the browser:
         python -c "import SimpleHTTPServer; m = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map; m[''] = 'text/plain'; m.update(dict([(k, v + ';charset=UTF-8') for k, v in m.items()])); SimpleHTTPServer.test();"
 
   This will serve the contents of the ohmlang.github.io site locally.
+
+### Playwright tests
+
+E2E tests are configured to run on every commit to `main` and each pull request. They can also be run locally via `npm run test:e2e`.
+
+**To update snapshots:** create a pull request on a branch whose name begins with the prefix `update-snapshots/`. This will trigger the Playwright workflow (see `playwright.yml`) to run with the `--update-snapshots` option and then commit the results to the original branch. If all looks good, you can then merge the PR to main.

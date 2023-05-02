@@ -1,39 +1,23 @@
 /* eslint-env browser */
 
-function toStorageKey(el, suffix) {
-  return 'splitter-' + el.id + '-' + suffix;
-}
-
-function ensureUnits(str, unit) {
-  return str.slice(-2) === unit ? str : `${str}${unit}`;
-}
-
 // Initializes a splitter element by patching the DOM and installing event handlers.
-function initializeSplitter(el) {
+// `target` is the element whose width or height is adjusted by the splitter.
+// `setSplit` is a callback which takes two arguments, indicating the desired ratio
+// between the two elements.
+export function initializeSplitter(splitter, isVertical, setSplit) {
   const handle = document.createElement('div');
   handle.classList.add('handle');
-  el.appendChild(handle);
+  splitter.appendChild(handle);
 
-  const isVertical = el.classList.contains('vertical');
   let dragging = false;
-  const prevEl = el.previousElementSibling;
-  const nextEl = el.nextElementSibling;
-  const parentEl = el.parentElement;
+
+  // This is assumed to be the element that the splitter divides.
+  const parentEl = splitter.parentElement;
 
   const dragOverlay = document.querySelector('#dragOverlay');
 
-  // Set the size of one of the splitter element's siblings to the given value.
-  // `which` must be one of 'next' or 'prev'.
-  function setSiblingSize(which, value) {
-    const node = which === 'prev' ? prevEl : nextEl;
-    node.style.flexBasis = value;
-    if (el.id) {
-      localStorage.setItem(toStorageKey(el, which), value);
-    }
-  }
-
   handle.onmousedown = function (e) {
-    if (!el.classList.contains('disabled')) {
+    if (!splitter.classList.contains('disabled')) {
       dragging = true;
       dragOverlay.style.display = 'block';
       dragOverlay.style.cursor = isVertical ? 'ew-resize' : 'ns-resize';
@@ -49,8 +33,7 @@ function initializeSplitter(el) {
     const pos = isVertical ? relativeX : relativeY;
 
     if (dragging && pos > 0 && pos < innerSize) {
-      setSiblingSize('next', `${innerSize - pos - 1}px`);
-      setSiblingSize('prev', `${pos}px`);
+      setSplit(pos, innerSize - pos);
       e.preventDefault();
       e.stopPropagation();
     }
@@ -62,28 +45,7 @@ function initializeSplitter(el) {
 
   // Reset the sizes to 50% when the handle is double-clicked.
   handle.ondblclick = function (e) {
-    setSiblingSize('next', 'calc(50% - 1px)');
-    setSiblingSize('prev', '50%');
+    setSplit(-1, -1);
+    e.preventDefault();
   };
-
-  // Restore the sizes from localStorage.
-  if (el.id) {
-    const nextPos = localStorage.getItem(toStorageKey(el, 'next'));
-    const prevPos = localStorage.getItem(toStorageKey(el, 'prev'));
-    if (nextPos && nextEl) {
-      setSiblingSize('next', ensureUnits(nextPos, 'px'));
-    }
-    if (prevPos && prevEl) {
-      setSiblingSize('prev', ensureUnits(prevPos, 'px'));
-    }
-  }
-}
-
-// Initialize all the splitters on the page.
-// A splitter is a <div> that has the class '.splitter' and no children.
-// If it also has the class '.vertical', it is a vertical splitter (i.e, it splits
-// two columns). Otherwise, it is assumed to be a horizontal splitter.
-const splitters = document.querySelectorAll('.splitter');
-for (let i = 0; i < splitters.length; ++i) {
-  initializeSplitter(splitters[i]);
 }

@@ -1,17 +1,16 @@
 /* eslint-env browser */
 /* global CodeMirror, ohm, ohmExtras */
 
-import {$, $$} from './domUtil.js';
+import {$, $$, createElement} from './domUtil.js';
 import ohmEditor from './ohmEditor.js';
 
+// TODO: Ideally these modules wouldn't do all their work as side effects.
 import './editorErrors.js';
-import './examples.js';
+import {mainLayout} from './mainLayout.js';
 import './externalRules.js';
 import './parseTree.js';
 import './ruleHyperlinks.js';
 import './searchBar.js';
-import './splitters.js';
-import './persistence.js';
 
 const FEAT_INLINE_EXAMPLES = true;
 
@@ -21,6 +20,8 @@ let inputChanged = true;
 let showFailuresImplicitly = true;
 
 let grammarMatcher = ohm.ohmGrammar.matcher();
+
+const urlParams = new URLSearchParams(window.location.search);
 
 // Helpers
 // -------
@@ -126,13 +127,115 @@ ohmEditor.setGrammar = function (grammar) {
       grammar = $('#sampleGrammar').textContent; // default element
     }
   }
-  const doc = CodeMirror.Doc(grammar, 'null');
+  const doc = CodeMirror.Doc(grammar, 'ohm');
   ohmEditor.ui.grammarEditor.swapDoc(doc);
 };
 
 ohmEditor.saveState = function (editor, key) {
   localStorage.setItem(key, editor.getValue());
 };
+
+function initializeLayout() {
+  const {body} = document;
+
+  // When embedded:
+  // - examples pane is closed by default
+  // - don't enable persistence features.
+  if (urlParams.get('embed') === 'true') {
+    mainLayout.toggleExamplesCollapsed(true);
+    body.classList.add('embedded');
+  } else {
+    const scriptEl = document.createElement('script');
+    scriptEl.src = 'assets/persistence-bundle.js';
+    body.appendChild(scriptEl);
+  }
+
+  // Allow the grammar to be specified in the URL.
+  if (urlParams.has('jsGrammar')) {
+    const {prefix, grammar, suffix} = extractJsGrammar(
+      urlParams.get('jsGrammar')
+    );
+
+    ohmEditor.setGrammar(grammar);
+
+    const {grammarEditor} = ohmEditor.ui;
+    const topWidget = createElement('.fakeJsDecl');
+    topWidget.appendChild(createElement('pre', prefix));
+    grammarEditor.addLineWidget(0, topWidget, {above: true});
+
+    const bottomWidget = createElement('.fakeJsDecl');
+    bottomWidget.appendChild(createElement('pre', suffix));
+    grammarEditor.addLineWidget(grammarEditor.doc.size - 1, bottomWidget, {
+      insertAt: 0,
+    });
+  }
+
+  if (urlParams.has('readOnly')) {
+    let readOnly = urlParams.get('readOnly');
+    if (readOnly === 'true') {
+      readOnly = true; // Convert to boolean
+    }
+    ohmEditor.ui.grammarEditor.setOption('readOnly', readOnly);
+  }
+
+  if (urlParams.get('showExternalRules') === 'false') {
+    body.classList.add('noExternalRules');
+  }
+}
+
+// To support grammars that are directly embedded in JS code, this function
+// can extract a grammar from a string literal. For example:
+//
+//   const g = String.raw`
+//     G {
+//       ...
+//     }
+//   `;
+const extractJsGrammar = (() => {
+  const g = ohm.grammar(
+    String.raw`
+    GrammarInStringLiteral <: Ohm {
+      Declaration
+        = LetOrConst ident "=" "String.raw"? backtickStringLiteral sc?
+
+      LetOrConst = let | const
+
+      backtickStringLiteral = openTick rawStringChar* closeTick
+      openTick = "\x60" "\n"?
+      closeTick = "\n"? "\x60"
+      rawStringChar = ~closeTick any
+
+      const = "const" &space
+      let = "let" &space
+      sc = ";"
+    }
+  `,
+    {Ohm: ohm.ohmGrammar}
+  );
+
+  const semantics = g.createSemantics().addOperation('extract', {
+    Declaration(letOrConst, ident, eq, raw, stringLiteral, sc) {
+      return {
+        grammar: stringLiteral.extract(),
+        prefix:
+          [letOrConst, ident, eq, raw].map(n => n.sourceString).join(' ') +
+          '`',
+        suffix: '`;',
+      };
+    },
+    backtickStringLiteral(_open, rawStringCharIter, _close) {
+      return rawStringCharIter.sourceString;
+    },
+  });
+
+  return code => {
+    const m = g.match(code, 'Declaration');
+    if (!m.succeeded()) {
+      throw new Error(m.message);
+    }
+    return semantics(m).extract();
+  };
+})();
 
 // Main
 // ----
@@ -165,7 +268,9 @@ checkboxes.forEach(cb => {
   });
 });
 
-ohmEditor.setGrammar(null /* restore local storage */);
+if (!urlParams.has('jsGrammar')) {
+  ohmEditor.setGrammar(null /* restore local storage */);
+}
 
 ohmEditor.ui.inputEditor.on('change', cm => {
   inputChanged = true;
@@ -220,5 +325,6 @@ console.log(
 );
 /* eslint-enable no-console */
 
+initializeLayout();
 resetGrammarMatcher();
 refresh();

@@ -1,16 +1,30 @@
 const template = `
   <div id="exampleContainer">
     <div id="userExampleContainer">
-      <div class="section-head flex-row">
+      <div ref="sectionHead" class="section-head flex-row">
         <h2>Examples</h2>
+        <button
+          class="example-count outline-btn round"
+          :class="classForAllExamples"
+          :hidden="!collapsed"
+          @click="toggleCollapsed"
+        >{{ count }}</button>
         <button
           aria-label="Add example"
           class="outline-btn"
           @click="handleAddClick"
-        >+&nbsp;Add</button>
+          :hidden="collapsed"
+        >+</button>
+        <div class="flex-spacer"></div>
+        <button
+          :aria-label="collapsed ? 'Expand' : 'Collapse'"
+          class="chevron-btn"
+          :class="collapsed ? 'closed' : ''"
+          @click="toggleCollapsed"
+        ></button>
       </div>
 
-      <div class="contents">
+      <div class="contents" :hidden="collapsed">
         <ul id="exampleList" aria-label="Examples">
           <li
             v-for="(ex, id) in exampleValues"
@@ -91,15 +105,26 @@ export default Vue.component('example-list', {
 
       // Indicates that the user is editing an example, but the change hasn't been committed yet.
       isInputPending: false,
+
+      collapsed: false,
+      minHeight: 0,
     };
   },
   computed: {
+    classForAllExamples() {
+      return [
+        ...new Set(Object.values(this.exampleStatus).map(s => s.className)),
+      ];
+    },
     selectedExampleStatus() {
       return this.exampleStatus[this.selectedId];
     },
     selectedExampleOrEmpty() {
       const ex = this.getSelected();
       return ex || {...EXAMPLE_DEFAULTS};
+    },
+    count() {
+      return Object.keys(this.exampleValues).length;
     },
   },
   watch: {
@@ -167,6 +192,11 @@ export default Vue.component('example-list', {
     handleDeleteClick(e) {
       const li = e.target.closest('li.example');
       this.deleteExample(li.id);
+      e.preventDefault();
+    },
+    toggleCollapsed(e) {
+      this.collapsed = !this.collapsed;
+      this.$emit('toggleCollapsed', this.collapsed);
       e.preventDefault();
     },
     handleMouseDown(e) {
@@ -379,24 +409,36 @@ export default Vue.component('example-list', {
     this._grammar = null;
   },
   mounted() {
+    this.minHeight = this.$refs.sectionHead.offsetHeight;
+
+    Object.assign(ohmEditor.examples, {
+      addExample: this.addExample,
+      getExample: this.getExample,
+      setExample: this.setExample,
+      getExamples: this.getExamples,
+      getSelected: this.getSelected,
+      setSelected: this.setSelected,
+      saveExamples: this.saveExamples,
+      restoreExamples: this.restoreExamples,
+    });
+
     this.restoreExamples('examples');
 
-    const self = this;
     ohmEditor.addListener('change:grammars', source => {
-      self.setGrammars(null);
+      this.setGrammars(null);
     });
     ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
       self.setGrammars(grammars);
     });
     ohmEditor.addListener('change:inputEditor', source => {
       // Don't indicate that input is pending if the user just changed the selected example.
-      if (!self._isSelectionChanging) {
-        self.isInputPending = true;
+      if (!this._isSelectionChanging) {
+        this.isInputPending = true;
       }
     });
     ohmEditor.addListener('change:input', source => {
-      self.isInputPending = false;
-      const ex = self.getSelected();
+      this.isInputPending = false;
+      const ex = this.getSelected();
       if (ex) {
         ex.text = source;
       }

@@ -1,9 +1,10 @@
 /* eslint-env browser */
-/* global GitHub */
+/* global GitHub, ohmEditor */
+
+import '../public/third_party/GitHub.bundle.min-2.3.0.js';
 
 import EllipsisDropdown from './components/ellipsis-dropdown.js';
 import {$, $$} from './domUtil.js';
-import ohmEditor from './ohmEditor.js';
 
 // These grammars are secret gists under the GitHub user 'ohm-official'.
 const officialGrammars = [
@@ -235,6 +236,7 @@ function doSaveAs() {
 // ----
 
 (function init() {
+  $('#grammarControls').hidden = false;
   saveButton.textContent = 'Save';
   saveButton.disabled = true;
 

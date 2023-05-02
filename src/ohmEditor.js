@@ -1,7 +1,9 @@
 /* eslint-env browser */
-/* global CodeMirror */
+/* global CodeMirror, ohm */
 
 import CheckedEmitter from 'checked-emitter';
+
+import {createModeFactory} from './ohmMode.js';
 
 const ohmEditor = new CheckedEmitter();
 export default ohmEditor;
@@ -79,9 +81,7 @@ ohmEditor.examples.registerEvents({
 
 ohmEditor.ui = {
   inputEditor: null, // Initialized in example-list.js.
-  grammarEditor: CodeMirror(
-    document.querySelector('#grammarContainer .editorWrapper')
-  ),
+  grammarEditor: null,
 };
 
 ohmEditor.defaultGrammar = () => {
@@ -127,4 +127,11 @@ ohmEditor.addListener('parse:grammars', (result, grammars, examples, err) => {
   updateCurrentGrammarAndStartRule();
 });
 
-ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
+export function initGrammarEditor(editorWrapperEl) {
+  CodeMirror.defineMode('ohm', createModeFactory(ohm));
+  ohmEditor.ui.grammarEditor = CodeMirror(editorWrapperEl, {
+    mode: {name: 'ohm'},
+    theme: 'light-owl',
+  });
+  ohmEditor.emit('init:grammarEditor', ohmEditor.ui.grammarEditor);
+}
