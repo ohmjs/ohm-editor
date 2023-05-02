@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global CodeMirror, ohm */
+/* global CodeMirror, ohm, ohmExtras */
 
 import {$, $$, createElement} from './domUtil.js';
 import ohmEditor from './ohmEditor.js';
@@ -21,6 +21,8 @@ let grammarMatcher = ohm.ohmGrammar.matcher();
 
 const urlParams = new URLSearchParams(window.location.search);
 
+const enableInlineExamples = urlParams.get('examples') === 'inline';
+
 // Helpers
 // -------
 
@@ -28,11 +30,15 @@ function parseGrammars() {
   let err;
   const grammars = {};
   const matchResult = grammarMatcher.match();
+  let examples = [];
   if (matchResult.succeeded()) {
     try {
       ohm._buildGrammar(matchResult, grammars);
     } catch (ex) {
       err = ex;
+    }
+    if (enableInlineExamples) {
+      examples = ohmExtras.extractExamples(ohmEditor.ui.grammarEditor.getValue());
     }
   } else {
     err = {
@@ -44,6 +50,7 @@ function parseGrammars() {
   return {
     matchResult,
     grammars,
+    examples,
     err,
   };
 }
@@ -87,8 +94,14 @@ function refresh() {
     grammarChanged = false;
     ohmEditor.emit('change:grammars', grammarSource);
 
-    const {matchResult, grammars, err} = parseGrammars();
-    ohmEditor.emit('parse:grammars', matchResult, grammars, err);
+    const {matchResult, grammars, examples, err} = parseGrammars();
+    ohmEditor.emit('parse:grammars', matchResult, grammars, examples, err);
+
+    if (enableInlineExamples) {
+      ohmEditor.examples.restoreExamples(examples.map(({ example, grammar, rule, shouldMatch }) => {
+        return { text: example, startRule: rule, selectedGrammar: grammar, shouldMatch };
+      }));
+    }
   }
   const {currentGrammar} = ohmEditor;
   if (currentGrammar) {

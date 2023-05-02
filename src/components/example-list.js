@@ -427,7 +427,7 @@ export default Vue.component('example-list', {
     ohmEditor.addListener('change:grammars', source => {
       this.setGrammars(null);
     });
-    ohmEditor.addListener('parse:grammars', (matchResult, grammars, err) => {
+    ohmEditor.addListener('parse:grammars', (matchResult, grammars, examples, err) => {
       this.setGrammars(grammars);
     });
     ohmEditor.addListener('change:inputEditor', source => {

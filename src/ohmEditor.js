@@ -23,7 +23,7 @@ ohmEditor.registerEvents({
   'change:input': ['inputSource'],
 
   // Emitted after attempting to parse the grammar(s) and the input, respectively.
-  'parse:grammars': ['matchResult', 'grammars', 'err'],
+  'parse:grammars': ['matchResult', 'grammars', 'examples', 'err'],
   'parse:input': ['matchResult', 'trace'],
 
   // The "current" grammar is determined by (a) the contents of the grammar editor, and
@@ -122,7 +122,7 @@ ohmEditor.examples.addListener('set:example', (id, oldValue, newValue) => {
   updateCurrentGrammarAndStartRule();
 });
 
-ohmEditor.addListener('parse:grammars', (result, grammars, err) => {
+ohmEditor.addListener('parse:grammars', (result, grammars, examples, err) => {
   ohmEditor.grammars = grammars;
   updateCurrentGrammarAndStartRule();
 });

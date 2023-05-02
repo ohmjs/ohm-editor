@@ -309,17 +309,17 @@ function doSaveAs() {
 
   function setGrammarAndExamples(description, grammar, examples) {
     if (description) {
-      document.title = 'Ohm - ' + description;
+      document.title = 'Ohm Editor - ' + description;
       grammarList.selectedOptions[0].text = description;
     } else {
-      document.title = 'Ohm';
+      document.title = 'Ohm Editor';
     }
 
     ohmEditor.once('change:grammars', _ => {
       saveButton.disabled = true;
     });
     if (examples) {
-      ohmEditor.once('parse:grammars', (matchResult, grammars, err) => {
+      ohmEditor.once('parse:grammars', (matchResult, grammars, inlineExamples, err) => {
         ohmEditor.examples.restoreExamples(examples);
       });
     }
